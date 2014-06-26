@@ -14,7 +14,8 @@ func main() {
 	if len(os.Args) < 2 {
 		fp = os.Stdin
 	} else {
-		fp, err := os.Open(os.Args[1])
+		var err error
+		fp, err = os.Open(os.Args[1])
 		if err != nil {
 			panic(err)
 		}
