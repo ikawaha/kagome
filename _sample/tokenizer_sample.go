@@ -21,11 +21,11 @@ func main() {
 		}
 		defer fp.Close()
 	}
-
+	t := tokenizer.NewTokenizer()
 	scanner := bufio.NewScanner(fp)
 	for scanner.Scan() {
 		line := scanner.Text()
-		morphs, err := tokenizer.Tokenize(line)
+		morphs, err := t.Tokenize(line)
 		if err != nil {
 			log.Println(err)
 		}

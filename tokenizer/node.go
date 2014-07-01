@@ -1,28 +1,29 @@
 package tokenizer
 
 import (
-	"github.com/ikawaha/kagome/dic"
-
 	"fmt"
+
+	"github.com/ikawaha/kagome/dic"
 )
 
 const (
 	BOSEOS = -1
 )
 
-type NodeType int
+type NodeClass byte
 
 const (
-	KNOWN NodeType = iota
+	KNOWN NodeClass = iota
 	UNKNOWN
 	INSERTED
 	USER
+	DUMMY
 )
 
 type Node struct {
 	id      int
 	start   int
-	class   NodeType
+	class   NodeClass
 	cost    int32
 	left    int32
 	right   int32
@@ -51,7 +52,7 @@ func (this Node) String() string {
 	return ret
 }
 
-func (this NodeType) String() string {
+func (this NodeClass) String() string {
 	switch this {
 	case KNOWN:
 		return "KNOWN"
@@ -61,6 +62,8 @@ func (this NodeType) String() string {
 		return "INSERTED"
 	case USER:
 		return "USER"
+	case DUMMY:
+		return "DUMMY"
 	}
-	return ""
+	return "<UNKNOWN_NODE_CLASS>"
 }

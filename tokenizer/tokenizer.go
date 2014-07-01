@@ -5,31 +5,44 @@ import (
 	"unicode/utf8"
 )
 
-func Tokenize(a_input string) (morphs []Morph, err error) {
+type Tokenizer struct {
+	lattice *lattice
+}
+
+func NewTokenizer() *Tokenizer {
+	ret := new(Tokenizer)
+	ret.lattice = NewLattice()
+	return ret
+}
+
+func (this *Tokenizer) Tokenize(a_input string) (morphs []Morph, err error) {
 	defer func() {
 		if e := recover(); e != nil {
-			err = fmt.Errorf("tokenizer.Tokenize: %v", e.(error))
+			err = fmt.Errorf("tokenizer.Tokenize(): %v", e.(error))
 		}
 	}()
-	lattice := &Lattice{}
-	if err = lattice.build(&a_input); err != nil {
+
+	if err = this.lattice.build(&a_input); err != nil {
 		return
 	}
-	if err = lattice.forward(); err != nil {
+	if err = this.lattice.forward(); err != nil {
 		return
 	}
-	lattice.backward()
-	morphs = make([]Morph, 0, len(lattice.output))
-	for _, n := range lattice.output {
+	this.lattice.backward()
+
+	size := len(this.lattice.output)
+	morphs = make([]Morph, 0, size)
+	for i := 1; i < size; i++ {
+		n := this.lattice.output[size-1-i]
 		m := Morph{
-			id:      n.id,
-			class:   n.class,
+			Id:      n.id,
+			Class:   n.class,
 			Start:   n.start,
 			End:     n.start + utf8.RuneCount(n.surface),
 			Surface: string(n.surface),
 		}
-		if m.id == BOSEOS {
-			m.Surface = "BOSEOS"
+		if m.Id == BOSEOS {
+			m.Surface = "EOS"
 		}
 		morphs = append(morphs, m)
 	}

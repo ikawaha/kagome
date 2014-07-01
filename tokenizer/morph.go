@@ -1,14 +1,14 @@
 package tokenizer
 
 import (
-	"github.com/ikawaha/kagome/dic"
-
 	"fmt"
+
+	"github.com/ikawaha/kagome/dic"
 )
 
 type Morph struct {
-	id         int
-	class      NodeType
+	Id         int
+	Class      NodeClass
 	Start, End int
 	Surface    string
 }
@@ -19,14 +19,13 @@ func (this Morph) Content() (content dic.Content, err error) {
 			err = fmt.Errorf("Morph.Content(): %v, %v", e.(error), this)
 		}
 	}()
-	if this.id == BOSEOS {
+	switch this.Class {
+	case DUMMY:
 		return
-	}
-	switch this.class {
 	case KNOWN:
-		content = dic.Contents[this.id]
+		content = dic.Contents[this.Id]
 	case UNKNOWN:
-		content = dic.UnkContents[this.id]
+		content = dic.UnkContents[this.Id]
 	}
 	return
 }

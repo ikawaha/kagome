@@ -1,51 +1,62 @@
 package tokenizer
 
 import (
-	"github.com/ikawaha/kagome/dic"
-
 	"fmt"
 	"unicode/utf8"
+
+	"github.com/ikawaha/kagome/dic"
 )
 
 const (
 	_MAX_INT32               = 1<<31 - 1
 	_MAX_UNKNOWN_WORD_LENGTH = 1024
+	_INIT_NODE_BUFFER_SIZE   = 512
 )
 
-type Lattice struct {
+type lattice struct {
 	input  []byte
-	list   [][]Node
+	list   [][]*Node
 	output []*Node
+	pool   *NodePool
 }
 
-func (this *Lattice) addNode(a_id, a_pos, a_start, a_end int, a_class NodeType) {
+func NewLattice() *lattice {
+	ret := new(lattice)
+	ret.pool = NewNodePool(_INIT_NODE_BUFFER_SIZE)
+	return ret
+}
+
+func (this *lattice) addNode(a_id, a_pos, a_start int, a_surface []byte, a_class NodeClass) {
 	var cost dic.Cost
-	if a_class == KNOWN {
+	switch a_class {
+	case DUMMY:
+		// use default cost
+	case KNOWN:
 		cost = dic.Costs[a_id]
-	} else {
+	case UNKNOWN:
 		cost = dic.UnkCosts[a_id]
 	}
-	node := Node{
-		id:      a_id,
-		start:   a_pos,
-		class:   a_class,
-		left:    int32(cost.Left),
-		right:   int32(cost.Right),
-		weight:  int32(cost.Weight),
-		surface: this.input[a_start:a_end],
-	}
+	node := this.pool.get()
+	node.id = a_id
+	node.start = a_start
+	node.class = a_class
+	node.left, node.right, node.weight = int32(cost.Left), int32(cost.Right), int32(cost.Weight)
+	node.surface = a_surface
+	node.prev = nil
 	p := a_pos + utf8.RuneCount(node.surface)
 	this.list[p] = append(this.list[p], node)
 }
 
-func (this *Lattice) build(a_input *string) (err error) {
+func (this *lattice) build(a_input *string) (err error) {
+	this.pool.clear()
+
 	this.input = []byte(*a_input)
 
 	runeCount := utf8.RuneCount(this.input)
-	this.list = make([][]Node, runeCount+2)
+	this.list = make([][]*Node, runeCount+2)
 
-	this.list[0] = append(this.list[0], Node{id: BOSEOS, class: KNOWN, start: 0})
-	this.list[len(this.list)-1] = append(this.list[len(this.list)-1], Node{id: BOSEOS, class: KNOWN, start: len(this.list) - 2})
+	this.addNode(BOSEOS, 0, 0, this.input[0:0], DUMMY)
+	this.addNode(BOSEOS, runeCount+1, runeCount, this.input[runeCount:runeCount], DUMMY)
 
 	chPos := -1
 	for bufPos, ch := range *a_input {
@@ -66,7 +77,7 @@ func (this *Lattice) build(a_input *string) (err error) {
 				c = 1
 			}
 			for x := 0; x < c; x++ {
-				this.addNode(id+x, chPos, bufPos, bufPos+len(substr), KNOWN)
+				this.addNode(id+x, chPos, chPos, this.input[bufPos:bufPos+len(substr)], KNOWN)
 			}
 		}
 		// (3) UNKNOWN DIC
@@ -91,7 +102,7 @@ func (this *Lattice) build(a_input *string) (err error) {
 				_, w = utf8.DecodeRune(this.input[i:])
 				end := i + w
 				for x := 0; x < pair[1]; x++ {
-					this.addNode(pair[0]+x, chPos, bufPos, end, UNKNOWN)
+					this.addNode(pair[0]+x, chPos, chPos, this.input[bufPos:end], UNKNOWN)
 				}
 			}
 		}
@@ -99,7 +110,7 @@ func (this *Lattice) build(a_input *string) (err error) {
 	return
 }
 
-func (this *Lattice) String() string {
+func (this *lattice) String() string {
 	str := ""
 	for i, nodes := range this.list {
 		str += fmt.Sprintf("[%v] :\n", i)
@@ -111,7 +122,7 @@ func (this *Lattice) String() string {
 	return str
 }
 
-func (this *Lattice) forward() (err error) {
+func (this *lattice) forward() (err error) {
 	for i, size := 1, len(this.list); i < size; i++ {
 		currentList := this.list[i]
 		for index, target := range currentList {
@@ -124,7 +135,7 @@ func (this *Lattice) forward() (err error) {
 				var c int16
 				c, err = dic.Connection.At(int(n.right), int(target.left))
 				if err != nil {
-					err = fmt.Errorf("Lattice.forward(): dic.Connection.At(%d, %d), %v", n.right, target.left, err)
+					err = fmt.Errorf("lattice.forward(): dic.Connection.At(%d, %d), %v", n.right, target.left, err)
 					return
 				}
 				totalCost := int64(c) + int64(target.weight) + int64(n.cost)
@@ -133,7 +144,7 @@ func (this *Lattice) forward() (err error) {
 				}
 				if j == 0 || int32(totalCost) < this.list[i][index].cost {
 					this.list[i][index].cost = int32(totalCost)
-					this.list[i][index].prev = &this.list[target.start][j]
+					this.list[i][index].prev = this.list[target.start][j]
 				}
 			}
 		}
@@ -141,19 +152,10 @@ func (this *Lattice) forward() (err error) {
 	return
 }
 
-func (this *Lattice) backward() {
+func (this *lattice) backward() {
 	size := len(this.list)
-	stack := make([]*Node, 0, size)
-	p := &this.list[size-1][0]
-
-	stack = append(stack, p)
-	for p != nil {
-		stack = append(stack, p)
-		p = p.prev
-	}
-
-	this.output = make([]*Node, 0, len(stack))
-	for i := len(stack) - 1; i > 0; i-- {
-		this.output = append(this.output, stack[i])
+	this.output = make([]*Node, 0, size)
+	for p := this.list[size-1][0]; p != nil; p = p.prev {
+		this.output = append(this.output, p)
 	}
 }

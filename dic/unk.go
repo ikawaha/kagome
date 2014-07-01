@@ -74,15 +74,15 @@ var UnkCosts []Cost = []Cost{
 }
 
 var UnkIndex map[CharacterClass][2]int = map[CharacterClass][2]int{
-	ALPHA:        [2]int{0, 6},
-	DEFAULT:      [2]int{11, 1},
-	NUMERIC:      [2]int{37, 1},
-	CYRILLIC:     [2]int{6, 5},
 	GREEK:        [2]int{12, 5},
 	HIRAGANA:     [2]int{17, 7},
-	KANJI:        [2]int{24, 6},
 	KANJINUMERIC: [2]int{30, 1},
 	KATAKANA:     [2]int{31, 6},
+	ALPHA:        [2]int{0, 6},
+	CYRILLIC:     [2]int{6, 5},
+	DEFAULT:      [2]int{11, 1},
+	KANJI:        [2]int{24, 6},
+	NUMERIC:      [2]int{37, 1},
 	SPACE:        [2]int{38, 1},
 	SYMBOL:       [2]int{39, 1},
 }

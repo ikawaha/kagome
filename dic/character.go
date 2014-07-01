@@ -3,41 +3,41 @@ package dic
 type CharacterClass byte
 
 const (
+	DEFAULT      CharacterClass = 0
 	SPACE        CharacterClass = 1
 	NUMERIC      CharacterClass = 4
 	HIRAGANA     CharacterClass = 6
+	KATAKANA     CharacterClass = 7
 	KANJINUMERIC CharacterClass = 8
-	DEFAULT      CharacterClass = 0
+	GREEK        CharacterClass = 9
 	KANJI        CharacterClass = 2
 	SYMBOL       CharacterClass = 3
 	ALPHA        CharacterClass = 5
-	KATAKANA     CharacterClass = 7
-	GREEK        CharacterClass = 9
 	CYRILLIC     CharacterClass = 10
 )
 
 func (this CharacterClass) String() string {
 	switch this {
+	case DEFAULT:
+		return "DEFAULT"
 	case SPACE:
 		return "SPACE"
 	case NUMERIC:
 		return "NUMERIC"
 	case HIRAGANA:
 		return "HIRAGANA"
+	case KATAKANA:
+		return "KATAKANA"
 	case KANJINUMERIC:
 		return "KANJINUMERIC"
-	case DEFAULT:
-		return "DEFAULT"
+	case GREEK:
+		return "GREEK"
 	case KANJI:
 		return "KANJI"
 	case SYMBOL:
 		return "SYMBOL"
 	case ALPHA:
 		return "ALPHA"
-	case KATAKANA:
-		return "KATAKANA"
-	case GREEK:
-		return "GREEK"
 	case CYRILLIC:
 		return "CYRILLIC"
 
