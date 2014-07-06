@@ -1,7 +1,7 @@
 package trie
 
 import (
-	"github.com/ikawaha/tokenizer/trie/da"
+	"github.com/ikawaha/kagome/trie/da"
 
 	"bufio"
 	"errors"
