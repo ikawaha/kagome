@@ -2,6 +2,7 @@ package tokenizer
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/ikawaha/kagome/dic"
 )
@@ -11,14 +12,10 @@ type Morph struct {
 	Class      NodeClass
 	Start, End int
 	Surface    string
+	ex         *dic.UserDicContent
 }
 
 func (this Morph) Content() (content dic.Content, err error) {
-	defer func() {
-		if e := recover(); e != nil {
-			err = fmt.Errorf("Morph.Content(): %v, %v", e.(error), this)
-		}
-	}()
 	switch this.Class {
 	case DUMMY:
 		return
@@ -26,6 +23,9 @@ func (this Morph) Content() (content dic.Content, err error) {
 		content = dic.Contents[this.Id]
 	case UNKNOWN:
 		content = dic.UnkContents[this.Id]
+	case USER:
+		content.Pos = this.ex.Pos
+		content.Yomi = strings.Join(this.ex.Yomi, "")
 	}
 	return
 }

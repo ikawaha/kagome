@@ -7,25 +7,61 @@ import (
 	"log"
 	"os"
 
+	"github.com/ikawaha/kagome/dic"
 	"github.com/ikawaha/kagome/tokenizer"
 )
 
-var usageMessage = "usage: kagome [-f input_file]\n"
+var usageMessage = "usage: kagome [-f input_file] [-u userdic_file]"
 
 func usage() {
-	fmt.Fprintf(os.Stderr, usageMessage)
+	fmt.Fprintln(os.Stderr, usageMessage)
 	flag.PrintDefaults()
 	os.Exit(2)
 }
 
 var (
-	fInputFile = flag.String("f", "", "input file")
+	fInputFile   = flag.String("f", "", "input file")
+	fUserDicFile = flag.String("u", "", "input file")
 )
 
+type Item string
+
+func (this Item) String() string {
+	if this == "" {
+		return "*"
+	}
+	return string(this)
+}
+
 func Main() {
-	var fp = os.Stdin
+	var inputFile = os.Stdin
+	if *fInputFile != "" {
+		var err error
+		inputFile, err = os.Open(*fInputFile)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		defer inputFile.Close()
+	}
+
 	t := tokenizer.NewTokenizer()
-	scanner := bufio.NewScanner(fp)
+	if *fUserDicFile != "" {
+		userDicFile, err := os.Open(*fUserDicFile)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		defer userDicFile.Close()
+		if udic, err := dic.NewUserDic(userDicFile); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		} else {
+			t.SetUserDic(udic)
+		}
+	}
+
+	scanner := bufio.NewScanner(inputFile)
 	for scanner.Scan() {
 		line := scanner.Text()
 		morphs, err := t.Tokenize(line)
@@ -38,7 +74,8 @@ func Main() {
 				fmt.Printf("%s\n", m.Surface)
 			} else {
 				fmt.Printf("%s\t%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
-					m.Surface, c.Pos, c.Pos1, c.Pos2, c.Pos3, c.Katuyougata, c.Katuyoukei, c.Kihonkei, c.Yomi, c.Pronunciation)
+					m.Surface, Item(c.Pos), Item(c.Pos1), Item(c.Pos2), Item(c.Pos3),
+					Item(c.Katuyougata), Item(c.Katuyoukei), Item(c.Kihonkei), Item(c.Yomi), Item(c.Pronunciation))
 			}
 		}
 	}

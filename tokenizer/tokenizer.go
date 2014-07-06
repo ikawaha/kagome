@@ -3,16 +3,24 @@ package tokenizer
 import (
 	"fmt"
 	"unicode/utf8"
+
+	"github.com/ikawaha/kagome/dic"
 )
 
 type Tokenizer struct {
 	lattice *lattice
+	userdic *dic.UserDic
 }
 
 func NewTokenizer() *Tokenizer {
 	ret := new(Tokenizer)
 	ret.lattice = NewLattice()
 	return ret
+}
+
+func (this *Tokenizer) SetUserDic(a_udic *dic.UserDic) {
+	this.userdic = a_udic
+	this.lattice.setUserDic(a_udic)
 }
 
 func (this *Tokenizer) Tokenize(a_input string) (morphs []Morph, err error) {
@@ -43,6 +51,9 @@ func (this *Tokenizer) Tokenize(a_input string) (morphs []Morph, err error) {
 		}
 		if m.Id == BOSEOS {
 			m.Surface = "EOS"
+		}
+		if m.Class == USER {
+			m.ex = &this.userdic.Contents[n.id]
 		}
 		morphs = append(morphs, m)
 	}

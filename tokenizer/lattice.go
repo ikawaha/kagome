@@ -18,12 +18,17 @@ type lattice struct {
 	list   [][]*Node
 	output []*Node
 	pool   *NodePool
+	udic   *dic.UserDic
 }
 
 func NewLattice() *lattice {
 	ret := new(lattice)
 	ret.pool = NewNodePool(_INIT_NODE_BUFFER_SIZE)
 	return ret
+}
+
+func (this *lattice) setUserDic(a_userdic *dic.UserDic) {
+	this.udic = a_userdic
 }
 
 func (this *lattice) addNode(a_id, a_pos, a_start int, a_surface []byte, a_class NodeClass) {
@@ -35,6 +40,8 @@ func (this *lattice) addNode(a_id, a_pos, a_start int, a_surface []byte, a_class
 		cost = dic.Costs[a_id]
 	case UNKNOWN:
 		cost = dic.UnkCosts[a_id]
+	case USER:
+		// use default cost
 	}
 	node := this.pool.get()
 	node.id = a_id
@@ -64,6 +71,14 @@ func (this *lattice) build(a_input *string) (err error) {
 
 		// (1) TODO: USER DIC
 		anyMatches := false
+		if this.udic != nil {
+			prefixs, ids := this.udic.Index.CommonPrefixSearchBytes(this.input[bufPos:])
+			anyMatches = len(prefixs) > 0
+			for key, substr := range prefixs {
+				id := ids[key]
+				this.addNode(id, chPos, chPos, this.input[bufPos:bufPos+len(substr)], USER)
+			}
+		}
 		if anyMatches {
 			continue
 		}
@@ -133,7 +148,9 @@ func (this *lattice) forward() (err error) {
 			}
 			for j, n := range prevList {
 				var c int16
-				c, err = dic.Connection.At(int(n.right), int(target.left))
+				if n.class != USER && target.class != USER {
+					c, err = dic.Connection.At(int(n.right), int(target.left))
+				}
 				if err != nil {
 					err = fmt.Errorf("lattice.forward(): dic.Connection.At(%d, %d), %v", n.right, target.left, err)
 					return
