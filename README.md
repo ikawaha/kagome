@@ -23,7 +23,7 @@ Install
 ソースの容量が大きく，コンパイル時間もかなりかかりますのでご注意ください．
 
 ```
-% go get github.com/ikawaha/kagome/{trie,dic,tokenizer,cmd/kagome}  
+% go get github.com/ikawaha/kagome/...
 ```
 
 Usage
