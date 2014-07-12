@@ -1,9 +1,10 @@
+ [![Build Status](https://drone.io/github.com/ikawaha/kagome/status.png)](https://drone.io/github.com/ikawaha/kagome/latest)
+
 Kagome Japanese Morphological Analyzer
 ===
 
 Kagome(籠目)は Pure Go な日本語形態素解析器のプロトタイプです．辞書をソースにエンコードして同梱しているので，バイナリだけで動作します．
 辞書データとして，MeCab-IPADICを利用しています．
-
 
 ```
 % kagome
