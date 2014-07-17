@@ -8,12 +8,12 @@ env: "PATH=/home/travis/gopath/bin:$PATH"
 install:
 - go get github.com/laher/goxc
 script:
-- goxc -d . -build-processors=1 -resources-include='README*' -n kagome
+- goxc -d . -bc "!plan9" -resources-include='README*' -n kagome
 deploy:
   provider: releases
   api_key:
     secure: kfhDbH8A5OyPgntm4PYXLX5I5+Rz14eIp7fPi94MMAZu6WipvQBukZfgkMYf9pR1XAnSdvbo69N90jExvOBfZQj/3z0zUymKJtzHlzg7Ug1CLeb3kN3eN+Tuy4xz+MNArefv60IVn/k9JbbaUB407xv/7oH7+0MHBOKlMhBY1s4=
-  file: 
+  file:
     - snapshot/kagome_linux_386.tar.gz
     - snapshot/kagome_linux_arm.tar.gz
     - snapshot/kagome_linux_amd64.tar.gz
@@ -29,7 +29,6 @@ deploy:
     - snapshot/kagome_netbsd_386.zip
     - snapshot/kagome_openbsd_amd64.zip
     - snapshot/kagome_openbsd_386.zip
-    - snapshot/kagome_plan9_386.zip
   on:
     all_branches: true
     tags: true
