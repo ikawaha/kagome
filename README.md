@@ -1,4 +1,3 @@
- [![Build Status](https://drone.io/github.com/ikawaha/kagome/status.png)](https://drone.io/github.com/ikawaha/kagome/latest)
  [![Build Status](https://travis-ci.org/ikawaha/kagome.svg?branch=master)](https://travis-ci.org/ikawaha/kagome)
 
 Kagome Japanese Morphological Analyzer
