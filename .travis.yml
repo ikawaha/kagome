@@ -15,20 +15,11 @@ deploy:
     secure: kfhDbH8A5OyPgntm4PYXLX5I5+Rz14eIp7fPi94MMAZu6WipvQBukZfgkMYf9pR1XAnSdvbo69N90jExvOBfZQj/3z0zUymKJtzHlzg7Ug1CLeb3kN3eN+Tuy4xz+MNArefv60IVn/k9JbbaUB407xv/7oH7+0MHBOKlMhBY1s4=
   file:
     - snapshot/kagome_linux_386.tar.gz
-    - snapshot/kagome_linux_arm.tar.gz
     - snapshot/kagome_linux_amd64.tar.gz
     - snapshot/kagome_windows_386.zip
     - snapshot/kagome_windows_amd64.zip
     - snapshot/kagome_darwin_amd64.zip
     - snapshot/kagome_darwin_386.zip
-    - snapshot/kagome_freebsd_arm.zip
-    - snapshot/kagome_freebsd_amd64.zip
-    - snapshot/kagome_freebsd_386.zip
-    - snapshot/kagome_netbsd_arm.zip
-    - snapshot/kagome_netbsd_amd64.zip
-    - snapshot/kagome_netbsd_386.zip
-    - snapshot/kagome_openbsd_amd64.zip
-    - snapshot/kagome_openbsd_386.zip
   on:
     all_branches: true
     tags: true
