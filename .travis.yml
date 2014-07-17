@@ -8,7 +8,7 @@ env: "PATH=/home/travis/gopath/bin:$PATH"
 install:
 - go get github.com/laher/goxc
 script:
-- goxc -d . -bc "!plan9" -resources-include='README*' -n kagome
+- goxc -d . -bc "linux,darwin,!arm windows" -resources-include='README*' -n kagome
 deploy:
   provider: releases
   api_key:
