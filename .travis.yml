@@ -1,6 +1,5 @@
 language: go
 go:
-#- '1.0'
 - '1.1'
 - '1.2'
 - '1.3'
@@ -9,8 +8,7 @@ env: "PATH=/home/travis/gopath/bin:$PATH"
 install:
 - go get github.com/laher/goxc
 script:
-- go test ./...
-- goxc -d . -resources-include='README*' -n kagome
+- goxc -d . -build-processors=1 -resources-include='README*' -n kagome
 deploy:
   provider: releases
   api_key:
