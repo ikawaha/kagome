@@ -21,11 +21,17 @@ EOS
 
 Install
 ---
+
+### Source
+
 ~~ソースの容量が大きく，コンパイル時間もかなりかかりますのでご注意ください．~~ 改善しました
 
 ```
 % go get github.com/ikawaha/kagome/...
 ```
+### Binary
+
+https://github.com/ikawaha/kagome/releases
 
 Usage
 ---
