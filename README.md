@@ -1,4 +1,4 @@
-[![Build Status](https://drone.io/github.com/ikawaha/kagome/status.png)](https://drone.io/github.com/ikawaha/kagome/latest)
+[![Build Status](https://drone.io/github.com/ikawaha/kagome/status.png)](https://drone.io/github.com/ikawaha/kagome/master)
 
 Kagome Japanese Morphological Analyzer
 ===
