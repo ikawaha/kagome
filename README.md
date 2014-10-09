@@ -1,3 +1,4 @@
+[ ![Codeship Status for ikawaha/kagome](https://www.codeship.io/projects/025a1110-31f1-0132-3592-56193348819b/status)](https://www.codeship.io/projects/40233)
 Kagome Japanese Morphological Analyzer
 ===
 
