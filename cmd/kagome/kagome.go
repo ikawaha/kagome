@@ -1,14 +1,14 @@
 package main
 
 import (
+	kagome "github.com/ikawaha/kagome"
+
 	"bufio"
 	"flag"
 	"fmt"
 	"log"
 	"os"
-
-	"github.com/ikawaha/kagome/dic"
-	"github.com/ikawaha/kagome/tokenizer"
+	"strings"
 )
 
 var usageMessage = "usage: kagome [-f input_file] [-u userdic_file]"
@@ -16,22 +16,13 @@ var usageMessage = "usage: kagome [-f input_file] [-u userdic_file]"
 func usage() {
 	fmt.Fprintln(os.Stderr, usageMessage)
 	flag.PrintDefaults()
-	os.Exit(2)
+	os.Exit(0)
 }
 
 var (
 	fInputFile   = flag.String("f", "", "input file")
-	fUserDicFile = flag.String("u", "", "input file")
+	fUserDicFile = flag.String("u", "", "user dic")
 )
-
-type Item string
-
-func (this Item) String() string {
-	if this == "" {
-		return "*"
-	}
-	return string(this)
-}
 
 func Main() {
 	var inputFile = os.Stdin
@@ -45,15 +36,9 @@ func Main() {
 		defer inputFile.Close()
 	}
 
-	t := tokenizer.NewTokenizer()
+	t := kagome.NewTokenizer()
 	if *fUserDicFile != "" {
-		userDicFile, err := os.Open(*fUserDicFile)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
-		}
-		defer userDicFile.Close()
-		if udic, err := dic.NewUserDic(userDicFile); err != nil {
+		if udic, err := kagome.NewUserDic(*fUserDicFile); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		} else {
@@ -64,18 +49,14 @@ func Main() {
 	scanner := bufio.NewScanner(inputFile)
 	for scanner.Scan() {
 		line := scanner.Text()
-		morphs, err := t.Tokenize(line)
-		if err != nil {
-			log.Println(err)
-		}
-		for _, m := range morphs {
-			c, _ := m.Content()
-			if m.Class == tokenizer.DUMMY {
-				fmt.Printf("%s\n", m.Surface)
+		tokens := t.Tokenize(line)
+		for i, size := 1, len(tokens); i < size; i++ {
+			tok := tokens[i]
+			c := tok.Features()
+			if tok.Class == kagome.DUMMY {
+				fmt.Printf("%s\n", tok.Surface)
 			} else {
-				fmt.Printf("%s\t%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
-					m.Surface, Item(c.Pos), Item(c.Pos1), Item(c.Pos2), Item(c.Pos3),
-					Item(c.Katuyougata), Item(c.Katuyoukei), Item(c.Kihonkei), Item(c.Yomi), Item(c.Pronunciation))
+				fmt.Printf("%s\t%v\n", tok.Surface, strings.Join(c, ","))
 			}
 		}
 	}
