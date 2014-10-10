@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ikawaha/kagome.svg?branch=refactoring%2Fkagome2)](https://travis-ci.org/ikawaha/kagome) [![Coverage Status](https://coveralls.io/repos/ikawaha/kagome/badge.png?branch=refactoring%2Fkagome2)](https://coveralls.io/r/ikawaha/kagome?branch=refactoring%2Fkagome2)
+[![Build Status](https://travis-ci.org/ikawaha/kagome.svg?branch=master)](https://travis-ci.org/ikawaha/kagome) [![Coverage Status](https://coveralls.io/repos/ikawaha/kagome/badge.png?branch=master)](https://coveralls.io/r/ikawaha/kagome?branch=master)
 
 Kagome Japanese Morphological Analyzer
 ===
@@ -26,9 +26,6 @@ Install
 ```
 % go get github.com/ikawaha/kagome/...
 ```
-### Binary
-
-https://github.com/ikawaha/kagome/releases
 
 Usage
 ---
