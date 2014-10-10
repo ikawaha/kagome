@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ikawaha/kagome.svg?branch=master)](https://travis-ci.org/ikawaha/kagome) [![Coverage Status](https://coveralls.io/repos/ikawaha/kagome/badge.png?branch=master)](https://coveralls.io/r/ikawaha/kagome?branch=master)
+[![Build Status](https://travis-ci.org/ikawaha/kagome.svg?branch=master)](https://travis-ci.org/ikawaha/kagome) [![Coverage Status](https://coveralls.io/repos/ikawaha/kagome/badge.png?branch=master)](https://coveralls.io/r/ikawaha/kagome?branch=master) [![GoDoc](https://godoc.org/github.com/ikawaha/kagome?status.svg)](https://godoc.org/github.com/ikawaha/kagome)
 
 Kagome Japanese Morphological Analyzer
 ===
