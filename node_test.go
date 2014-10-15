@@ -55,3 +55,17 @@ func TestNewNodePoolGetAndClear02(t *testing.T) {
 		t.Errorf("usage: got %v, expected 0\n", np.usage)
 	}
 }
+
+func TestNilNodePoolGetAndClear01(t *testing.T) {
+	var np *nodePool
+	if np != nil {
+		t.Fatalf("initialize error, expected nil, got %v\n", np)
+	}
+	np.get()
+	np.get()
+	n := np.get()
+	if n == nil {
+		t.Error("node alloc error\n")
+	}
+	np.clear()
+}
