@@ -5,6 +5,10 @@ import (
 	"unicode/utf8"
 )
 
+const (
+	initialNodePoolCapacity = 512
+)
+
 // Tokenizer represents morphological analyzer.
 type Tokenizer struct {
 	lattice *lattice
@@ -12,6 +16,15 @@ type Tokenizer struct {
 
 // NewTokenizer create a tokenizer.
 func NewTokenizer() (t *Tokenizer) {
+	t = new(Tokenizer)
+	t.lattice = newLattice()
+	t.lattice.setDic(NewSysDic())
+	t.lattice.setNodePool(initialNodePoolCapacity)
+	return
+}
+
+// NewThreadsafeTokenizer create a threadsafe tokenizer.
+func NewThreadsafeTokenizer() (t *Tokenizer) {
 	t = new(Tokenizer)
 	t.lattice = newLattice()
 	t.lattice.setDic(NewSysDic())
@@ -53,12 +66,6 @@ func (t *Tokenizer) Tokenize(input string) (tokens []Token) {
 				tok.Surface = "EOS"
 			}
 		}
-
-		//XXX
-		//if tok.Class == USER {
-		//      udic := t.lattice.getUdic()
-		//	tok.ex = udic.Contents[n.id]
-		//}
 		tokens = append(tokens, tok)
 	}
 	return
