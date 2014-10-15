@@ -1,7 +1,5 @@
 package kagome
 
-import ()
-
 // Reserved identifier of node id.
 const BosEosId int = -1
 
@@ -62,6 +60,9 @@ func newNodePool(size int) (np *nodePool) {
 }
 
 func (np *nodePool) get() (n *node) {
+	if np == nil {
+		return new(node)
+	}
 	if np.usage == len(np.buf) {
 		neoCap := np.usage * 2
 		dst := make([]*node, neoCap)
@@ -77,5 +78,8 @@ func (np *nodePool) get() (n *node) {
 }
 
 func (np *nodePool) clear() {
+	if np == nil {
+		return
+	}
 	np.usage = 0
 }

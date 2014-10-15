@@ -9,7 +9,6 @@ import (
 const (
 	maximumCost              = 1<<31 - 1
 	maximumUnknownWordLength = 1024
-	initialNodePoolCapacity  = 512
 )
 
 type lattice struct {
@@ -24,8 +23,11 @@ type lattice struct {
 func newLattice() (la *lattice) {
 	la = new(lattice)
 	la.dic = NewSysDic()
-	la.pool = newNodePool(initialNodePoolCapacity)
 	return
+}
+
+func (la *lattice) setNodePool(size int) {
+	la.pool = newNodePool(size)
 }
 
 func (la *lattice) setDic(dic *Dic) {
