@@ -2,13 +2,16 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/ikawaha/kagome"
@@ -19,7 +22,7 @@ type KagomeHandler struct {
 }
 
 func (h *KagomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	type morph struct {
+	type record struct {
 		Id       int      `json:"id"`
 		Start    int      `json:"start"`
 		End      int      `json:"end"`
@@ -41,13 +44,13 @@ func (h *KagomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tokens := h.tokenizer.Tokenize(body.Input)
-	var ans []morph
+	var rsp []record
 	for _, tok := range tokens {
 		if tok.Id == kagome.BosEosId {
 			continue
 		}
 		fs := tok.Features()
-		m := morph{
+		m := record{
 			Id:       tok.Id,
 			Class:    fmt.Sprintf("%v", tok.Class),
 			Start:    tok.Start,
@@ -55,12 +58,12 @@ func (h *KagomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			Surface:  tok.Surface,
 			Features: fs,
 		}
-		ans = append(ans, m)
+		rsp = append(rsp, m)
 	}
 	j, e := json.Marshal(struct {
-		Status bool    `json:"status"`
-		Tokens []morph `json:"tokens"`
-	}{Status: true, Tokens: ans})
+		Status bool     `json:"status"`
+		Tokens []record `json:"tokens"`
+	}{Status: true, Tokens: rsp})
 	if e != nil {
 		fmt.Fprintf(w, "{\"status\":false,\"message\":\"%v\"}", e)
 		return
@@ -73,7 +76,7 @@ type KagomeDemoHandler struct {
 }
 
 func (h *KagomeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	type morph struct {
+	type record struct {
 		Surface        string
 		Pos            string
 		Baseform       string
@@ -81,13 +84,39 @@ func (h *KagomeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Pronounciation string
 	}
 	sen := r.FormValue("s")
-	tokens := h.tokenizer.Tokenize(sen)
-	var morphs []morph
+	opt := r.FormValue("r")
+	var records []record
+	var tokens []kagome.Token
+	var svg string
+	switch opt {
+	case "1":
+		tokens = h.tokenizer.Tokenize(sen)
+	case "2":
+		//TODO
+	case "3":
+		//TODO
+	case "4":
+		if _, e := exec.LookPath("dot"); e != nil {
+			log.Print("graphviz is not in your future\n")
+			break
+		}
+		var buf bytes.Buffer
+		cmd := exec.Command("dot", "-Tsvg")
+		r, w := io.Pipe()
+		cmd.Stdin = r
+		cmd.Stdout = &buf
+		cmd.Start()
+		h.tokenizer.Dot(sen, w)
+		w.Close()
+		cmd.Wait()
+		svg = buf.String()
+		svg = svg[strings.Index(svg, "<svg"):]
+	}
 	for _, tok := range tokens {
 		if tok.Id == kagome.BosEosId {
 			continue
 		}
-		m := morph{Surface: tok.Surface}
+		m := record{Surface: tok.Surface}
 		fs := tok.Features()
 		switch len(fs) {
 		case 9:
@@ -106,12 +135,14 @@ func (h *KagomeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			m.Reading = fs[2]
 			m.Pronounciation = "*"
 		}
-		morphs = append(morphs, m)
+		records = append(records, m)
 	}
 	d := struct {
 		Sentence string
-		Tokens   []morph
-	}{Sentence: sen, Tokens: morphs}
+		Tokens   []record
+		GraphSvg template.HTML
+		RadioOpt string
+	}{Sentence: sen, Tokens: records, GraphSvg: template.HTML(svg), RadioOpt: opt}
 	t := template.Must(template.New("top").Parse(demo_html))
 	t.Execute(w, d)
 }
@@ -244,13 +275,13 @@ var demo_html = `
         box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
       }
       .txar {
-         border:0;
+         border:10px;
          padding:10px;
          font-size:1.1em;
          font-family:Arial, sans-serif;
          border:solid 1px #ccc;
-         margin:0 0 0px;
-         width:70%;
+         margin:0;
+         width:80%;
          -webkit-border-radius: 3px;
          -moz-border-radius: 3px;
          border-radius: 3px;
@@ -264,9 +295,18 @@ var demo_html = `
         border: 1px solid #DDD;
         border-radius: 3px;
         color:#111;
-        width: 50px;
+        width: 100px;
         padding: 5px 0;
         margin: 0;
+      }
+      #box {
+        width:100%;
+        margin:10px;
+        auto;
+      }
+      #rbox {
+        width:15%;
+        float:right;
       }
   </style>
   <meta charset="UTF-8">
@@ -277,11 +317,30 @@ var demo_html = `
   <![endif]-->
   <body>
   <div id="center">
-  <h1>Kagome Demo</h1>
+  <h1>Kagome</h1>
+    Kagome is an open source Japanese morphological analyzer written in Golang
+    <h2>Feature summary</h2>
+    <ul>
+      <li><strong>Word segmentation.</strong> Segmenting text into words (or morphemes)</li>
+      <li><strong>Part-of-speech tagging.</strong> Assign word-categories (nouns, verbs, particles, adjectives, etc.)</li>
+      <li><strong>Lemmatization.</strong> Get dictionary forms for inflected verbs and adjectives</li>
+      <li><strong>Readings.</strong> Extract readings for kanji.</li>
+    </ul>
   <form class="frm" action="/_demo" method="POST">
-    <p><textarea class="txar" rows="2" name="s" placeholder="日本語の文章(UTF-8)を入力してから実行をクリックしてください">{{.Sentence}}</textarea></p>
-   <p><input class="btn" type="submit" value="実行"/></p>
+    <div id="box">
+    <textarea class="txar" rows="3" name="s" placeholder="Enter Japanese text blow in UTF-8 and click tokenize.">{{.Sentence}}</textarea>
+    <div id="rbox">
+      <div><input type="radio" name="r" value="1" checked>Normal</div>
+      <div><input type="radio" name="r" value="2" {{if eq .RadioOpt "2"}}checked{{end}} disabled>Search</div>
+      <div><input type="radio" name="r" value="3" {{if eq .RadioOpt "3"}}checked{{end}} disabled>Extended</div>
+      <div><input type="radio" name="r" value="4" {{if eq .RadioOpt "4"}}checked{{end}}>Lattice</div>
+    </div>
+     <p><input class="btn" type="submit" value="Tokenize"/></p>
+    </div>
   </form>
+  {{if .GraphSvg}}
+    {{.GraphSvg}}
+  {{end}}
   {{if .Tokens}}
   <table class="tbl">
     <thread><tr>

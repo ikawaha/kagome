@@ -212,6 +212,7 @@ func (la *lattice) dot(w io.Writer) {
 		bests[n] = struct{}{}
 	}
 	fmt.Fprintln(w, "graph lattice {")
+	fmt.Fprintln(w, "\tdpi=48;")
 	fmt.Fprintln(w, "\tgraph [style=filled, rankdir=LR]")
 	for i, list := range la.list {
 		for _, n := range list {
