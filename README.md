@@ -85,7 +85,8 @@ $ curl -XPUT localhost:8080 -d'{"sentence":"すもももももももものうち
 
 ##### 形態素解析デモ
 Web サーバを立ち上げた状態で，ブラウザで `/_demo` にアクセスすると，形態素解析のデモ利用できます．
-`-http=:8080` を指定した場合，`http://localhost:8080/_demo` になります．
+`-http=:8080` を指定した場合，`http://localhost:8080/_demo` になります．Lattice の表示には [graphviz](http://www.graphviz.org/) が必要です．
+
 ![lattice](https://raw.githubusercontent.com/wiki/ikawaha/kagome/images/demoapp.png)
 
 #### ユーザー辞書について
