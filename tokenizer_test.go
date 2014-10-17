@@ -199,7 +199,6 @@ func TestSearchModeTokenize04(t *testing.T) {
 
 }
 
-//XXX ----
 func TestExtendedModeTokenize01(t *testing.T) {
 	tnz := NewTokenizer()
 	tokens := tnz.ExtendedModeTokenize("")
