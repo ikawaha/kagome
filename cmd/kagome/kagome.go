@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/ikawaha/kagome"
 )
@@ -36,7 +37,7 @@ func (h *KagomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	e := json.NewDecoder(r.Body).Decode(&body)
 	if e != nil {
-		fmt.Fprintf(w, "{\"status\":false,\"message\":\"%v\"}", e)
+		fmt.Fprintf(w, "{\"status\":false,\"error\":\"%v\"}", e)
 		return
 	}
 	if body.Input == "" {
@@ -65,7 +66,7 @@ func (h *KagomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Tokens []record `json:"tokens"`
 	}{Status: true, Tokens: rsp})
 	if e != nil {
-		fmt.Fprintf(w, "{\"status\":false,\"message\":\"%v\"}", e)
+		fmt.Fprintf(w, "{\"status\":false,\"error\":\"%v\"}", e)
 		return
 	}
 	w.Write(j)
@@ -88,14 +89,16 @@ func (h *KagomeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var records []record
 	var tokens []kagome.Token
 	var svg string
+	var cmdErr string
+	const cmdTimeout = 30 * time.Second
 	switch opt {
-	case "1":
+	case "1": // normal
 		tokens = h.tokenizer.Tokenize(sen)
-	case "2":
-		//TODO
-	case "3":
-		//TODO
-	case "4":
+	case "2": // search
+		tokens = h.tokenizer.SearchModeTokenize(sen)
+	case "3": // extended
+		tokens = h.tokenizer.ExtendedModeTokenize(sen)
+	case "4": // lattice
 		if _, e := exec.LookPath("dot"); e != nil {
 			log.Print("graphviz is not in your future\n")
 			break
@@ -105,12 +108,32 @@ func (h *KagomeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		r, w := io.Pipe()
 		cmd.Stdin = r
 		cmd.Stdout = &buf
+		cmd.Stderr = os.Stderr
 		cmd.Start()
 		h.tokenizer.Dot(sen, w)
 		w.Close()
-		cmd.Wait()
+
+		done := make(chan error, 1) //XXX
+		go func() {
+			done <- cmd.Wait()
+		}()
+		select {
+		case <-time.After(cmdTimeout):
+			if err := cmd.Process.Kill(); err != nil {
+				log.Fatal("failed to kill: ", err)
+			}
+			cmdErr = "Time out"
+			<-done
+		case err := <-done:
+			if err != nil {
+				cmdErr = "Error"
+				log.Printf("process done with error = %v", err)
+			}
+		}
 		svg = buf.String()
-		svg = svg[strings.Index(svg, "<svg"):]
+		if pos := strings.Index(svg, "<svg"); pos > 0 {
+			svg = svg[pos:]
+		}
 	}
 	for _, tok := range tokens {
 		if tok.Id == kagome.BosEosId {
@@ -140,9 +163,10 @@ func (h *KagomeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	d := struct {
 		Sentence string
 		Tokens   []record
+		CmdErr   string
 		GraphSvg template.HTML
 		RadioOpt string
-	}{Sentence: sen, Tokens: records, GraphSvg: template.HTML(svg), RadioOpt: opt}
+	}{Sentence: sen, Tokens: records, CmdErr: cmdErr, GraphSvg: template.HTML(svg), RadioOpt: opt}
 	t := template.Must(template.New("top").Parse(demo_html))
 	t.Execute(w, d)
 }
@@ -331,13 +355,16 @@ var demo_html = `
     <textarea class="txar" rows="3" name="s" placeholder="Enter Japanese text blow in UTF-8 and click tokenize.">{{.Sentence}}</textarea>
     <div id="rbox">
       <div><input type="radio" name="r" value="1" checked>Normal</div>
-      <div><input type="radio" name="r" value="2" {{if eq .RadioOpt "2"}}checked{{end}} disabled>Search</div>
-      <div><input type="radio" name="r" value="3" {{if eq .RadioOpt "3"}}checked{{end}} disabled>Extended</div>
+      <div><input type="radio" name="r" value="2" {{if eq .RadioOpt "2"}}checked{{end}}>Search</div>
+      <div><input type="radio" name="r" value="3" {{if eq .RadioOpt "3"}}checked{{end}}>Extended</div>
       <div><input type="radio" name="r" value="4" {{if eq .RadioOpt "4"}}checked{{end}}>Lattice</div>
     </div>
      <p><input class="btn" type="submit" value="Tokenize"/></p>
     </div>
   </form>
+  {{if .CmdErr}}
+    <strong>{{.CmdErr}}</strong>
+  {{end}}
   {{if .GraphSvg}}
     {{.GraphSvg}}
   {{end}}

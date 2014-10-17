@@ -3,12 +3,17 @@ package kagome
 import (
 	"fmt"
 	"io"
+	"unicode"
 	"unicode/utf8"
 )
 
 const (
 	maximumCost              = 1<<31 - 1
 	maximumUnknownWordLength = 1024
+	searchModeKanjiLength    = 2
+	searchModeKanjiPenalty   = 3000
+	searchModeOtherLength    = 7
+	searchModeOtherPenalty   = 1700
 )
 
 type lattice struct {
@@ -148,8 +153,27 @@ func (la *lattice) String() string {
 	}
 	return str
 }
+func kanjiOnly(s string) bool {
+	for _, r := range s {
+		if !unicode.IsOneOf([]*unicode.RangeTable{unicode.Ideographic}, r) {
+			return false
+		}
+	}
+	return s != ""
+}
 
-func (la *lattice) forward() {
+func additionalCost(n *node) int {
+	l := utf8.RuneCountInString(n.surface)
+	if l > searchModeKanjiLength && kanjiOnly(n.surface) {
+		return (l - searchModeKanjiLength) * searchModeKanjiPenalty
+	}
+	if l > searchModeOtherLength {
+		return (l - searchModeOtherLength) * searchModeOtherPenalty
+	}
+	return 0
+}
+
+func (la *lattice) forward(mode tokenizeMode) {
 	for i, size := 1, len(la.list); i < size; i++ {
 		currentList := la.list[i]
 		for index, target := range currentList {
@@ -164,6 +188,9 @@ func (la *lattice) forward() {
 					c = la.dic.Connection.At(int(n.right), int(target.left))
 				}
 				totalCost := int64(c) + int64(target.weight) + int64(n.cost)
+				if mode == searchModeTokenize {
+					totalCost += int64(additionalCost(n))
+				}
 				if totalCost > maximumCost {
 					totalCost = maximumCost
 				}
@@ -177,15 +204,34 @@ func (la *lattice) forward() {
 	return
 }
 
-func (la *lattice) backward() {
+func (la *lattice) backward(mode tokenizeMode) {
+	const bufferExpandRatio = 2
 	size := len(la.list)
 	if cap(la.output) < size {
-		la.output = make([]*node, 0, size)
+		la.output = make([]*node, 0, size*bufferExpandRatio)
 	} else {
 		la.output = la.output[:0]
 	}
 	for p := la.list[size-1][0]; p != nil; p = p.prev {
-		la.output = append(la.output, p)
+		if mode != extendedModeTokenize || p.class != UNKNOWN {
+			la.output = append(la.output, p)
+			continue
+		}
+		runeLen := utf8.RuneCountInString(p.surface)
+		stack := make([]*node, 0, runeLen)
+		i := 0
+		for _, r := range p.surface {
+			n := la.pool.get()
+			n.id = p.id
+			n.start = p.start + i
+			n.class = DUMMY
+			n.surface = string(r)
+			stack = append(stack, n)
+			i++
+		}
+		for j, end := 0, len(stack); j < end; j++ {
+			la.output = append(la.output, stack[runeLen-1-j])
+		}
 	}
 }
 
