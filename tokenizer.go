@@ -76,7 +76,7 @@ func (t *Tokenizer) Tokenize(input string) (tokens []Token) {
 	return
 }
 
-// Tokenize returns morphs of a sentence.
+// SearchModeTokenize returns morphs of a sentence.
 func (t *Tokenizer) SearchModeTokenize(input string) (tokens []Token) {
 	t.lattice.build(input)
 	t.lattice.forward(searchModeTokenize)
@@ -106,7 +106,7 @@ func (t *Tokenizer) SearchModeTokenize(input string) (tokens []Token) {
 	return
 }
 
-// Tokenize returns morphs of a sentence.
+// ExtendedModeTokenize returns morphs of a sentence.
 func (t *Tokenizer) ExtendedModeTokenize(input string) (tokens []Token) {
 	t.lattice.build(input)
 	t.lattice.forward(extendedModeTokenize)
