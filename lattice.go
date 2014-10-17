@@ -188,7 +188,7 @@ func (la *lattice) forward(mode tokenizeMode) {
 					c = la.dic.Connection.At(int(n.right), int(target.left))
 				}
 				totalCost := int64(c) + int64(target.weight) + int64(n.cost)
-				if mode == searchModeTokenize {
+				if mode != normalModeTokenize {
 					totalCost += int64(additionalCost(n))
 				}
 				if totalCost > maximumCost {
