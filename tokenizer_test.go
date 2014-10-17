@@ -226,7 +226,9 @@ func TestExtendedModeTokenize02(t *testing.T) {
 	tokens := tnz.ExtendedModeTokenize("関西国際空港")
 	expected := []Token{
 		{Id: -1, Surface: "BOS"},
-		{Id: 372977, Surface: "関西国際空港", Start: 0, End: 6, Class: KNOWN},
+		{Id: 372968, Surface: "関西", Start: 0, End: 2, Class: KNOWN},
+		{Id: 168541, Surface: "国際", Start: 2, End: 4, Class: KNOWN},
+		{Id: 307133, Surface: "空港", Start: 4, End: 6, Class: KNOWN},
 		{Id: -1, Surface: "EOS", Start: 6, End: 6},
 	}
 	if len(tokens) != len(expected) {
