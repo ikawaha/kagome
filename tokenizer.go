@@ -5,8 +5,13 @@ import (
 	"unicode/utf8"
 )
 
+type tokenizeMode int
+
 const (
-	initialNodePoolCapacity = 512
+	initialNodePoolCapacity              = 512
+	normalModeTokenize      tokenizeMode = iota + 1
+	searchModeTokenize
+	extendedModeTokenize
 )
 
 // Tokenizer represents morphological analyzer.
@@ -44,8 +49,68 @@ func (t *Tokenizer) SetUserDic(udic *UserDic) {
 // Tokenize returns morphs of a sentence.
 func (t *Tokenizer) Tokenize(input string) (tokens []Token) {
 	t.lattice.build(input)
-	t.lattice.forward()
-	t.lattice.backward()
+	t.lattice.forward(normalModeTokenize)
+	t.lattice.backward(normalModeTokenize)
+	size := len(t.lattice.output)
+	tokens = make([]Token, 0, size)
+	for i := range t.lattice.output {
+		n := t.lattice.output[size-1-i]
+		tok := Token{
+			Id:      n.id,
+			Class:   n.class,
+			Start:   n.start,
+			End:     n.start + utf8.RuneCountInString(n.surface),
+			Surface: n.surface,
+			dic:     t.lattice.dic,
+			udic:    t.lattice.udic,
+		}
+		if tok.Id == BosEosId {
+			if i == 0 {
+				tok.Surface = "BOS"
+			} else {
+				tok.Surface = "EOS"
+			}
+		}
+		tokens = append(tokens, tok)
+	}
+	return
+}
+
+// SearchModeTokenize returns morphs of a sentence.
+func (t *Tokenizer) SearchModeTokenize(input string) (tokens []Token) {
+	t.lattice.build(input)
+	t.lattice.forward(searchModeTokenize)
+	t.lattice.backward(searchModeTokenize)
+	size := len(t.lattice.output)
+	tokens = make([]Token, 0, size)
+	for i := range t.lattice.output {
+		n := t.lattice.output[size-1-i]
+		tok := Token{
+			Id:      n.id,
+			Class:   n.class,
+			Start:   n.start,
+			End:     n.start + utf8.RuneCountInString(n.surface),
+			Surface: n.surface,
+			dic:     t.lattice.dic,
+			udic:    t.lattice.udic,
+		}
+		if tok.Id == BosEosId {
+			if i == 0 {
+				tok.Surface = "BOS"
+			} else {
+				tok.Surface = "EOS"
+			}
+		}
+		tokens = append(tokens, tok)
+	}
+	return
+}
+
+// ExtendedModeTokenize returns morphs of a sentence.
+func (t *Tokenizer) ExtendedModeTokenize(input string) (tokens []Token) {
+	t.lattice.build(input)
+	t.lattice.forward(extendedModeTokenize)
+	t.lattice.backward(extendedModeTokenize)
 	size := len(t.lattice.output)
 	tokens = make([]Token, 0, size)
 	for i := range t.lattice.output {

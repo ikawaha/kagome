@@ -128,3 +128,23 @@ func TestSetNodePool01(t *testing.T) {
 	la.build("")
 	la.build("すもももももももものうち")
 }
+
+func TestKanjiOnly01(t *testing.T) {
+	callAndResponse := []struct {
+		in  string
+		out bool
+	}{
+		{in: "ひらがな", out: false},
+		{in: "カタカナ", out: false},
+		{in: "漢字", out: true},
+		{in: "かな漢字交じり", out: false},
+		{in: "123", out: false},
+		{in: "#$%", out: false},
+		{in: "", out: false},
+	}
+	for _, cr := range callAndResponse {
+		if rsp := kanjiOnly(cr.in); rsp != cr.out {
+			t.Errorf("in: %v, got %v, expected: %v", cr.in, rsp, cr.out)
+		}
+	}
+}
