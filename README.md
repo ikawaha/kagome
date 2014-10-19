@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ikawaha/kagome.svg?branch=master)](https://travis-ci.org/ikawaha/kagome) [![Coverage Status](https://coveralls.io/repos/ikawaha/kagome/badge.png?branch=master)](https://coveralls.io/r/ikawaha/kagome?branch=master) [![GoDoc](https://godoc.org/github.com/ikawaha/kagome?status.svg)](https://godoc.org/github.com/ikawaha/kagome)
+[![Build Status](https://travis-ci.org/ikawaha/kagome.svg?branch=master)](https://travis-ci.org/ikawaha/kagome) [![Coverage Status](https://coveralls.io/repos/ikawaha/kagome/badge.png?branch=master)](https://coveralls.io/r/ikawaha/kagome?branch=master) [![GoDoc](https://godoc.org/github.com/ikawaha/kagome?status.svg)](https://godoc.org/github.com/ikawaha/kagome) [![Go Walker](http://gowalker.org/api/v1/badge)](https://gowalker.org/github.com/ikawaha/kagome)
 
 Kagome Japanese Morphological Analyzer
 ===
@@ -32,9 +32,10 @@ Usage
 
 ```
 $ kagome -h
-usage: kagome [-f input_file | --http addr] [-u userdic_file]
+usage: kagome [-file input_file | --http addr] [-udic userdic_file] [-mode (search|extended)]
   -file="": input file
   -http="": HTTP service address (e.g., ':6060')
+  -mode="": tokenize mode
   -udic="": user dic
 ```
 
@@ -85,7 +86,7 @@ $ curl -XPUT localhost:8080 -d'{"sentence":"すもももももももものうち
 
 ##### 形態素解析デモ
 Web サーバを立ち上げた状態で，ブラウザで `/_demo` にアクセスすると，形態素解析のデモ利用できます．
-`-http=:8080` を指定した場合，`http://localhost:8080/_demo` になります．Lattice の表示には [graphviz](http://www.graphviz.org/) が必要です．
+`-http=:8080` を指定した場合，`http://localhost:8080/_demo` になります．Lattice の表示には [graphviz](http://www.graphviz.org/) が必要です．(デモでは Lattice が大きすぎて表示に時間がかかりすぎる場合は Timeout します．そのような場合には後述の lattice ツールを利用してみてください．)
 
 ![lattice](https://raw.githubusercontent.com/wiki/ikawaha/kagome/images/demoapp.png)
 

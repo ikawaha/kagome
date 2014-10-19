@@ -171,7 +171,7 @@ func (h *KagomeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, d)
 }
 
-var usageMessage = "usage: kagome [-f input_file | --http addr] [-u userdic_file]"
+var usageMessage = "usage: kagome [-file input_file | --http addr] [-udic userdic_file] [-mode (normal|search|extended)]"
 
 func usage() {
 	fmt.Fprintln(os.Stderr, usageMessage)
@@ -183,6 +183,7 @@ var (
 	fHttp        = flag.String("http", "", "HTTP service address (e.g., ':6060')")
 	fInputFile   = flag.String("file", "", "input file")
 	fUserDicFile = flag.String("udic", "", "user dic")
+	fTokenizeMode = flag.String("mode", "normal", "tokenize mode")
 )
 
 func Main() {
@@ -229,10 +230,24 @@ func Main() {
 	if udic != nil {
 		t.SetUserDic(udic)
 	}
+
+	var tokenize = t.Tokenize
+	switch {
+	case *fTokenizeMode == "normal":
+		break
+	case *fTokenizeMode == "search":
+		tokenize = t.SearchModeTokenize
+	case *fTokenizeMode == "extended":
+		tokenize = t.ExtendedModeTokenize
+	case *fTokenizeMode != "":
+		fmt.Fprintf(os.Stderr, "invalid argument: -mode %v\n", *fTokenizeMode)
+		usage()
+	}
+
 	scanner := bufio.NewScanner(inputFile)
 	for scanner.Scan() {
 		line := scanner.Text()
-		tokens := t.Tokenize(line)
+		tokens := tokenize(line)
 		for i, size := 1, len(tokens); i < size; i++ {
 			tok := tokens[i]
 			c := tok.Features()
