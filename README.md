@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ikawaha/kagome.svg?branch=master)](https://travis-ci.org/ikawaha/kagome) [![Coverage Status](https://coveralls.io/repos/ikawaha/kagome/badge.png?branch=master)](https://coveralls.io/r/ikawaha/kagome?branch=master) [![GoDoc](https://godoc.org/github.com/ikawaha/kagome?status.svg)](https://godoc.org/github.com/ikawaha/kagome) [![Go Walker](http://gowalker.org/api/v1/badge)](https://gowalker.org/github.com/ikawaha/kagome)
+[![Build Status](https://travis-ci.org/ikawaha/kagome.svg?branch=master)](https://travis-ci.org/ikawaha/kagome) [![Coverage Status](https://coveralls.io/repos/ikawaha/kagome/badge.png?branch=master)](https://coveralls.io/r/ikawaha/kagome?branch=master) [![GoDoc](https://godoc.org/github.com/ikawaha/kagome?status.svg)](https://godoc.org/github.com/ikawaha/kagome) [![Go Walker](http://gowalker.org/api/v1/badge)](https://gowalker.org/github.com/ikawaha/kagome) [![Gobuild Download](http://gobuild.io/badge/github.com/ikawaha/kagome/cmd/kagome/downloads.svg)](http://gobuild.io/github.com/ikawaha/kagome/cmd/kagome)
 
 Kagome Japanese Morphological Analyzer
 ===
@@ -26,6 +26,13 @@ Install
 ```
 % go get github.com/ikawaha/kagome/...
 ```
+
+### Binary
+
+|ツール|バイナリ(win, linux, darwin)|
+|:-----|:-------|
+|形態素解析|[![Gobuild Download](http://gobuild.io/badge/github.com/ikawaha/kagome/cmd/kagome/downloads.svg)](http://gobuild.io/github.com/ikawaha/kagome/cmd/kagome)|
+|ラティス表示|[![Gobuild Download](http://gobuild.io/badge/github.com/ikawaha/kagome/cmd/lattice/downloads.svg)](http://gobuild.io/github.com/ikawaha/kagome/cmd/lattice)|
 
 Usage
 ---
