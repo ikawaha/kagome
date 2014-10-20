@@ -58,7 +58,7 @@ EOS
 
 #### 検索用の分割モード
 
-![kuromoji](https://github.com/atilika/kuromoji) の検索用分割モード相当の分割が出来るようになっています．
+[kuromoji](https://github.com/atilika/kuromoji) の検索用分割モード相当の分割が出来るようになっています．
 
 * 標準　標準の分割
 * 検索　ヒューリスティックの適用によって検索に役立つよう細分割
