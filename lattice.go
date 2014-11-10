@@ -155,7 +155,7 @@ func (la *lattice) String() string {
 }
 func kanjiOnly(s string) bool {
 	for _, r := range s {
-		if !unicode.IsOneOf([]*unicode.RangeTable{unicode.Ideographic}, r) {
+		if !unicode.In(r, unicode.Ideographic) {
 			return false
 		}
 	}
