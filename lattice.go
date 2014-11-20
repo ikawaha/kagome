@@ -112,16 +112,18 @@ func (la *lattice) build(input string) {
 		if !anyMatches || la.dic.InvokeList[class] {
 			endPos := pos + utf8.RuneLen(ch)
 			unkWordLen := 1
-			for i, w, size := endPos, 1, len(input); i < size; i += w {
-				var c rune
-				c, w = utf8.DecodeRuneInString(input[i:])
-				if la.dic.CharCategory[c] != class {
-					break
-				}
-				endPos += w
-				unkWordLen++
-				if unkWordLen >= maximumUnknownWordLength {
-					break
+			if la.dic.GroupList[class] {
+				for i, w, size := endPos, 1, len(input); i < size; i += w {
+					var c rune
+					c, w = utf8.DecodeRuneInString(input[i:])
+					if la.dic.CharCategory[c] != class {
+						break
+					}
+					endPos += w
+					unkWordLen++
+					if unkWordLen >= maximumUnknownWordLength {
+						break
+					}
 				}
 			}
 			id := la.dic.UnkIndex[int(class)]
@@ -155,7 +157,7 @@ func (la *lattice) String() string {
 }
 func kanjiOnly(s string) bool {
 	for _, r := range s {
-		if !unicode.IsOneOf([]*unicode.RangeTable{unicode.Ideographic}, r) {
+		if !unicode.In(r, unicode.Ideographic) {
 			return false
 		}
 	}
