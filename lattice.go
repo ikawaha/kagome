@@ -112,16 +112,18 @@ func (la *lattice) build(input string) {
 		if !anyMatches || la.dic.InvokeList[class] {
 			endPos := pos + utf8.RuneLen(ch)
 			unkWordLen := 1
-			for i, w, size := endPos, 1, len(input); i < size; i += w {
-				var c rune
-				c, w = utf8.DecodeRuneInString(input[i:])
-				if la.dic.CharCategory[c] != class {
-					break
-				}
-				endPos += w
-				unkWordLen++
-				if unkWordLen >= maximumUnknownWordLength {
-					break
+			if la.dic.GroupList[class] {
+				for i, w, size := endPos, 1, len(input); i < size; i += w {
+					var c rune
+					c, w = utf8.DecodeRuneInString(input[i:])
+					if la.dic.CharCategory[c] != class {
+						break
+					}
+					endPos += w
+					unkWordLen++
+					if unkWordLen >= maximumUnknownWordLength {
+						break
+					}
 				}
 			}
 			id := la.dic.UnkIndex[int(class)]
