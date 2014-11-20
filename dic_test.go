@@ -277,3 +277,79 @@ func TestSystemDicCharCategory01(t *testing.T) {
 		}
 	}
 }
+
+func TestInvokeList01(t *testing.T) {
+	const (
+		DEFAULT      = 0
+		SPACE        = 1
+		KANJI        = 2
+		SYMBOL       = 3
+		NUMERIC      = 4
+		ALPHA        = 5
+		HIRAGANA     = 6
+		KATAKANA     = 7
+		KANJINUMERIC = 8
+		GREEK        = 9
+		CYRILLIC     = 10
+	)
+	crs := []struct {
+		class  int
+		invoke bool
+	}{
+		{DEFAULT, false},
+		{SPACE, false},
+		{KANJI, false},
+		{SYMBOL, true},
+		{NUMERIC, true},
+		{ALPHA, true},
+		{HIRAGANA, false},
+		{KATAKANA, true},
+		{KANJINUMERIC, true},
+		{GREEK, true},
+		{CYRILLIC, true},
+	}
+	sysDic := NewSysDic()
+	for _, cr := range crs {
+		if iv := sysDic.InvokeList[cr.class]; iv != cr.invoke {
+			t.Errorf("input %v: got %v, expected %v\n", cr.class, iv, cr.invoke)
+		}
+	}
+}
+
+func TestGroupList01(t *testing.T) {
+	const (
+		DEFAULT      = 0
+		SPACE        = 1
+		KANJI        = 2
+		SYMBOL       = 3
+		NUMERIC      = 4
+		ALPHA        = 5
+		HIRAGANA     = 6
+		KATAKANA     = 7
+		KANJINUMERIC = 8
+		GREEK        = 9
+		CYRILLIC     = 10
+	)
+	crs := []struct {
+		class  int
+		invoke bool
+	}{
+		{DEFAULT, true},
+		{SPACE, true},
+		{KANJI, false},
+		{SYMBOL, true},
+		{NUMERIC, true},
+		{ALPHA, true},
+		{HIRAGANA, true},
+		{KATAKANA, true},
+		{KANJINUMERIC, true},
+		{GREEK, true},
+		{CYRILLIC, true},
+	}
+	sysDic := NewSysDic()
+	for _, cr := range crs {
+		if iv := sysDic.GroupList[cr.class]; iv != cr.invoke {
+			t.Errorf("input %v: got %v, expected %v\n", cr.class, iv, cr.invoke)
+		}
+	}
+}
