@@ -275,6 +275,10 @@ func TestSystemDicCharCategory01(t *testing.T) {
 		if category != cr.category {
 			t.Errorf("input %04X, got %v, expected %v\n", cr.input, category, cr.category)
 		}
+		category = sysDic.charCategory(rune(cr.input))
+		if category != cr.category {
+			t.Errorf("input %04X, got %v, expected %v\n", cr.input, category, cr.category)
+		}
 	}
 }
 
