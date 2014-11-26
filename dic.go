@@ -48,6 +48,13 @@ func NewSysDic() (dic *Dic) {
 	return sysDic
 }
 
+func (d Dic) charCategory(r rune) byte {
+	if int(r) <= len(d.CharCategory) {
+		return d.CharCategory[r]
+	}
+	return d.CharCategory[0] //XXX
+}
+
 func loadSysDic() (d *Dic) {
 	d = new(Dic)
 	if err := func() error {
