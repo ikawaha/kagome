@@ -30,7 +30,7 @@ func TestLatticeBuild01(t *testing.T) {
 	}
 
 	if la.dic == nil {
-		t.Errorf("lattice initialize error: dic is nil\n", la.udic)
+		t.Errorf("lattice initialize error: dic is nil\n")
 	}
 	if la.udic != nil {
 		t.Errorf("lattice initialize error: got %v, expected empty\n", la.udic)
@@ -84,7 +84,7 @@ func TestLatticeBuild02(t *testing.T) {
 		t.Errorf("lattice initialize error: node pool is not nil: %v\n", la.pool)
 	}
 	if la.dic == nil {
-		t.Errorf("lattice initialize error: dic is nil\n", la.udic)
+		t.Errorf("lattice initialize error: dic is nil\n")
 	}
 	if la.udic != nil {
 		t.Errorf("lattice initialize error: got %v, expected empty\n", la.udic)
@@ -111,7 +111,7 @@ func TestSetUserDic01(t *testing.T) {
 	}
 	la.setUserDic(udic)
 	if la.udic != udic {
-		t.Error("got %p, expected %p", la.udic, udic)
+		t.Errorf("got %p, expected %p", la.udic, udic)
 	}
 	la.setUserDic(nil)
 	if la.udic != nil {
