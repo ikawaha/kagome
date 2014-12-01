@@ -212,7 +212,7 @@ func TestDaBuildAndPrefixSearch03(t *testing.T) {
 	expected := 7 //電気通信大学大学院電気通信学研究科
 	id, ok := d.PrefixSearchString("電気通信大学大学院電気通信学研究科")
 	if !ok {
-		t.Fatalf("cannot search the prefix\n", id, expected)
+		t.Fatalf("cannot search the prefix. id=%v, %v\n", id, expected)
 	}
 	if id != expected {
 		t.Fatalf("got %v, expected %v\n", id, expected)
