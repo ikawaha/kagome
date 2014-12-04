@@ -34,9 +34,6 @@ func TestLatticeBuild01(t *testing.T) {
 	if len(la.output) != 0 {
 		t.Errorf("lattice initialize error: got %v, expected empty\n", la.output)
 	}
-	if la.pool != nil {
-		t.Errorf("lattice initialize error: node pool is not nil: %v\n", la.pool)
-	}
 
 	if la.dic == nil {
 		t.Errorf("lattice initialize error: dic is nil\n")
@@ -89,9 +86,6 @@ func TestLatticeBuild02(t *testing.T) {
 	if len(la.output) != 0 {
 		t.Errorf("lattice initialize error: got %v, expected empty\n", la.output)
 	}
-	if la.pool != nil {
-		t.Errorf("lattice initialize error: node pool is not nil: %v\n", la.pool)
-	}
 	if la.dic == nil {
 		t.Errorf("lattice initialize error: dic is nil\n")
 	}
@@ -126,16 +120,6 @@ func TestSetUserDic01(t *testing.T) {
 	if la.udic != nil {
 		t.Errorf("got %p, expected nil\n", la.dic)
 	}
-}
-
-func TestSetNodePool01(t *testing.T) {
-	la := newLattice()
-	la.setNodePool(0)
-	if la.pool == nil {
-		t.Error("lattice initialize error: node pool is nil\n")
-	}
-	la.build("")
-	la.build("すもももももももものうち")
 }
 
 func TestKanjiOnly01(t *testing.T) {

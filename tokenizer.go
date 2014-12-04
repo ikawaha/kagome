@@ -33,15 +33,6 @@ func NewTokenizer() (t *Tokenizer) {
 	t = new(Tokenizer)
 	t.lattice = newLattice()
 	t.lattice.setDic(NewSysDic())
-	t.lattice.setNodePool(initialNodePoolCapacity)
-	return
-}
-
-// NewThreadsafeTokenizer create a threadsafe tokenizer.
-func NewThreadsafeTokenizer() (t *Tokenizer) {
-	t = new(Tokenizer)
-	t.lattice = newLattice()
-	t.lattice.setDic(NewSysDic())
 	return
 }
 
