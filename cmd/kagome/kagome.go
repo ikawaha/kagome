@@ -211,7 +211,7 @@ func Main() {
 	}
 
 	if *fHttp != "" {
-		t := kagome.NewThreadsafeTokenizer()
+		t := kagome.NewTokenizer()
 		if udic != nil {
 			t.SetUserDic(udic)
 		}
