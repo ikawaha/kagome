@@ -1,8 +1,18 @@
+//  Copyright (c) 2014 ikawaha.
+//  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+//  except in compliance with the License. You may obtain a copy of the License at
+//    http://www.apache.org/licenses/LICENSE-2.0
+//  Unless required by applicable law or agreed to in writing, software distributed under the
+//  License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+//  either express or implied. See the License for the specific language governing permissions
+//  and limitations under the License.
+
 package kagome
 
 import (
 	"fmt"
 	"io"
+	"sync"
 	"unicode"
 	"unicode/utf8"
 )
@@ -16,11 +26,16 @@ const (
 	searchModeOtherPenalty   = 1700
 )
 
+var nodePool = sync.Pool{
+	New: func() interface{} {
+		return new(node)
+	},
+}
+
 type lattice struct {
 	input  string
 	list   [][]*node
 	output []*node
-	pool   *nodePool
 	dic    *Dic
 	udic   *UserDic
 }
@@ -31,8 +46,14 @@ func newLattice() (la *lattice) {
 	return
 }
 
-func (la *lattice) setNodePool(size int) {
-	la.pool = newNodePool(size)
+func (la *lattice) clear() {
+	for i := range la.list {
+		for j := range la.list[i] {
+			nodePool.Put(la.list[i][j])
+		}
+		la.list[i] = la.list[i][:0]
+	}
+	la.list = la.list[:0]
 }
 
 func (la *lattice) setDic(dic *Dic) {
@@ -57,7 +78,7 @@ func (la *lattice) addNode(pos, id, start int, class NodeClass, surface string) 
 	case USER:
 		// use default cost
 	}
-	n := la.pool.get()
+	n := nodePool.Get().(*node)
 	n.id = id
 	n.start = start
 	n.class = class
@@ -69,10 +90,14 @@ func (la *lattice) addNode(pos, id, start int, class NodeClass, surface string) 
 }
 
 func (la *lattice) build(input string) {
+	la.clear()
 	rc := utf8.RuneCountInString(input)
-	la.pool.clear()
 	la.input = input
-	la.list = make([][]*node, rc+2)
+	if cap(la.list) < rc+2 {
+		const expandRatio = 2
+		la.list = make([][]*node, 0, (rc+2)*expandRatio)
+	}
+	la.list = la.list[0 : rc+2]
 
 	la.addNode(0, BosEosId, 0, DUMMY, input[0:0])
 	la.addNode(rc+1, BosEosId, rc, DUMMY, input[rc:rc])
@@ -223,7 +248,7 @@ func (la *lattice) backward(mode tokenizeMode) {
 		stack := make([]*node, 0, runeLen)
 		i := 0
 		for _, r := range p.surface {
-			n := la.pool.get()
+			n := nodePool.Get().(*node)
 			n.id = p.id
 			n.start = p.start + i
 			n.class = DUMMY
