@@ -107,28 +107,28 @@ func (la *lattice) build(input string) {
 		runePos++
 		anyMatches := false
 
-		// (1) TODO: USER DIC
+		// (1) USER DIC
 		if la.udic != nil {
-			ids, lens := la.udic.Index.CommonPrefixSearchString(input[pos:])
-			for i := range ids {
-				la.addNode(runePos, ids[i], runePos, USER, input[pos:pos+lens[i]])
+			lens, outputs := la.udic.Index.CommonPrefixSearch(input[pos:])
+			for i, ids := range outputs {
+				for j := range ids {
+					la.addNode(runePos, int(ids[j]), runePos,
+						USER, input[pos:pos+int(lens[i])])
+				}
 			}
-			anyMatches = (len(ids) > 0)
+			anyMatches = (len(lens) > 0)
 		}
 		if anyMatches {
 			continue
 		}
 
 		// (2) KNOWN DIC
-		if ids, lens := la.dic.Index.CommonPrefixSearchString(input[pos:]); len(ids) > 0 {
+		if lens, outputs := la.dic.Index.CommonPrefixSearch(input[pos:]); len(lens) > 0 {
 			anyMatches = true
-			for i, id := range ids {
-				dup, ok := la.dic.IndexDup[id]
-				if !ok {
-					dup = 1
-				}
-				for x := 0; x < dup; x++ {
-					la.addNode(runePos, id+x, runePos, KNOWN, input[pos:pos+lens[i]])
+			for i, ids := range outputs {
+				for j := range ids {
+					la.addNode(runePos, int(ids[j]), runePos,
+						KNOWN, input[pos:pos+lens[i]])
 				}
 			}
 		}
@@ -160,7 +160,8 @@ func (la *lattice) build(input string) {
 					dup = 1
 				}
 				for x := 0; x < dup; x++ {
-					la.addNode(runePos, id+x, runePos, UNKNOWN, input[pos:end])
+					la.addNode(runePos, id+x, runePos,
+						UNKNOWN, input[pos:end])
 				}
 			}
 		}
@@ -308,9 +309,11 @@ func (la *lattice) dot(w io.Writer) {
 		_, l := bests[e.from]
 		_, r := bests[e.to]
 		if l && r {
-			fmt.Fprintf(w, "\t\"%p\" -- \"%p\" [label=\"%d\",color=blue,style=bold];\n", e.from, e.to, c)
+			fmt.Fprintf(w, "\t\"%p\" -- \"%p\" [label=\"%d\",color=blue,style=bold];\n",
+				e.from, e.to, c)
 		} else {
-			fmt.Fprintf(w, "\t\"%p\" -- \"%p\" [label=\"%d\"];\n", e.from, e.to, c)
+			fmt.Fprintf(w, "\t\"%p\" -- \"%p\" [label=\"%d\"];\n",
+				e.from, e.to, c)
 		}
 	}
 

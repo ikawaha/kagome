@@ -26,7 +26,7 @@ type UserDicContent struct {
 
 // UserDic represents a user dictionary.
 type UserDic struct {
-	Index    Trie
+	Index    FST
 	Contents []UserDicContent
 }
 
@@ -58,8 +58,7 @@ func NewUserDic(path string) (udic *UserDic, err error) {
 
 	udic = new(UserDic)
 	prev := ""
-	var keys []string
-	var ids []int
+	var keys PairSlice
 	for _, line := range text {
 		record := strings.Split(line, ",")
 		if len(record) != userDicColumnSize {
@@ -71,8 +70,7 @@ func NewUserDic(path string) (udic *UserDic, err error) {
 			continue
 		}
 		prev = k
-		ids = append(ids, len(keys))
-		keys = append(keys, k)
+		keys = append(keys, Pair{k, int32(len(keys))})
 		tokens := strings.Split(record[1], " ")
 		yomi := strings.Split(record[2], " ")
 		if len(tokens) == 0 || len(tokens) != len(yomi) {
@@ -81,8 +79,6 @@ func NewUserDic(path string) (udic *UserDic, err error) {
 		}
 		udic.Contents = append(udic.Contents, UserDicContent{tokens, yomi, record[3]})
 	}
-	da := new(DoubleArray)
-	da.BuildWithIds(keys, ids)
-	udic.Index = da
+	udic.Index, err = BuildFST(keys)
 	return
 }

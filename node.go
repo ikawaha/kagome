@@ -23,7 +23,7 @@ const (
 // NodeClass represents a node type.
 type NodeClass int
 
-// String returns a string representation of a node class.1
+// String returns a string representation of a node class.
 func (nc NodeClass) String() string {
 	switch nc {
 	case DUMMY:

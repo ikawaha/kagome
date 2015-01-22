@@ -37,16 +37,8 @@ func TestNewUserDicIndex01(t *testing.T) {
 		tuple{inp: "成田国際空港", id: 9, ok: false},
 	}
 	for _, cr := range callAndRespose {
-		id, ok := udic.Index.FindString(cr.inp)
-		if ok != cr.ok {
-			t.Errorf("got %v, expected %v\n", ok, cr.ok)
-		} else {
-			if !ok {
-				continue
-			}
-		}
-		if id != cr.id {
-			t.Errorf("got %v, expected %v\n", id, cr.id)
+		if ids := udic.Index.Search(cr.inp); (len(ids) != 0) != cr.ok {
+			t.Errorf("got %v, expected %v\n", ids, cr.ok)
 		}
 	}
 }
