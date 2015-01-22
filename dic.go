@@ -10,12 +10,12 @@
 package kagome
 
 import (
-	"github.com/ikawaha/kagome/data"
-
 	"bytes"
 	"encoding/gob"
 	"fmt"
 	"sync"
+
+	"github.com/ikawaha/kagome/data"
 )
 
 const (
@@ -33,8 +33,7 @@ type Dic struct {
 	Morphs       []Morph
 	Contents     [][]string
 	Connection   ConnectionTable
-	Index        Trie
-	IndexDup     map[int]int
+	Index        FST
 	CharClass    []string
 	CharCategory []byte
 	InvokeList   []bool
@@ -88,14 +87,8 @@ func loadSysDic() (d *Dic) {
 		if e != nil {
 			return e
 		}
-		var da DoubleArray
-		dec := gob.NewDecoder(bytes.NewBuffer(buf))
-		if e = dec.Decode(&da); e != nil {
+		if e = d.Index.Read(bytes.NewReader(buf)); e != nil {
 			return fmt.Errorf("dic initializer, Index: %v", e)
-		}
-		d.Index = &da
-		if e = dec.Decode(&d.IndexDup); e != nil {
-			return fmt.Errorf("dic initializer, IndexDup: %v", e)
 		}
 		return nil
 	}(); err != nil {

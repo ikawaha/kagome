@@ -48,46 +48,60 @@ func TestSystemDicContents01(t *testing.T) {
 
 func TestSystemDicIndex01(t *testing.T) {
 	sysDic := NewSysDic()
-	type callAndRespose struct {
+	type callAndResponse struct {
 		input string
-		ids   []int
-		lens  []int
+		ids   []int32
 	}
-	testSet := []callAndRespose{
-		{input: "あい", ids: []int{122, 141}, lens: []int{3, 6}},
-		{input: "あいあい", ids: []int{122, 141, 146}, lens: []int{3, 6, 12}},
+	testSet := []callAndResponse{
+		{"すもも", []int32{36163}},
 	}
 	for _, cr := range testSet {
-		ids, lens := sysDic.Index.CommonPrefixSearchString(cr.input)
+		ids := sysDic.Index.Search(cr.input)
 		if !reflect.DeepEqual(ids, cr.ids) {
-			t.Errorf("input %v, got ids %v, expected %v\n", cr.input, ids, cr.ids)
-		}
-		if !reflect.DeepEqual(lens, cr.lens) {
-			t.Errorf("input %v, got lens %v, expected %v\n", cr.input, lens, cr.lens)
+			t.Errorf("input %v, got %v, expected %v\n", cr.input, ids, cr.ids)
 		}
 	}
-
 }
 
-func TestSystemDicIndexDup01(t *testing.T) {
+func TestSystemDicIndex02(t *testing.T) {
 	sysDic := NewSysDic()
 	type callAndRespose struct {
-		input int
-		dup   int
+		input string
+		lens  []int
+		ids   [][]int32
 	}
 	testSet := []callAndRespose{
-		{input: 141, dup: 5}, // "あい"
-		{input: 146, dup: 1}, // "あいあい"
+		{input: "あい",
+			lens: []int{3, 6},
+			ids: [][]int32{
+				[]int32{122, 123, 124, 125},
+				[]int32{141, 142, 143, 144, 145}}},
+		{input: "あいあい",
+			lens: []int{3, 6, 12},
+			ids: [][]int32{
+				[]int32{122, 123, 124, 125},
+				[]int32{141, 142, 143, 144, 145},
+				[]int32{146}}},
+		{input: "すもも",
+			lens: []int{3, 6, 9},
+			ids: [][]int32{
+				[]int32{34563, 34564, 34565, 34566, 34567, 34568, 34569},
+				[]int32{36161},
+				[]int32{36163}}},
 	}
 	for _, cr := range testSet {
-		dup, ok := sysDic.IndexDup[cr.input]
-		if !ok {
-			dup++
+		lens, ids := sysDic.Index.CommonPrefixSearch(cr.input)
+		if !reflect.DeepEqual(lens, cr.lens) {
+			t.Errorf("input %v, got lens %v,\n expected %v\n", cr.input, lens, cr.lens)
 		}
-		if dup != cr.dup {
-			t.Errorf("input %v, got %v, expected %v\n", cr.input, dup, cr.dup)
+		if len(ids) != len(cr.ids) {
+			t.Errorf("input %v, got ids len %v, expected len %v\n", cr.input, len(ids), len(cr.ids))
+		}
+		if !reflect.DeepEqual(ids, cr.ids) {
+			t.Errorf("input %v, got ids %v,\n expected %v\n", cr.input, ids, cr.ids)
 		}
 	}
+
 }
 
 func TestSystemDicCharClass01(t *testing.T) {
