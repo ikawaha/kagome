@@ -673,7 +673,7 @@ func (t FST) PrefixSearch(input string) (length int, output []int32) {
 
 }
 
-// CommonPrefixSearchString finds keywords sharing common prefix in given input
+// CommonPrefixSearch finds keywords sharing common prefix in given input
 // and returns it's lengths and outputs. Returns nil, nil if there does not common prefix keywords.
 func (t FST) CommonPrefixSearch(input string) (lens []int, outputs [][]int32) {
 	snap, _ := t.run(input)
