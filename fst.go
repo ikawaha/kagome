@@ -42,7 +42,7 @@ func (ps PairSlice) maxInputWordLen() (max int) {
 type int32Set map[int32]bool
 
 type state struct {
-	ID      int
+	Id      int
 	Trans   map[byte]*state
 	Output  map[byte]int32
 	Tail    int32Set
@@ -96,7 +96,7 @@ func (n *state) setTransition(ch byte, next *state) {
 	n.Trans[ch] = next
 
 	const magic = 1001
-	n.hcode += (int64(ch) + int64(next.ID)) * magic
+	n.hcode += (int64(ch) + int64(next.Id)) * magic
 }
 
 func (n *state) renew() {
@@ -147,7 +147,7 @@ func (n *state) String() string {
 	if n == nil {
 		return "<nil>"
 	}
-	ret += fmt.Sprintf("%d[%p]:", n.ID, n)
+	ret += fmt.Sprintf("%d[%p]:", n.Id, n)
 	for ch := range n.Trans {
 		ret += fmt.Sprintf("%X02/%v -->%p, ", ch, n.Output[ch], n.Trans[ch])
 	}
@@ -165,7 +165,7 @@ type mast struct {
 }
 
 func (m *mast) addState(n *state) {
-	n.ID = len(m.states)
+	n.Id = len(m.states)
 	m.states = append(m.states, n)
 	if n.IsFinal {
 		m.finalStates = append(m.finalStates, n)
@@ -311,11 +311,11 @@ func (m *mast) dot(w io.Writer) {
 	fmt.Fprintln(w, "\trankdir=LR;")
 	fmt.Fprintln(w, "\tnode [shape=circle]")
 	for _, s := range m.finalStates {
-		fmt.Fprintf(w, "\t%d [peripheries = 2];\n", s.ID)
+		fmt.Fprintf(w, "\t%d [peripheries = 2];\n", s.Id)
 	}
 	for _, from := range m.states {
 		for in, to := range from.Trans {
-			fmt.Fprintf(w, "\t%d -> %d [label=\"%02X/%v", from.ID, to.ID, in, from.Output[in])
+			fmt.Fprintf(w, "\t%d -> %d [label=\"%02X/%v", from.Id, to.Id, in, from.Output[in])
 			if to.hasTail() {
 				fmt.Fprintf(w, " %v", to.tails())
 			}
@@ -401,9 +401,9 @@ func (m mast) buildMachine() (t FST, err error) {
 			ch := edges[size-1-i]
 			next := s.Trans[ch]
 			out := s.Output[ch]
-			addr, ok := addrMap[next.ID]
+			addr, ok := addrMap[next.Id]
 			if !ok && !next.IsFinal {
-				err = fmt.Errorf("next addr is undefined: state(%v), input(%X)", s.ID, ch)
+				err = fmt.Errorf("next addr is undefined: state(%v), input(%X)", s.Id, ch)
 				return
 			}
 			jump := len(prog) - addr + 1
@@ -461,7 +461,7 @@ func (m mast) buildMachine() (t FST, err error) {
 
 			prog = append(prog, code)
 		}
-		addrMap[s.ID] = len(prog)
+		addrMap[s.Id] = len(prog)
 	}
 	t = FST{prog: invert(prog), data: data}
 	return
