@@ -9,9 +9,7 @@
 
 package kagome
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestTokenize01(t *testing.T) {
 	tnz := NewTokenizer()
