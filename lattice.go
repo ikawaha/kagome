@@ -26,9 +26,9 @@ const (
 	searchModeOtherPenalty   = 1700
 )
 
-var nodePool = sync.Pool{
+var latticePool = sync.Pool{
 	New: func() interface{} {
-		return new(node)
+		return new(lattice)
 	},
 }
 
@@ -40,13 +40,13 @@ type lattice struct {
 	udic   *UserDic
 }
 
-func newLattice() (la *lattice) {
-	la = new(lattice)
+func newLattice() *lattice {
+	la := latticePool.Get().(*lattice)
 	la.dic = NewSysDic()
-	return
+	return la
 }
 
-func (la *lattice) clear() {
+func (la *lattice) free() {
 	for i := range la.list {
 		for j := range la.list[i] {
 			nodePool.Put(la.list[i][j])
@@ -54,16 +54,8 @@ func (la *lattice) clear() {
 		la.list[i] = la.list[i][:0]
 	}
 	la.list = la.list[:0]
-}
-
-func (la *lattice) setDic(dic *Dic) {
-	if dic != nil {
-		la.dic = dic
-	}
-}
-
-func (la *lattice) setUserDic(udic *UserDic) {
-	la.udic = udic
+	la.udic = nil
+	latticePool.Put(la)
 }
 
 func (la *lattice) addNode(pos, id, start int, class NodeClass, surface string) {
@@ -78,7 +70,7 @@ func (la *lattice) addNode(pos, id, start int, class NodeClass, surface string) 
 	case USER:
 		// use default cost
 	}
-	n := nodePool.Get().(*node)
+	n := newNode()
 	n.id = id
 	n.start = start
 	n.class = class
@@ -90,7 +82,6 @@ func (la *lattice) addNode(pos, id, start int, class NodeClass, surface string) 
 }
 
 func (la *lattice) build(input string) {
-	la.clear()
 	rc := utf8.RuneCountInString(input)
 	la.input = input
 	if cap(la.list) < rc+2 {
