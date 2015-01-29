@@ -329,14 +329,15 @@ type operation byte
 
 const (
 	opAccept      operation = 1
-	opMatch       operation = 2
-	opBreak       operation = 3
-	opOutput      operation = 4
-	opOutputBreak operation = 5
+	opAcceptBreak operation = 2
+	opMatch       operation = 3
+	opBreak       operation = 4
+	opOutput      operation = 5
+	opOutputBreak operation = 6
 )
 
 func (o operation) String() string {
-	opName := []string{"OP0", "ACC", "MTC", "BRK", "OUT", "OUB", "OP6", "OP7"}
+	opName := []string{"OP0", "ACC", "ACB", "MTC", "BRK", "OUT", "OUB", "OP6", "OP7"}
 	if int(o) >= len(opName) {
 		return fmt.Sprintf("NA[%d]", o)
 	}
@@ -453,7 +454,11 @@ func (m mast) buildMachine() (t FST, err error) {
 				(*(*int32)(p)) = int32(len(data))
 				prog = append(prog, code)
 			}
-			code[0] = byte(opAccept)
+			if len(s.Trans) != 0 {
+				code[0] = byte(opAccept)
+			} else {
+				code[0] = byte(opAcceptBreak)
+			}
 			code[1], code[2], code[3] = 0, 0, 0 // clear
 			if len(s.Tail) > 0 {
 				code[1] = 1
@@ -485,6 +490,8 @@ func (t FST) String() string {
 		v16 = (*(*uint16)(unsafe.Pointer(&code[2])))
 		switch operation(op) {
 		case opAccept:
+			fallthrough
+		case opAcceptBreak:
 			//fmt.Printf("%3d %v\t%X %d\n", pc, op, ch, v16) //XXX
 			ret += fmt.Sprintf("%3d %v\t%d %d\n", pc, op, ch, v16)
 			if ch == 0 {
@@ -615,6 +622,8 @@ func (t *FST) run(input string) (snap []configuration, accept bool) {
 			hd++
 			continue
 		case opAccept:
+			fallthrough
+		case opAcceptBreak:
 			c := configuration{pc: pc, hd: hd}
 			pc++
 			if ch == 0 {
@@ -629,7 +638,7 @@ func (t *FST) run(input string) (snap []configuration, accept bool) {
 				pc++
 			}
 			snap = append(snap, c)
-			if hd == len(input) {
+			if op == opAcceptBreak || hd == len(input) {
 				goto L_END
 			}
 			continue
@@ -642,7 +651,7 @@ L_END:
 	if hd != len(input) {
 		return
 	}
-	if op != opAccept {
+	if op != opAccept && op != opAcceptBreak {
 		//fmt.Printf("[[FINAL]]pc:%d, op:%s, ch:[%X], sz:%d, v:%d\n", pc, op, ch, sz, va) //XXX
 		return
 
@@ -728,6 +737,8 @@ func (t FST) Write(w io.Writer) error {
 		//fmt.Printf("%3d %v\t%X %d\n", pc, op, ch, v16) //XXX
 		switch operation(op) {
 		case opAccept:
+			fallthrough
+		case opAcceptBreak:
 			if ch == 0 {
 				break
 			}
@@ -835,6 +846,8 @@ func (t *FST) Read(r io.Reader) (e error) {
 		}
 		switch operation(op) {
 		case opAccept:
+			fallthrough
+		case opAcceptBreak:
 			code[0], code[1], code[2], code[3] = op, ch, 0, 0
 			t.prog = append(t.prog, code)
 			//fmt.Printf("%3d %v\t%X %d\n", pc, operation(op), ch, 0) //XXX
