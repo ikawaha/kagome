@@ -9,9 +9,7 @@
 
 package kagome
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestLatticeBuild01(t *testing.T) {
 	la := newLattice()
@@ -91,34 +89,6 @@ func TestLatticeBuild02(t *testing.T) {
 	}
 	if la.udic != nil {
 		t.Errorf("lattice initialize error: got %v, expected empty\n", la.udic)
-	}
-}
-
-func TestSetDic01(t *testing.T) {
-	la := newLattice()
-	la.setDic(nil)
-	if la.dic == nil {
-		t.Error("dic is nil\n")
-	}
-	d := NewSysDic()
-	if la.dic != d {
-		t.Errorf("got %p, expected %p\n", la.dic, d)
-	}
-}
-
-func TestSetUserDic01(t *testing.T) {
-	la := newLattice()
-	udic, e := NewUserDic("_sample/userdic.txt")
-	if e != nil {
-		t.Errorf("unexpected error: %v\n", e)
-	}
-	la.setUserDic(udic)
-	if la.udic != udic {
-		t.Errorf("got %p, expected %p", la.udic, udic)
-	}
-	la.setUserDic(nil)
-	if la.udic != nil {
-		t.Errorf("got %p, expected nil\n", la.dic)
 	}
 }
 
