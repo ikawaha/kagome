@@ -9,6 +9,8 @@
 
 package kagome
 
+import "sync"
+
 // Reserved identifier of node id.
 const BosEosId int = -1
 
@@ -48,4 +50,14 @@ type node struct {
 	weight  int32
 	surface string
 	prev    *node
+}
+
+var nodePool = sync.Pool{
+	New: func() interface{} {
+		return new(node)
+	},
+}
+
+func newNode() *node {
+	return nodePool.Get().(*node)
 }

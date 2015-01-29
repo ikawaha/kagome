@@ -25,44 +25,49 @@ const (
 
 // Tokenizer represents morphological analyzer.
 type Tokenizer struct {
-	lattice *lattice
+	dic  *Dic
+	udic *UserDic
 }
 
 // NewTokenizer create a tokenizer.
 func NewTokenizer() (t *Tokenizer) {
 	t = new(Tokenizer)
-	t.lattice = newLattice()
-	t.lattice.setDic(NewSysDic())
+	t.dic = NewSysDic()
 	return
 }
 
 // SetDic sets dictionary to dic.
 func (t *Tokenizer) SetDic(dic *Dic) {
-	t.lattice.setDic(dic)
+	if dic != nil {
+		t.dic = dic
+	}
 }
 
 // SetUserDic sets user dictionary to udic.
 func (t *Tokenizer) SetUserDic(udic *UserDic) {
-	t.lattice.setUserDic(udic)
+	t.udic = udic
 }
 
 // Tokenize returns morphs of a sentence.
 func (t *Tokenizer) Tokenize(input string) (tokens []Token) {
-	t.lattice.build(input)
-	t.lattice.forward(normalModeTokenize)
-	t.lattice.backward(normalModeTokenize)
-	size := len(t.lattice.output)
+	la := newLattice()
+	defer la.free()
+	la.dic, la.udic = t.dic, t.udic
+	la.build(input)
+	la.forward(normalModeTokenize)
+	la.backward(normalModeTokenize)
+	size := len(la.output)
 	tokens = make([]Token, 0, size)
-	for i := range t.lattice.output {
-		n := t.lattice.output[size-1-i]
+	for i := range la.output {
+		n := la.output[size-1-i]
 		tok := Token{
 			Id:      n.id,
 			Class:   n.class,
 			Start:   n.start,
 			End:     n.start + utf8.RuneCountInString(n.surface),
 			Surface: n.surface,
-			dic:     t.lattice.dic,
-			udic:    t.lattice.udic,
+			dic:     t.dic,
+			udic:    t.udic,
 		}
 		if tok.Id == BosEosId {
 			if i == 0 {
@@ -78,21 +83,24 @@ func (t *Tokenizer) Tokenize(input string) (tokens []Token) {
 
 // SearchModeTokenize returns morphs of a sentence.
 func (t *Tokenizer) SearchModeTokenize(input string) (tokens []Token) {
-	t.lattice.build(input)
-	t.lattice.forward(searchModeTokenize)
-	t.lattice.backward(searchModeTokenize)
-	size := len(t.lattice.output)
+	la := newLattice()
+	defer la.free()
+	la.dic, la.udic = t.dic, t.udic
+	la.build(input)
+	la.forward(searchModeTokenize)
+	la.backward(searchModeTokenize)
+	size := len(la.output)
 	tokens = make([]Token, 0, size)
-	for i := range t.lattice.output {
-		n := t.lattice.output[size-1-i]
+	for i := range la.output {
+		n := la.output[size-1-i]
 		tok := Token{
 			Id:      n.id,
 			Class:   n.class,
 			Start:   n.start,
 			End:     n.start + utf8.RuneCountInString(n.surface),
 			Surface: n.surface,
-			dic:     t.lattice.dic,
-			udic:    t.lattice.udic,
+			dic:     t.dic,
+			udic:    t.udic,
 		}
 		if tok.Id == BosEosId {
 			if i == 0 {
@@ -108,21 +116,24 @@ func (t *Tokenizer) SearchModeTokenize(input string) (tokens []Token) {
 
 // ExtendedModeTokenize returns morphs of a sentence.
 func (t *Tokenizer) ExtendedModeTokenize(input string) (tokens []Token) {
-	t.lattice.build(input)
-	t.lattice.forward(extendedModeTokenize)
-	t.lattice.backward(extendedModeTokenize)
-	size := len(t.lattice.output)
+	la := newLattice()
+	defer la.free()
+	la.dic, la.udic = t.dic, t.udic
+	la.build(input)
+	la.forward(extendedModeTokenize)
+	la.backward(extendedModeTokenize)
+	size := len(la.output)
 	tokens = make([]Token, 0, size)
-	for i := range t.lattice.output {
-		n := t.lattice.output[size-1-i]
+	for i := range la.output {
+		n := la.output[size-1-i]
 		tok := Token{
 			Id:      n.id,
 			Class:   n.class,
 			Start:   n.start,
 			End:     n.start + utf8.RuneCountInString(n.surface),
 			Surface: n.surface,
-			dic:     t.lattice.dic,
-			udic:    t.lattice.udic,
+			dic:     t.dic,
+			udic:    t.udic,
 		}
 		if tok.Id == BosEosId {
 			if i == 0 {
@@ -138,7 +149,35 @@ func (t *Tokenizer) ExtendedModeTokenize(input string) (tokens []Token) {
 
 // Dot returns morphs of a sentense and exports a lattice graph to dot format.
 func (t *Tokenizer) Dot(input string, w io.Writer) (tokens []Token) {
+	la := newLattice()
+	defer la.free()
+	la.dic, la.udic = t.dic, t.udic
+	la.build(input)
+	la.forward(normalModeTokenize)
+	la.backward(normalModeTokenize)
+	size := len(la.output)
+	tokens = make([]Token, 0, size)
+	for i := range la.output {
+		n := la.output[size-1-i]
+		tok := Token{
+			Id:      n.id,
+			Class:   n.class,
+			Start:   n.start,
+			End:     n.start + utf8.RuneCountInString(n.surface),
+			Surface: n.surface,
+			dic:     t.dic,
+			udic:    t.udic,
+		}
+		if tok.Id == BosEosId {
+			if i == 0 {
+				tok.Surface = "BOS"
+			} else {
+				tok.Surface = "EOS"
+			}
+		}
+		tokens = append(tokens, tok)
+	}
 	tokens = t.Tokenize(input)
-	t.lattice.dot(w)
+	la.dot(w)
 	return
 }

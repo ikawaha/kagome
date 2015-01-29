@@ -25,7 +25,7 @@ func TestStateEq01(t *testing.T) {
 		{pair{x: nil, y: nil}, false},
 		{pair{x: nil, y: &state{}}, false},
 		{pair{x: &state{}, y: nil}, false},
-		{pair{&state{ID: 1}, &state{ID: 2}}, true},
+		{pair{&state{Id: 1}, &state{Id: 2}}, true},
 		{pair{&state{IsFinal: true}, &state{IsFinal: false}}, false},
 		{pair{&state{Output: map[byte]int32{1: 555}}, &state{}}, false},
 		{pair{&state{Output: map[byte]int32{1: 555}}, &state{Output: map[byte]int32{1: 555}}},
@@ -47,8 +47,8 @@ func TestStateEq01(t *testing.T) {
 }
 
 func TestStateEq02(t *testing.T) {
-	x := &state{ID: 1}
-	y := &state{ID: 2}
+	x := &state{Id: 1}
+	y := &state{Id: 2}
 	a := &state{
 		Trans: map[byte]*state{1: x, 2: y},
 	}
@@ -90,7 +90,7 @@ func TestStateString01(t *testing.T) {
 	}
 	r := &state{}
 	s := state{
-		ID:      1,
+		Id:      1,
 		Trans:   map[byte]*state{1: nil, 2: r},
 		Output:  map[byte]int32{3: 555, 4: 888},
 		Tail:    int32Set{1111: true},
@@ -103,8 +103,8 @@ func TestStateString01(t *testing.T) {
 func TestMASTBuildMAST01(t *testing.T) {
 	inp := PairSlice{}
 	m := buildMAST(inp)
-	if m.initialState.ID != 0 {
-		t.Errorf("got initial state id %v, expected 0\n", m.initialState.ID)
+	if m.initialState.Id != 0 {
+		t.Errorf("got initial state id %v, expected 0\n", m.initialState.Id)
 	}
 	if len(m.states) != 1 {
 		t.Errorf("expected: initial state only, got %v\n", m.states)
