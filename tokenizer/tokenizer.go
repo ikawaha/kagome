@@ -44,9 +44,7 @@ func New(d Dic) (t *Tokenizer) {
 
 // SetDic sets dictionary to dic.
 func (t *Tokenizer) SetDic(d Dic) {
-	if d.dic != nil {
-		t.dic = d.dic
-	}
+	t.dic = d.dic
 }
 
 // SetUserDic sets user dictionary to udic.
@@ -59,7 +57,7 @@ func (t *Tokenizer) Tokenize(input string, mode TokenizeMode) (tokens []Token) {
 	la := lattice.New(t.dic, t.udic)
 	defer la.Free()
 	la.Build(input)
-	var m lattice.TokenizeMode
+	m := lattice.Normal
 	switch mode {
 	case Normal:
 		m = lattice.Normal
@@ -67,8 +65,6 @@ func (t *Tokenizer) Tokenize(input string, mode TokenizeMode) (tokens []Token) {
 		m = lattice.Search
 	case Extended:
 		m = lattice.Extended
-	default:
-		m = lattice.Normal
 	}
 	la.Forward(m)
 	la.Backward(m)
