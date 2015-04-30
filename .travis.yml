@@ -13,6 +13,7 @@ install:
 script:
   - go test -v ./...
   - /bin/sh ./go-coverall.sh
+  - cd tokenizer; go test -bench .
 
 
 #branches:
