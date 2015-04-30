@@ -57,7 +57,9 @@ func newOption() (o *option) {
 func (o *option) parse(args []string) (err error) {
 	o.flagSet.Parse(args)
 	// validations
-
+	if o.mode != "normal" && o.mode != "search" && o.mode != "extended" {
+		return fmt.Errorf("unknown mode: %v", o.mode)
+	}
 	return
 }
 
@@ -239,6 +241,7 @@ func Run(args []string) error {
 	if e := opt.parse(args); e != nil {
 		Usage()
 		PrintDefaults()
+		fmt.Fprintf(errorWriter, "%v\n", e)
 		os.Exit(1)
 	}
 	return command(opt)
