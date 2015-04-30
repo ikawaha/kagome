@@ -10,6 +10,7 @@
 package lattice
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/ikawaha/kagome/internal/dic"
@@ -96,6 +97,40 @@ func TestLatticeBuild02(t *testing.T) {
 	}
 }
 
+func TestLatticeBuild03(t *testing.T) {
+
+	const udicPath = "../../_sample/userdic.txt"
+
+	udic, e := dic.NewUserDic(udicPath)
+	if e != nil {
+		t.Fatal("unexpected error: cannot load user dic, %v", e)
+	}
+	la := New(dic.SysDic(), udic)
+	if la == nil {
+		t.Fatal("cannot new a lattice\n")
+	}
+
+	inp := "朝青龍"
+	la.Build(inp)
+	if la.Input != inp {
+		t.Errorf("got %v, expected %v\n", la.Input, inp)
+	}
+
+	if la.list[3][0].Class == USER {
+		t.Errorf("%+v", la)
+	}
+
+	if len(la.Output) != 0 {
+		t.Errorf("lattice initialize error: got %v, expected empty\n", la.Output)
+	}
+	if la.dic == nil {
+		t.Errorf("lattice initialize error: dic is nil\n")
+	}
+	if la.udic == nil {
+		t.Errorf("lattice initialize error: got %v, expected not empty\n", la.udic)
+	}
+}
+
 func TestKanjiOnly01(t *testing.T) {
 	callAndResponse := []struct {
 		in  string
@@ -113,5 +148,97 @@ func TestKanjiOnly01(t *testing.T) {
 		if rsp := kanjiOnly(cr.in); rsp != cr.out {
 			t.Errorf("in: %v, got %v, expected: %v", cr.in, rsp, cr.out)
 		}
+	}
+}
+
+func TestLatticeString(t *testing.T) {
+	la := New(dic.SysDic(), nil)
+	if la == nil {
+		t.Fatal("cannot new a lattice\n")
+	}
+	// test
+	expected := ""
+	str := la.String()
+	if str != expected {
+		t.Errorf("got %v, expected: %v", str, expected)
+	}
+	// only idling
+	la.Build("わたしまけましたわ")
+	str = la.String()
+	if str == "" {
+		t.Errorf("got empty string")
+	}
+}
+
+func TestLatticeDot(t *testing.T) {
+	la := New(dic.SysDic(), nil)
+	if la == nil {
+		t.Fatal("cannot new a lattice\n")
+	}
+	// test
+	expected := "graph lattice {\n\tdpi=48;\n\tgraph [style=filled, rankdir=LR]\n}\n"
+	var b bytes.Buffer
+	la.Dot(&b)
+	if b.String() != expected {
+		t.Errorf("got %v, expected: %v", b.String(), expected)
+	}
+	// only idling
+	b.Reset()
+	la.Build("わたしまけましたわ")
+	la.Dot(&b)
+	if b.String() == "" {
+		t.Errorf("got empty string")
+	}
+}
+
+func TestLatticeFree(t *testing.T) {
+	la := New(dic.SysDic(), nil)
+	if la == nil {
+		t.Fatal("unexpected error: cannot new a lattice\n")
+	}
+	la.Free()
+	if len(la.list) != 0 {
+		t.Errorf("cannot free nodes: %v", len(la.list))
+	}
+	la.Build("あ")
+	if len(la.list) == 0 {
+		t.Error("unexpected error: cannot build lattice")
+	}
+	la.Free()
+	if len(la.list) != 0 {
+		t.Errorf("cannot free nodes: %v", len(la.list))
+	}
+}
+
+func TestForward(t *testing.T) {
+	la := New(dic.SysDic(), nil)
+	if la == nil {
+		t.Fatal("unexpected error: cannot new a lattice\n")
+	}
+	// only run
+	la.Forward(Normal)
+	la.Forward(Search)
+	la.Forward(Extended)
+
+	for _, m := range []TokenizeMode{Normal, Search, Extended} {
+		la.Build("わたしまけましたわ")
+		la.Forward(m)
+	}
+}
+
+func TestBackward(t *testing.T) {
+	la := New(dic.SysDic(), nil)
+	if la == nil {
+		t.Fatal("unexpected error: cannot new a lattice\n")
+	}
+	// only run
+	la.Backward(Normal)
+	la.Backward(Search)
+	la.Backward(Extended)
+
+	for _, m := range []TokenizeMode{Normal, Search, Extended} {
+		la.Build("わたしまけましたわ")
+		la.Forward(m)
+		la.Backward(m)
 	}
 }
