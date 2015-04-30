@@ -116,7 +116,7 @@ func TestLatticeBuild03(t *testing.T) {
 		t.Errorf("got %v, expected %v\n", la.Input, inp)
 	}
 
-	if la.list[3][0].Class == USER {
+	if la.list[3][0].Class != USER {
 		t.Errorf("%+v", la)
 	}
 
