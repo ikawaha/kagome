@@ -238,6 +238,9 @@ func (la *lattice) Forward(m TokenizeMode) {
 func (la *lattice) Backward(m TokenizeMode) {
 	const bufferExpandRatio = 2
 	size := len(la.list)
+	if size == 0 {
+		return
+	}
 	if cap(la.Output) < size {
 		la.Output = make([]*node, 0, size*bufferExpandRatio)
 	} else {
