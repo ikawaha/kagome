@@ -14,6 +14,16 @@ import (
 	"testing"
 )
 
+func TestSystemDic(t *testing.T) {
+	d := SysDic() // load default ipadic
+
+	const expected = 392126
+	c := len(d.Morphs)
+	if c != expected {
+		t.Errorf("got %v, expected %v\n", c, expected)
+	}
+}
+
 func TestSystemDicIPAPath01(t *testing.T) {
 	expected := "dic/ipa"
 	if IPADicPath != expected {
