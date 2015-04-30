@@ -27,17 +27,18 @@ const (
 )
 
 func (c TokenClass) String() string {
+	ret := ""
 	switch c {
 	case DUMMY:
-		return "DUMMY"
+		ret = "DUMMY"
 	case KNOWN:
-		return "KNOWN"
+		ret = "KNOWN"
 	case UNKNOWN:
-		return "UNKNOWN"
+		ret = "UNKNOWN"
 	case USER:
-		return "USER"
+		ret = "USER"
 	}
-	return ""
+	return ret
 }
 
 // Token represents a morph of a sentence.
