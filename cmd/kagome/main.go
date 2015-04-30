@@ -14,7 +14,6 @@ import (
 	"os"
 	"path"
 
-	"github.com/ikawaha/kagome/cmd/kagome/dic"
 	"github.com/ikawaha/kagome/cmd/kagome/server"
 	"github.com/ikawaha/kagome/cmd/kagome/tokenize"
 )
@@ -29,7 +28,6 @@ var subcommands = []struct {
 	// subcommands
 	{tokenize.CommandName, tokenize.Description, tokenize.Run},
 	{server.CommandName, server.Description, server.Run},
-	{dic.CommandName, dic.Description, dic.Run},
 }
 
 func Usage() {
