@@ -10,6 +10,7 @@
 package tokenizer
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/ikawaha/kagome/internal/lattice"
@@ -310,23 +311,53 @@ func TestExtendedModeTokenize04(t *testing.T) {
 
 }
 
-func BenchmarkTokenize01(b *testing.B) {
-	tnz := New(SysDic())
-	for i := 0; i < b.N; i++ {
-		tnz.Tokenize("人魚は、南の方の海にばかり棲んでいるのではありません。北の海にも棲んでいたのであります。北方の海の色は、青うございました。ある時、岩の上に、女の人魚があがって、あたりの景色を眺めながら休んでいました。", Normal)
+func TestTokenizerSetDic(t *testing.T) {
+	d := SysDic()
+	tnz := New(d)
+
+	tnz.SetDic(d)
+	if tnz.dic != d.dic {
+		t.Error("got %v, expected %v", tnz.dic, d)
 	}
 }
 
-func BenchmarkTokenize02(b *testing.B) {
+func TestTokenizerDot(t *testing.T) {
 	tnz := New(SysDic())
-	for i := 0; i < b.N; i++ {
-		tnz.Tokenize("人魚は、南の方の海にばかり棲んでいるのではありません。北の海にも棲んでいたのであります。北方の海の色は、青うございました。ある時、岩の上に、女の人魚があがって、あたりの景色を眺めながら休んでいました。", Search)
+
+	// test empty case
+	var b bytes.Buffer
+	tnz.Dot("", &b)
+	if b.String() == "" {
+		t.Errorf("got empty string")
+	}
+
+	// only idling
+	b.Reset()
+	tnz.Dot("わたしまけましたわ", &b)
+	if b.String() == "" {
+		t.Errorf("got empty string")
 	}
 }
 
-func BenchmarkTokenize03(b *testing.B) {
+var benchSampleText = "人魚は、南の方の海にばかり棲んでいるのではありません。北の海にも棲んでいたのであります。北方の海の色は、青うございました。ある時、岩の上に、女の人魚があがって、あたりの景色を眺めながら休んでいました。"
+
+func BenchmarkTokenizeNormal(b *testing.B) {
 	tnz := New(SysDic())
 	for i := 0; i < b.N; i++ {
-		tnz.Tokenize("人魚は、南の方の海にばかり棲んでいるのではありません。北の海にも棲んでいたのであります。北方の海の色は、青うございました。ある時、岩の上に、女の人魚があがって、あたりの景色を眺めながら休んでいました。", Extended)
+		tnz.Tokenize(benchSampleText, Normal)
+	}
+}
+
+func BenchmarkTokenizeSearch(b *testing.B) {
+	tnz := New(SysDic())
+	for i := 0; i < b.N; i++ {
+		tnz.Tokenize(benchSampleText, Search)
+	}
+}
+
+func BenchmarkTokenizeExtended(b *testing.B) {
+	tnz := New(SysDic())
+	for i := 0; i < b.N; i++ {
+		tnz.Tokenize(benchSampleText, Extended)
 	}
 }
