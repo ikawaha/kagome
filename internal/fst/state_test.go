@@ -55,10 +55,12 @@ func TestStateEq02(t *testing.T) {
 	x := &state{ID: 1}
 	y := &state{ID: 2}
 	a := &state{
-		Trans: map[byte]*state{1: x, 2: y},
+		Trans:  map[byte]*state{1: x, 2: y},
+		Output: make(map[byte]int32),
 	}
 	b := &state{
-		Trans: map[byte]*state{1: x, 2: y},
+		Trans:  map[byte]*state{1: x, 2: y},
+		Output: make(map[byte]int32),
 	}
 	c := &state{
 		Trans: map[byte]*state{1: y, 2: y},
@@ -69,6 +71,13 @@ func TestStateEq02(t *testing.T) {
 	if rst, exp := a.eq(b), true; rst != exp {
 		t.Errorf("got %v, expected %v\n", rst, exp)
 	}
+
+	a.setOutput('a', 1)
+	b.setOutput('a', 2)
+	if rst, exp := a.eq(b), false; rst != exp {
+		t.Errorf("got %v, expected %v\n", rst, exp)
+	}
+
 	if rst, exp := a.eq(c), false; rst != exp {
 		t.Errorf("got %v, expected %v\n", rst, exp)
 	}
