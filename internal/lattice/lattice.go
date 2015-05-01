@@ -93,30 +93,30 @@ func (la *lattice) addNode(pos, id, start int, class NodeClass, surface string) 
 	la.list[p] = append(la.list[p], n)
 }
 
-func (la *lattice) Build(Input string) {
-	rc := utf8.RuneCountInString(Input)
-	la.Input = Input
+func (la *lattice) Build(inp string) {
+	rc := utf8.RuneCountInString(inp)
+	la.Input = inp
 	if cap(la.list) < rc+2 {
 		const expandRatio = 2
 		la.list = make([][]*node, 0, (rc+2)*expandRatio)
 	}
 	la.list = la.list[0 : rc+2]
 
-	la.addNode(0, BosEosID, 0, DUMMY, Input[0:0])
-	la.addNode(rc+1, BosEosID, rc, DUMMY, Input[rc:rc])
+	la.addNode(0, BosEosID, 0, DUMMY, inp[0:0])
+	la.addNode(rc+1, BosEosID, rc, DUMMY, inp[rc:rc])
 
 	runePos := -1
-	for pos, ch := range Input {
+	for pos, ch := range inp {
 		runePos++
 		anyMatches := false
 
 		// (1) USER DIC
 		if la.udic != nil {
-			lens, outputs := la.udic.Index.CommonPrefixSearch(Input[pos:])
+			lens, outputs := la.udic.Index.CommonPrefixSearch(inp[pos:])
 			for i, ids := range outputs {
 				for j := range ids {
 					la.addNode(runePos, int(ids[j]), runePos,
-						USER, Input[pos:pos+int(lens[i])])
+						USER, inp[pos:pos+int(lens[i])])
 				}
 			}
 			anyMatches = (len(lens) > 0)
@@ -126,12 +126,12 @@ func (la *lattice) Build(Input string) {
 		}
 
 		// (2) KNOWN DIC
-		if lens, outputs := la.dic.Index.CommonPrefixSearch(Input[pos:]); len(lens) > 0 {
+		if lens, outputs := la.dic.Index.CommonPrefixSearch(inp[pos:]); len(lens) > 0 {
 			anyMatches = true
 			for i, ids := range outputs {
 				for j := range ids {
 					la.addNode(runePos, int(ids[j]), runePos,
-						KNOWN, Input[pos:pos+lens[i]])
+						KNOWN, inp[pos:pos+lens[i]])
 				}
 			}
 		}
@@ -141,9 +141,9 @@ func (la *lattice) Build(Input string) {
 			endPos := pos + utf8.RuneLen(ch)
 			unkWordLen := 1
 			if la.dic.GroupList[class] {
-				for i, w, size := endPos, 1, len(Input); i < size; i += w {
+				for i, w, size := endPos, 1, len(inp); i < size; i += w {
 					var c rune
-					c, w = utf8.DecodeRuneInString(Input[i:])
+					c, w = utf8.DecodeRuneInString(inp[i:])
 					if la.dic.CharactorCategory(c) != class {
 						break
 					}
@@ -156,7 +156,7 @@ func (la *lattice) Build(Input string) {
 			}
 			id := la.dic.UnkIndex[int(class)]
 			for i, w := pos, 0; i < endPos; i += w {
-				_, w = utf8.DecodeRuneInString(Input[i:])
+				_, w = utf8.DecodeRuneInString(inp[i:])
 				end := i + w
 				dup, ok := la.dic.UnkIndexDup[int(class)]
 				if !ok {
@@ -164,7 +164,7 @@ func (la *lattice) Build(Input string) {
 				}
 				for x := 0; x < dup; x++ {
 					la.addNode(runePos, id+x, runePos,
-						UNKNOWN, Input[pos:end])
+						UNKNOWN, inp[pos:end])
 				}
 			}
 		}
