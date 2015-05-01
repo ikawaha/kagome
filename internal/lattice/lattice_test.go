@@ -12,6 +12,7 @@ package lattice
 import (
 	"bytes"
 	"testing"
+	"unicode/utf8"
 
 	"github.com/ikawaha/kagome/internal/dic"
 )
@@ -19,56 +20,56 @@ import (
 func TestLatticeBuild01(t *testing.T) {
 	la := New(dic.SysDic(), nil)
 	if la == nil {
-		t.Error("cannot new a lattice\n")
+		t.Error("cannot new a lattice")
 	}
 	inp := ""
 	la.Build(inp)
 	if la.Input != inp {
-		t.Errorf("got %v, expected %v\n", la.Input, inp)
+		t.Errorf("got %v, expected %v", la.Input, inp)
 	}
 	boseos := node{ID: -1}
 	if len(la.list) != 2 {
-		t.Errorf("lattice initialize error: got %v, expected has 2 eos/bos nodes\n", la.list)
+		t.Errorf("lattice initialize error: got %v, expected has 2 eos/bos nodes", la.list)
 	} else if len(la.list[0]) != 1 || *la.list[0][0] != boseos {
-		t.Errorf("lattice initialize error: got %v, expected %v\n", *la.list[0][0], boseos)
+		t.Errorf("lattice initialize error: got %v, expected %v", *la.list[0][0], boseos)
 	} else if len(la.list[1]) != 1 || *la.list[1][0] != boseos {
-		t.Errorf("lattice initialize error: got %v, expected %v\n", *la.list[1][0], boseos)
+		t.Errorf("lattice initialize error: got %v, expected %v", *la.list[1][0], boseos)
 	}
 	if len(la.Output) != 0 {
-		t.Errorf("lattice initialize error: got %v, expected empty\n", la.Output)
+		t.Errorf("lattice initialize error: got %v, expected empty", la.Output)
 	}
 
 	if la.dic == nil {
-		t.Errorf("lattice initialize error: dic is nil\n")
+		t.Errorf("lattice initialize error: dic is nil")
 	}
 	if la.udic != nil {
-		t.Errorf("lattice initialize error: got %v, expected empty\n", la.udic)
+		t.Errorf("lattice initialize error: got %v, expected empty", la.udic)
 	}
 }
 
 func TestLatticeBuild02(t *testing.T) {
 	la := New(dic.SysDic(), nil)
 	if la == nil {
-		t.Fatal("cannot new a lattice\n")
+		t.Fatal("cannot new a lattice")
 	}
 	inp := "あ"
 	la.Build(inp)
 	if la.Input != inp {
-		t.Errorf("got %v, expected %v\n", la.Input, inp)
+		t.Errorf("got %v, expected %v", la.Input, inp)
 	}
 	bos := node{ID: -1}
 	eos := node{ID: -1, Start: 1}
 	if len(la.list) != 3 {
-		t.Errorf("lattice initialize error: got %v, expected has 2 eos/bos nodes\n", la.list)
+		t.Errorf("lattice initialize error: got %v, expected has 2 eos/bos nodes", la.list)
 	} else if len(la.list[0]) != 1 || *la.list[0][0] != bos {
-		t.Errorf("lattice initialize error: got %v, expected %v\n", *la.list[0][0], bos)
+		t.Errorf("lattice initialize error: got %v, expected %v", *la.list[0][0], bos)
 	} else if len(la.list[2]) != 1 || *la.list[2][0] != eos {
-		t.Errorf("lattice initialize error: got %v, expected %v\n", *la.list[2][0], eos)
+		t.Errorf("lattice initialize error: got %v, expected %v", *la.list[2][0], eos)
 	}
 
 	expected := 4
 	if len(la.list[1]) != expected {
-		t.Errorf("lattice initialize error: got %v, expected %v\n", len(la.list[1]), expected)
+		t.Errorf("lattice initialize error: got %v, expected %v", len(la.list[1]), expected)
 	} else {
 		l := la.list[1]
 		callAndResponse := []struct {
@@ -82,18 +83,18 @@ func TestLatticeBuild02(t *testing.T) {
 		}
 		for _, cr := range callAndResponse {
 			if *l[cr.in] != cr.out {
-				t.Errorf("lattice initialize error: got %v, expected %v\n", l[cr.in], cr.out)
+				t.Errorf("lattice initialize error: got %v, expected %v", l[cr.in], cr.out)
 			}
 		}
 	}
 	if len(la.Output) != 0 {
-		t.Errorf("lattice initialize error: got %v, expected empty\n", la.Output)
+		t.Errorf("lattice initialize error: got %v, expected empty", la.Output)
 	}
 	if la.dic == nil {
-		t.Errorf("lattice initialize error: dic is nil\n")
+		t.Errorf("lattice initialize error: dic is nil")
 	}
 	if la.udic != nil {
-		t.Errorf("lattice initialize error: got %v, expected empty\n", la.udic)
+		t.Errorf("lattice initialize error: got %v, expected empty", la.udic)
 	}
 }
 
@@ -107,13 +108,13 @@ func TestLatticeBuild03(t *testing.T) {
 	}
 	la := New(dic.SysDic(), udic)
 	if la == nil {
-		t.Fatal("cannot new a lattice\n")
+		t.Fatal("cannot new a lattice")
 	}
 
 	inp := "朝青龍"
 	la.Build(inp)
 	if la.Input != inp {
-		t.Errorf("got %v, expected %v\n", la.Input, inp)
+		t.Errorf("got %v, expected %v", la.Input, inp)
 	}
 
 	if la.list[3][0].Class != USER {
@@ -121,39 +122,39 @@ func TestLatticeBuild03(t *testing.T) {
 	}
 
 	if len(la.Output) != 0 {
-		t.Errorf("lattice initialize error: got %v, expected empty\n", la.Output)
+		t.Errorf("lattice initialize error: got %v, expected empty", la.Output)
 	}
 	if la.dic == nil {
-		t.Errorf("lattice initialize error: dic is nil\n")
+		t.Errorf("lattice initialize error: dic is nil")
 	}
 	if la.udic == nil {
-		t.Errorf("lattice initialize error: got %v, expected not empty\n", la.udic)
+		t.Errorf("lattice initialize error: got %v, expected not empty", la.udic)
 	}
 }
 
 func TestLatticeBuild04(t *testing.T) {
 	la := New(dic.SysDic(), nil)
 	if la == nil {
-		t.Fatal("cannot new a lattice\n")
+		t.Fatal("cannot new a lattice")
 	}
 	inp := "ポポピ"
 	la.Build(inp)
 	if la.Input != inp {
-		t.Errorf("got %v, expected %v\n", la.Input, inp)
+		t.Errorf("got %v, expected %v", la.Input, inp)
 	}
 	bos := node{ID: -1}
 	eos := node{ID: -1, Start: 3}
 	if len(la.list) != 5 {
-		t.Errorf("lattice initialize error: got %v, expected has 2 eos/bos nodes\n", la.list)
+		t.Errorf("lattice initialize error: got %v, expected has 2 eos/bos nodes", la.list)
 	} else if len(la.list[0]) != 1 || *la.list[0][0] != bos {
-		t.Errorf("lattice initialize error: got %v, expected %v\n", *la.list[0][0], bos)
+		t.Errorf("lattice initialize error: got %v, expected %v", *la.list[0][0], bos)
 	} else if len(la.list[len(la.list)-1]) != 1 || *la.list[len(la.list)-1][0] != eos {
-		t.Errorf("lattice initialize error: got %v, expected %v\n", *la.list[len(la.list)-1][0], eos)
+		t.Errorf("lattice initialize error: got %v, expected %v", *la.list[len(la.list)-1][0], eos)
 	}
 
 	expected := 7
 	if len(la.list[1]) != expected {
-		t.Errorf("lattice initialize error: got %v, expected %v\n", len(la.list[1]), expected)
+		t.Errorf("lattice initialize error: got %v, expected %v", len(la.list[1]), expected)
 	} else {
 		l := la.list[1]
 		callAndResponse := []struct {
@@ -170,18 +171,40 @@ func TestLatticeBuild04(t *testing.T) {
 		}
 		for _, cr := range callAndResponse {
 			if *l[cr.in] != cr.out {
-				t.Errorf("lattice initialize error: got %v, expected %v\n", l[cr.in], cr.out)
+				t.Errorf("lattice initialize error: got %v, expected %v", l[cr.in], cr.out)
 			}
 		}
 	}
 	if len(la.Output) != 0 {
-		t.Errorf("lattice initialize error: got %v, expected empty\n", la.Output)
+		t.Errorf("lattice initialize error: got %v, expected empty", la.Output)
 	}
 	if la.dic == nil {
-		t.Errorf("lattice initialize error: dic is nil\n")
+		t.Errorf("lattice initialize error: dic is nil")
 	}
 	if la.udic != nil {
-		t.Errorf("lattice initialize error: got %v, expected empty\n", la.udic)
+		t.Errorf("lattice initialize error: got %v, expected empty", la.udic)
+	}
+}
+
+func TestLatticeBuild05(t *testing.T) {
+
+	la := New(dic.SysDic(), nil)
+	if la == nil {
+		t.Fatal("cannot new a lattice")
+	}
+	inp := "ポポピポンポコナーノ"
+	var b bytes.Buffer
+	for i, step := 0, utf8.RuneCountInString(inp); i < maximumUnknownWordLength; i = i + step {
+		b.WriteString(inp)
+	}
+	la.Build(b.String())
+	for i := range la.list {
+		for j := range la.list[i] {
+			l := utf8.RuneCountInString(la.list[i][j].Surface)
+			if l > maximumUnknownWordLength {
+				t.Errorf("too long unknown word, %v", l)
+			}
+		}
 	}
 }
 
@@ -208,15 +231,15 @@ func TestKanjiOnly01(t *testing.T) {
 func TestLatticeString(t *testing.T) {
 	la := New(dic.SysDic(), nil)
 	if la == nil {
-		t.Fatal("cannot new a lattice\n")
+		t.Fatal("cannot new a lattice")
 	}
-	// test
+
 	expected := ""
 	str := la.String()
 	if str != expected {
 		t.Errorf("got %v, expected: %v", str, expected)
 	}
-	// only idling
+
 	la.Build("わたしまけましたわ")
 	str = la.String()
 	if str == "" {
@@ -227,16 +250,15 @@ func TestLatticeString(t *testing.T) {
 func TestLatticeDot(t *testing.T) {
 	la := New(dic.SysDic(), nil)
 	if la == nil {
-		t.Fatal("cannot new a lattice\n")
+		t.Fatal("cannot new a lattice")
 	}
-	// test
+
 	expected := "graph lattice {\n\tdpi=48;\n\tgraph [style=filled, rankdir=LR]\n}\n"
 	var b bytes.Buffer
 	la.Dot(&b)
 	if b.String() != expected {
 		t.Errorf("got %v, expected: %v", b.String(), expected)
 	}
-	// only idling
 	b.Reset()
 	la.Build("わたしまけましたわ")
 	la.Dot(&b)
@@ -248,7 +270,7 @@ func TestLatticeDot(t *testing.T) {
 func TestLatticeFree(t *testing.T) {
 	la := New(dic.SysDic(), nil)
 	if la == nil {
-		t.Fatal("unexpected error: cannot new a lattice\n")
+		t.Fatal("unexpected error: cannot new a lattice")
 	}
 	la.Free()
 	if len(la.list) != 0 {
@@ -267,9 +289,8 @@ func TestLatticeFree(t *testing.T) {
 func TestForward(t *testing.T) {
 	la := New(dic.SysDic(), nil)
 	if la == nil {
-		t.Fatal("unexpected error: cannot new a lattice\n")
+		t.Fatal("unexpected error: cannot new a lattice")
 	}
-	// only run
 	la.Forward(Normal)
 	la.Forward(Search)
 	la.Forward(Extended)
@@ -283,7 +304,7 @@ func TestForward(t *testing.T) {
 func TestBackward(t *testing.T) {
 	la := New(dic.SysDic(), nil)
 	if la == nil {
-		t.Fatal("unexpected error: cannot new a lattice\n")
+		t.Fatal("unexpected error: cannot new a lattice")
 	}
 	// only run
 	la.Backward(Normal)
