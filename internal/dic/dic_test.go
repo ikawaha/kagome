@@ -300,6 +300,19 @@ func TestDicCharCategory01(t *testing.T) {
 	}
 }
 
+func TestCharCategory02(t *testing.T) {
+	dic, err := Load(testDic)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	c := dic.CharactorCategory(rune(len(dic.CharCategory) + 1))
+	expected := dic.CharCategory[0]
+	if c != expected {
+		t.Errorf("got %v, expected %v", c, expected)
+	}
+
+}
+
 func TestDicInvokeList01(t *testing.T) {
 	const (
 		DEFAULT      = 0
