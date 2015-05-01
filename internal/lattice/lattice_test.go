@@ -131,6 +131,60 @@ func TestLatticeBuild03(t *testing.T) {
 	}
 }
 
+func TestLatticeBuild04(t *testing.T) {
+	la := New(dic.SysDic(), nil)
+	if la == nil {
+		t.Fatal("cannot new a lattice\n")
+	}
+	inp := "ポポピ"
+	la.Build(inp)
+	if la.Input != inp {
+		t.Errorf("got %v, expected %v\n", la.Input, inp)
+	}
+	bos := node{ID: -1}
+	eos := node{ID: -1, Start: 3}
+	if len(la.list) != 5 {
+		t.Errorf("lattice initialize error: got %v, expected has 2 eos/bos nodes\n", la.list)
+	} else if len(la.list[0]) != 1 || *la.list[0][0] != bos {
+		t.Errorf("lattice initialize error: got %v, expected %v\n", *la.list[0][0], bos)
+	} else if len(la.list[len(la.list)-1]) != 1 || *la.list[len(la.list)-1][0] != eos {
+		t.Errorf("lattice initialize error: got %v, expected %v\n", *la.list[len(la.list)-1][0], eos)
+	}
+
+	expected := 7
+	if len(la.list[1]) != expected {
+		t.Errorf("lattice initialize error: got %v, expected %v\n", len(la.list[1]), expected)
+	} else {
+		l := la.list[1]
+		callAndResponse := []struct {
+			in  int
+			out node
+		}{
+			{in: 0, out: node{98477, 0, KNOWN, 0, 1285, 1285, 4279, "ポ", nil}},
+			{in: 1, out: node{31, 0, UNKNOWN, 0, 1289, 1289, 13581, "ポ", nil}},
+			{in: 2, out: node{32, 0, UNKNOWN, 0, 1285, 1285, 9461, "ポ", nil}},
+			{in: 3, out: node{33, 0, UNKNOWN, 0, 1293, 1293, 13661, "ポ", nil}},
+			{in: 4, out: node{34, 0, UNKNOWN, 0, 1292, 1292, 10922, "ポ", nil}},
+			{in: 5, out: node{35, 0, UNKNOWN, 0, 1288, 1288, 10521, "ポ", nil}},
+			{in: 6, out: node{36, 0, UNKNOWN, 0, 3, 3, 14138, "ポ", nil}},
+		}
+		for _, cr := range callAndResponse {
+			if *l[cr.in] != cr.out {
+				t.Errorf("lattice initialize error: got %v, expected %v\n", l[cr.in], cr.out)
+			}
+		}
+	}
+	if len(la.Output) != 0 {
+		t.Errorf("lattice initialize error: got %v, expected empty\n", la.Output)
+	}
+	if la.dic == nil {
+		t.Errorf("lattice initialize error: dic is nil\n")
+	}
+	if la.udic != nil {
+		t.Errorf("lattice initialize error: got %v, expected empty\n", la.udic)
+	}
+}
+
 func TestKanjiOnly01(t *testing.T) {
 	callAndResponse := []struct {
 		in  string
