@@ -14,6 +14,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/ikawaha/kagome/cmd/kagome/lattice"
 	"github.com/ikawaha/kagome/cmd/kagome/server"
 	"github.com/ikawaha/kagome/cmd/kagome/tokenize"
 )
@@ -28,6 +29,7 @@ var subcommands = []struct {
 	// subcommands
 	{tokenize.CommandName, tokenize.Description, tokenize.Run},
 	{server.CommandName, server.Description, server.Run},
+	{lattice.CommandName, lattice.Description, lattice.Run},
 }
 
 func Usage() {
