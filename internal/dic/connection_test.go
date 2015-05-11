@@ -10,6 +10,8 @@
 package dic
 
 import (
+	"bytes"
+	"reflect"
 	"testing"
 )
 
@@ -36,4 +38,41 @@ func TestConnectionTableAt(t *testing.T) {
 		}
 	}
 
+}
+
+func TestConnectionTableWriteTo(t *testing.T) {
+	ct := ConnectionTable{
+		Row: 2,
+		Col: 3,
+		Vec: []int16{11, 12, 13, 21, 22, 23},
+	}
+	var b bytes.Buffer
+	n, err := ct.WriteTo(&b)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if n != int64(b.Len()) {
+		t.Errorf("got %v, expected %v", n, b.Len())
+	}
+}
+
+func TestLoadConnectionTable(t *testing.T) {
+	src := ConnectionTable{
+		Row: 2,
+		Col: 3,
+		Vec: []int16{11, 12, 13, 21, 22, 23},
+	}
+	var b bytes.Buffer
+	_, err := src.WriteTo(&b)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	dst, err := LoadConnectionTable(&b)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if !reflect.DeepEqual(src, dst) {
+		t.Errorf("got %v, expected %v", dst, src)
+	}
 }
