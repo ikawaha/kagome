@@ -211,14 +211,17 @@ func saveIpaDic(d *IpaDic, base string, archive bool) (err error) {
 			defer f.Close()
 			out = f
 		}
+		if _, e = dic.MorphSlice(d.Morphs).WriteTo(out); e != nil {
+			return
+		}
+		// if e = enc.Encode(d.Morphs); e != nil {
+		// 	return
+		// }
+		// if _, e = buf.WriteTo(out); e != nil {
+		// 	return
+		// }
 		var buf bytes.Buffer
 		enc := gob.NewEncoder(&buf)
-		if e = enc.Encode(d.Morphs); e != nil {
-			return
-		}
-		if _, e = buf.WriteTo(out); e != nil {
-			return
-		}
 		if e = enc.Encode(d.Contents); e != nil {
 			return
 		}
@@ -251,7 +254,7 @@ func saveIpaDic(d *IpaDic, base string, archive bool) (err error) {
 		if !ok {
 			return fmt.Errorf("invalid type assertions: %v", d.Index)
 		}
-		if e := t.Write(out); e != nil {
+		if _, e := t.WriteTo(out); e != nil {
 			return e
 		}
 		return nil
@@ -275,14 +278,17 @@ func saveIpaDic(d *IpaDic, base string, archive bool) (err error) {
 			defer f.Close()
 			out = f
 		}
-		var buf bytes.Buffer
-		enc := gob.NewEncoder(&buf)
-		if e = enc.Encode(d.Connection); e != nil {
+		if _, e = d.Connection.WriteTo(out); e != nil {
 			return e
 		}
-		if _, e = buf.WriteTo(out); e != nil {
-			return e
-		}
+		// var buf bytes.Buffer
+		// enc := gob.NewEncoder(&buf)
+		// if e = enc.Encode(d.Connection); e != nil {
+		// 	return e
+		// }
+		// if _, e = buf.WriteTo(out); e != nil {
+		// 	return e
+		// }
 		return e
 	}(); err != nil {
 		return
@@ -564,7 +570,7 @@ func loadIpaMorphFile(path string) (records [][]string, err error) {
 	return
 }
 
-func loadIpaMatrixDefFile(path string) (rowSize, colSize int, vec []int16, err error) {
+func loadIpaMatrixDefFile(path string) (rowSize, colSize int64, vec []int16, err error) {
 	var file *os.File
 	file, err = os.Open(path)
 	if err != nil {
@@ -579,12 +585,12 @@ func loadIpaMatrixDefFile(path string) (rowSize, colSize int, vec []int16, err e
 		err = fmt.Errorf("invalid format: %s", line)
 		return
 	}
-	rowSize, err = strconv.Atoi(dim[0])
+	rowSize, err = strconv.ParseInt(dim[0], 10, 0)
 	if err != nil {
 		err = fmt.Errorf("invalid format: %s, %s", err, line)
 		return
 	}
-	colSize, err = strconv.Atoi(dim[1])
+	colSize, err = strconv.ParseInt(dim[1], 10, 0)
 	if err != nil {
 		err = fmt.Errorf("invalid format: %s, %s", err, line)
 		return
@@ -597,12 +603,12 @@ func loadIpaMatrixDefFile(path string) (rowSize, colSize int, vec []int16, err e
 			err = fmt.Errorf("invalid format: %s", line)
 			return
 		}
-		row, e := strconv.Atoi(ary[0])
+		row, e := strconv.ParseInt(ary[0], 10, 0)
 		if e != nil {
 			err = fmt.Errorf("invalid format: %s, %s", e, line)
 			return
 		}
-		col, e := strconv.Atoi(ary[1])
+		col, e := strconv.ParseInt(ary[1], 10, 0)
 		if e != nil {
 			err = fmt.Errorf("invalid format: %s, %s", e, line)
 			return
