@@ -65,6 +65,8 @@ func New(d *dic.Dic, u *dic.UserDic) *Lattice {
 
 // Free releases a memory of a lattice.
 func (la *Lattice) Free() {
+	la.Input = ""
+	la.Output = la.Output[:0]
 	for i := range la.list {
 		for j := range la.list[i] {
 			nodePool.Put(la.list[i][j])
