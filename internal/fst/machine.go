@@ -30,7 +30,7 @@ const (
 )
 
 func (o operation) String() string {
-	opName := []string{"OP0", "ACC", "ACB", "MTC", "BRK", "OUT", "OUB", "OP6", "OP7"}
+	opName := []string{"OP0", "ACC", "ACB", "MTC", "BRK", "OUT", "OUB", "OP7"}
 	if int(o) >= len(opName) {
 		return fmt.Sprintf("NA[%d]", o)
 	}
