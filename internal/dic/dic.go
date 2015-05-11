@@ -35,6 +35,7 @@ type Dic struct {
 	UnkContents [][]string
 }
 
+// CharactorCategory returns the category of a rune.
 func (d Dic) CharactorCategory(r rune) byte {
 	if int(r) <= len(d.CharCategory) {
 		return d.CharCategory[r]
@@ -43,10 +44,12 @@ func (d Dic) CharactorCategory(r rune) byte {
 }
 
 func (d *Dic) loadMorphDicPart(r io.Reader) error {
-	dec := gob.NewDecoder(r)
-	if e := dec.Decode(&d.Morphs); e != nil {
+	m, e := LoadMorphSlice(r)
+	if e != nil {
 		return fmt.Errorf("dic initializer, Morphs: %v", e)
 	}
+	d.Morphs = m
+	dec := gob.NewDecoder(r)
 	if e := dec.Decode(&d.Contents); e != nil {
 		return fmt.Errorf("dic initializer, Contents: %v", e)
 	}
@@ -63,10 +66,11 @@ func (d *Dic) loadIndexDicPart(r io.Reader) error {
 }
 
 func (d *Dic) loadConnectionDicPart(r io.Reader) error {
-	dec := gob.NewDecoder(r)
-	if e := dec.Decode(&d.Connection); e != nil {
+	t, e := LoadConnectionTable(r)
+	if e != nil {
 		return fmt.Errorf("dic initializer, Connection: %v", e)
 	}
+	d.Connection = t
 	return nil
 }
 
@@ -104,6 +108,7 @@ func (d *Dic) loadUnkDicPart(r io.Reader) error {
 	return nil
 }
 
+// Load loads a dictionary from a file.
 func Load(path string) (d *Dic, err error) {
 	d = new(Dic)
 	r, err := zip.OpenReader(path)
