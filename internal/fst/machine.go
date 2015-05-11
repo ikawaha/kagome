@@ -393,8 +393,8 @@ func (t FST) CommonPrefixSearch(input string) (lens []int, outputs [][]int32) {
 
 }
 
-// Write saves a program of finite state transducer.
-func (t FST) Write(w io.Writer) error {
+// WriteTo saves a program of finite state transducer.
+func (t FST) WriteTo(w io.Writer) (n int64, err error) {
 	var (
 		pc   int
 		code instruction
@@ -405,20 +405,24 @@ func (t FST) Write(w io.Writer) error {
 	)
 	dataLen := int64(len(t.data))
 	//fmt.Println("data len:", dataLen)
-	if e := binary.Write(w, binary.LittleEndian, dataLen); e != nil {
-		return e
+	if err = binary.Write(w, binary.LittleEndian, dataLen); err != nil {
+		return
 	}
+	n += int64(binary.Size(dataLen))
 	//fmt.Println("data len:", dataLen) //XXX
 	for _, v := range t.data {
-		if e := binary.Write(w, binary.LittleEndian, v); e != nil {
-			return e
+		if err = binary.Write(w, binary.LittleEndian, v); err != nil {
+			return
 		}
+		n += int64(binary.Size(v))
 	}
 
 	progLen := int64(len(t.prog))
-	if e := binary.Write(w, binary.LittleEndian, progLen); e != nil {
-		return e
+	if err = binary.Write(w, binary.LittleEndian, progLen); err != nil {
+		return
 	}
+	n += int64(binary.Size(progLen))
+
 	//fmt.Println("prog len:", progLen) //XXX
 	for pc = 0; pc < len(t.prog); pc++ {
 		code = t.prog[pc]
@@ -427,9 +431,12 @@ func (t FST) Write(w io.Writer) error {
 		v16 = (*(*uint16)(unsafe.Pointer(&code[2])))
 
 		// write op and ch
-		if _, e := w.Write(code[0:2]); e != nil {
-			return e
+		var tmp int
+		tmp, err = w.Write(code[0:2])
+		if err != nil {
+			return
 		}
+		n += int64(tmp)
 		//fmt.Printf("%3d %v\t%X %d\n", pc, op, ch, v16) //XXX
 		switch operation(op) {
 		case opAccept:
@@ -441,45 +448,51 @@ func (t FST) Write(w io.Writer) error {
 			pc++
 			code = t.prog[pc]
 			v32 = (*(*int32)(unsafe.Pointer(&code[0]))) //to addr
-			if e := binary.Write(w, binary.LittleEndian, v32); e != nil {
-				return e
+			if err = binary.Write(w, binary.LittleEndian, v32); err != nil {
+				return
 			}
+			n += int64(binary.Size(v32))
 			//fmt.Printf("%3d \t[%d]\n", pc, v32) //XXX
 			pc++
 			code = t.prog[pc]
 			v32 = (*(*int32)(unsafe.Pointer(&code[0]))) //from addr
-			if e := binary.Write(w, binary.LittleEndian, v32); e != nil {
-				return e
+			if err = binary.Write(w, binary.LittleEndian, v32); err != nil {
+				return
 			}
+			n += int64(binary.Size(v32))
 			//fmt.Printf("%3d \t[%d]\n", pc, v32) //XXX
 		case opMatch:
 			fallthrough
 		case opBreak:
-			if e := binary.Write(w, binary.LittleEndian, v16); e != nil {
-				return e
+			if err = binary.Write(w, binary.LittleEndian, v16); err != nil {
+				return
 			}
+			n += int64(binary.Size(v16))
 			if v16 != 0 {
 				break
 			}
 			pc++
 			code = t.prog[pc]
 			v32 = (*(*int32)(unsafe.Pointer(&code[0])))
-			if e := binary.Write(w, binary.LittleEndian, v32); e != nil {
-				return e
+			if err = binary.Write(w, binary.LittleEndian, v32); err != nil {
+				return
 			}
+			n += int64(binary.Size(v32))
 			//fmt.Printf("%3d \t[%d]\n", pc, v32) //XXX
 		case opOutput:
 			fallthrough
 		case opOutputBreak:
-			if e := binary.Write(w, binary.LittleEndian, v16); e != nil {
-				return e
+			if err = binary.Write(w, binary.LittleEndian, v16); err != nil {
+				return
 			}
+			n += int64(binary.Size(v16))
 			pc++
 			code = t.prog[pc]
 			v32 = (*(*int32)(unsafe.Pointer(&code[0])))
-			if e := binary.Write(w, binary.LittleEndian, v32); e != nil {
-				return e
+			if err = binary.Write(w, binary.LittleEndian, v32); err != nil {
+				return
 			}
+			n += int64(binary.Size(v32))
 			//fmt.Printf("%3d \t[%d]\n", pc, v32) //XXX
 
 			if v16 != 0 {
@@ -488,15 +501,16 @@ func (t FST) Write(w io.Writer) error {
 			pc++
 			code = t.prog[pc]
 			v32 = (*(*int32)(unsafe.Pointer(&code[0])))
-			if e := binary.Write(w, binary.LittleEndian, v32); e != nil {
-				return e
+			if err = binary.Write(w, binary.LittleEndian, v32); err != nil {
+				return
 			}
+			n += int64(binary.Size(v32))
 			//fmt.Printf("%3d \t[%d]\n", pc, v32) //XXX
 		default:
-			return fmt.Errorf("undefined operation error")
+			return n, fmt.Errorf("undefined operation error")
 		}
 	}
-	return nil
+	return
 }
 
 // Read loads a program of finite state transducer.

@@ -299,9 +299,18 @@ func TestFSTSaveAndLoad01(t *testing.T) {
 	}
 
 	var b bytes.Buffer
-	org.Write(&b)
+	n, e := org.WriteTo(&b)
+	if e != nil {
+		t.Errorf("unexpected error: %v\n", e)
+	}
+	if n != int64(b.Len()) {
+		t.Errorf("write len: got %v, expected %v", n, b.Len())
+	}
 
 	rst, e := Read(&b)
+	if e != nil {
+		t.Errorf("unexpected error: %v\n", e)
+	}
 
 	if !reflect.DeepEqual(org.data, rst.data) {
 		t.Errorf("data:got %v, expected %v\n", rst.data, org.data)
