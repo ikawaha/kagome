@@ -291,6 +291,7 @@ func TestForward(t *testing.T) {
 	if la == nil {
 		t.Fatal("unexpected error: cannot new a lattice")
 	}
+	la.list = make([][]*node, 0)
 	la.Forward(Normal)
 	la.Forward(Search)
 	la.Forward(Extended)
@@ -306,6 +307,7 @@ func TestBackward(t *testing.T) {
 	if la == nil {
 		t.Fatal("unexpected error: cannot new a lattice")
 	}
+	la.list = make([][]*node, 0)
 	// only run
 	la.Backward(Normal)
 	la.Backward(Search)
