@@ -22,6 +22,8 @@ func TestLatticeBuild01(t *testing.T) {
 	if la == nil {
 		t.Error("cannot new a lattice")
 	}
+	defer la.Free()
+
 	inp := ""
 	la.Build(inp)
 	if la.Input != inp {
@@ -52,6 +54,8 @@ func TestLatticeBuild02(t *testing.T) {
 	if la == nil {
 		t.Fatal("cannot new a lattice")
 	}
+	defer la.Free()
+
 	inp := "あ"
 	la.Build(inp)
 	if la.Input != inp {
@@ -110,6 +114,7 @@ func TestLatticeBuild03(t *testing.T) {
 	if la == nil {
 		t.Fatal("cannot new a lattice")
 	}
+	defer la.Free()
 
 	inp := "朝青龍"
 	la.Build(inp)
@@ -137,6 +142,8 @@ func TestLatticeBuild04(t *testing.T) {
 	if la == nil {
 		t.Fatal("cannot new a lattice")
 	}
+	defer la.Free()
+
 	inp := "ポポピ"
 	la.Build(inp)
 	if la.Input != inp {
@@ -192,6 +199,8 @@ func TestLatticeBuild05(t *testing.T) {
 	if la == nil {
 		t.Fatal("cannot new a lattice")
 	}
+	defer la.Free()
+
 	inp := "ポポピポンポコナーノ"
 	var b bytes.Buffer
 	for i, step := 0, utf8.RuneCountInString(inp); i < maximumUnknownWordLength; i = i + step {
@@ -233,6 +242,7 @@ func TestLatticeString(t *testing.T) {
 	if la == nil {
 		t.Fatal("cannot new a lattice")
 	}
+	defer la.Free()
 
 	expected := ""
 	str := la.String()
@@ -252,6 +262,7 @@ func TestLatticeDot(t *testing.T) {
 	if la == nil {
 		t.Fatal("cannot new a lattice")
 	}
+	defer la.Free()
 
 	expected := "graph lattice {\n\tdpi=48;\n\tgraph [style=filled, rankdir=LR]\n}\n"
 	var b bytes.Buffer
@@ -267,22 +278,36 @@ func TestLatticeDot(t *testing.T) {
 	}
 }
 
-func TestLatticeFree(t *testing.T) {
+func TestLatticeNewAndFree(t *testing.T) {
 	la := New(dic.SysDic(), nil)
 	if la == nil {
 		t.Fatal("unexpected error: cannot new a lattice")
 	}
-	la.Free()
-	if len(la.list) != 0 {
-		t.Errorf("cannot free nodes: %v", len(la.list))
+	if la.Input != "" {
+		t.Fatalf("unexpected error: lattice input initialize error, %+v", la.Input)
 	}
-	la.Build("あ")
-	if len(la.list) == 0 {
-		t.Error("unexpected error: cannot build lattice")
+	if len(la.Output) != 0 {
+		t.Fatal("unexpected error: lattice output initialize error, %+v", la.Output)
 	}
-	la.Free()
 	if len(la.list) != 0 {
-		t.Errorf("cannot free nodes: %v", len(la.list))
+		t.Fatal("unexpected error: lattice list initialize error, %+v", la.list)
+	}
+	la.Build("すべては科学する心に宿るのだ")
+	la.Free()
+
+	// renew
+	la = New(dic.SysDic(), nil)
+	if la == nil {
+		t.Fatal("unexpected error: cannot new a lattice")
+	}
+	if la.Input != "" {
+		t.Fatalf("unexpected error: lattice input initialize error, %+v", la.Input)
+	}
+	if len(la.Output) != 0 {
+		t.Fatal("unexpected error: lattice output initialize error, %+v", la.Output)
+	}
+	if len(la.list) != 0 {
+		t.Fatal("unexpected error: lattice list initialize error, %+v", la.list)
 	}
 }
 
@@ -291,7 +316,7 @@ func TestForward(t *testing.T) {
 	if la == nil {
 		t.Fatal("unexpected error: cannot new a lattice")
 	}
-	la.list = make([][]*node, 0)
+
 	la.Forward(Normal)
 	la.Forward(Search)
 	la.Forward(Extended)
@@ -307,7 +332,7 @@ func TestBackward(t *testing.T) {
 	if la == nil {
 		t.Fatal("unexpected error: cannot new a lattice")
 	}
-	la.list = make([][]*node, 0)
+
 	// only run
 	la.Backward(Normal)
 	la.Backward(Search)
