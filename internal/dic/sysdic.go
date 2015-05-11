@@ -17,6 +17,7 @@ import (
 )
 
 const (
+	// IPADicPath represents the internal IPA dictionary path.
 	IPADicPath = "dic/ipa"
 )
 

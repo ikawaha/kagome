@@ -32,18 +32,22 @@ const (
 type TokenizeMode int
 
 const (
-	Normal   TokenizeMode = iota + 1 //Normal Mode
-	Search                           // Search Mode
-	Extended                         // Extended Mode ()
+	//Normal Mode
+	Normal TokenizeMode = iota + 1
+	// Search Mode
+	Search
+	// Extended Mode
+	Extended
 )
 
 var latticePool = sync.Pool{
 	New: func() interface{} {
-		return new(lattice)
+		return new(Lattice)
 	},
 }
 
-type lattice struct {
+// Lattice represents a grid of morph nodes.
+type Lattice struct {
 	Input  string
 	Output []*node
 	list   [][]*node
@@ -51,14 +55,16 @@ type lattice struct {
 	udic   *dic.UserDic
 }
 
-func New(d *dic.Dic, u *dic.UserDic) *lattice {
-	la := latticePool.Get().(*lattice)
+// New returns a new lattice.
+func New(d *dic.Dic, u *dic.UserDic) *Lattice {
+	la := latticePool.Get().(*Lattice)
 	la.dic = d
 	la.udic = u
 	return la
 }
 
-func (la *lattice) Free() {
+// Free releases a memory of a lattice.
+func (la *Lattice) Free() {
 	for i := range la.list {
 		for j := range la.list[i] {
 			nodePool.Put(la.list[i][j])
@@ -70,7 +76,7 @@ func (la *lattice) Free() {
 	latticePool.Put(la)
 }
 
-func (la *lattice) addNode(pos, id, start int, class NodeClass, surface string) {
+func (la *Lattice) addNode(pos, id, start int, class NodeClass, surface string) {
 	var m dic.Morph
 	switch class {
 	case DUMMY:
@@ -93,7 +99,8 @@ func (la *lattice) addNode(pos, id, start int, class NodeClass, surface string) 
 	la.list[p] = append(la.list[p], n)
 }
 
-func (la *lattice) Build(inp string) {
+// Build builds a lattice from the inputs.
+func (la *Lattice) Build(inp string) {
 	rc := utf8.RuneCountInString(inp)
 	la.Input = inp
 	if cap(la.list) < rc+2 {
@@ -173,7 +180,7 @@ func (la *lattice) Build(inp string) {
 }
 
 // String returns a debug string of a lattice.
-func (la *lattice) String() string {
+func (la *Lattice) String() string {
 	str := ""
 	for i, nodes := range la.list {
 		str += fmt.Sprintf("[%v] :\n", i)
@@ -184,6 +191,7 @@ func (la *lattice) String() string {
 	}
 	return str
 }
+
 func kanjiOnly(s string) bool {
 	for _, r := range s {
 		if !unicode.In(r, unicode.Ideographic) {
@@ -204,7 +212,8 @@ func additionalCost(n *node) int {
 	return 0
 }
 
-func (la *lattice) Forward(m TokenizeMode) {
+// Forward runs forward algorithm of the Viterbi.
+func (la *Lattice) Forward(m TokenizeMode) {
 	for i, size := 1, len(la.list); i < size; i++ {
 		currentList := la.list[i]
 		for index, target := range currentList {
@@ -235,7 +244,8 @@ func (la *lattice) Forward(m TokenizeMode) {
 	return
 }
 
-func (la *lattice) Backward(m TokenizeMode) {
+// Backward runs backward algorithm of the Viterbi.
+func (la *Lattice) Backward(m TokenizeMode) {
 	const bufferExpandRatio = 2
 	size := len(la.list)
 	if size == 0 {
@@ -269,7 +279,8 @@ func (la *lattice) Backward(m TokenizeMode) {
 	}
 }
 
-func (la *lattice) Dot(w io.Writer) {
+// Dot outputs the lattice in the graphviz dot format.
+func (la *Lattice) Dot(w io.Writer) {
 	type edge struct {
 		from *node
 		to   *node

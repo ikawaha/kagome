@@ -19,6 +19,7 @@ type Morph struct {
 	LeftID, RightID, Weight int16
 }
 
+// MorphSlice represents a slice of morphs.
 type MorphSlice []Morph
 
 // WriteTo implements the io.WriterTo interface
