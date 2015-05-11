@@ -279,35 +279,38 @@ func TestLatticeDot(t *testing.T) {
 }
 
 func TestLatticeNewAndFree(t *testing.T) {
-	la := New(dic.SysDic(), nil)
-	if la == nil {
-		t.Fatal("unexpected error: cannot new a lattice")
-	}
-	if la.Input != "" {
-		t.Fatalf("unexpected error: lattice input initialize error, %+v", la.Input)
-	}
-	if len(la.Output) != 0 {
-		t.Fatal("unexpected error: lattice output initialize error, %+v", la.Output)
-	}
-	if len(la.list) != 0 {
-		t.Fatal("unexpected error: lattice list initialize error, %+v", la.list)
-	}
-	la.Build("すべては科学する心に宿るのだ")
-	la.Free()
+	for i := 0; i < 100; i++ {
+		la := New(dic.SysDic(), nil)
+		if la == nil {
+			t.Fatal("unexpected error: cannot new a lattice")
+		}
+		if la.Input != "" {
+			t.Fatalf("unexpected error: lattice input initialize error, %+v", la.Input)
+		}
+		if len(la.Output) != 0 {
+			t.Fatal("unexpected error: lattice output initialize error, %+v", la.Output)
+		}
+		if len(la.list) != 0 {
+			t.Fatal("unexpected error: lattice list initialize error, %+v", la.list)
+		}
+		la.Build("すべては科学する心に宿るのだ")
+		la.Free()
 
-	// renew
-	la = New(dic.SysDic(), nil)
-	if la == nil {
-		t.Fatal("unexpected error: cannot new a lattice")
-	}
-	if la.Input != "" {
-		t.Fatalf("unexpected error: lattice input initialize error, %+v", la.Input)
-	}
-	if len(la.Output) != 0 {
-		t.Fatal("unexpected error: lattice output initialize error, %+v", la.Output)
-	}
-	if len(la.list) != 0 {
-		t.Fatal("unexpected error: lattice list initialize error, %+v", la.list)
+		// renew
+		la = New(dic.SysDic(), nil)
+		if la == nil {
+			t.Fatal("unexpected error: cannot new a lattice")
+		}
+		if la.Input != "" {
+			t.Fatalf("unexpected error: lattice input initialize error, %+v", la.Input)
+		}
+		if len(la.Output) != 0 {
+			t.Fatal("unexpected error: lattice output initialize error, %+v", la.Output)
+		}
+		if len(la.list) != 0 {
+			t.Fatal("unexpected error: lattice list initialize error, %+v", la.list)
+		}
+		la.Free()
 	}
 }
 
