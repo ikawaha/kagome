@@ -28,7 +28,7 @@ func TestNodeClassString(t *testing.T) {
 
 	for _, p := range pairs {
 		if p.in.String() != p.out {
-			t.Errorf("got %v, expected %v")
+			t.Errorf("got %v, expected %v", p.in.String(), p.out)
 		}
 	}
 }

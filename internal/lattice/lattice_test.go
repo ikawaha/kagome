@@ -104,7 +104,7 @@ func TestLatticeBuild03(t *testing.T) {
 
 	udic, e := dic.NewUserDic(udicPath)
 	if e != nil {
-		t.Fatal("unexpected error: cannot load user dic, %v", e)
+		t.Fatalf("unexpected error: cannot load user dic, %v", e)
 	}
 	la := New(dic.SysDic(), udic)
 	if la == nil {
