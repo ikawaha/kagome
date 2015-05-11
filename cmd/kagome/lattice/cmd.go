@@ -53,7 +53,6 @@ func (o *option) parse(args []string) (err error) {
 	// validations
 	if o.flagSet.NArg() == 0 {
 		return fmt.Errorf("input is empty")
-		return
 	}
 	o.input = strings.Join(o.flagSet.Args(), " ")
 	return
