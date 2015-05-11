@@ -317,7 +317,7 @@ func TestTokenizerSetDic(t *testing.T) {
 
 	tnz.SetDic(d)
 	if tnz.dic != d.dic {
-		t.Error("got %v, expected %v", tnz.dic, d)
+		t.Errorf("got %v, expected %v", tnz.dic, d)
 	}
 }
 
