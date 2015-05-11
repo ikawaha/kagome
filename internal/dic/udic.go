@@ -72,7 +72,7 @@ func NewUserDic(path string) (udic *UserDic, err error) {
 			continue
 		}
 		prev = k
-		keys = append(keys, fst.Pair{k, int32(len(keys))})
+		keys = append(keys, fst.Pair{In: k, Out: int32(len(keys))})
 		tokens := strings.Split(record[1], " ")
 		yomi := strings.Split(record[2], " ")
 		if len(tokens) == 0 || len(tokens) != len(yomi) {
