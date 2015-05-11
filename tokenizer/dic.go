@@ -11,19 +11,22 @@ package tokenizer
 
 import "github.com/ikawaha/kagome/internal/dic"
 
+// Dic represents a dictionary.
 type Dic struct {
 	dic *dic.Dic
 }
 
+// UserDic represents a user dictionary.
 type UserDic struct {
 	dic *dic.UserDic
 }
 
-// SysDic returns system dictionary.
+// SysDic returns the system dictionary.
 func SysDic() Dic {
 	return Dic{dic.SysDic()}
 }
 
+// NewDic loads a dictionary from a file.
 func NewDic(path string) (Dic, error) {
 	d, err := dic.Load(path)
 	return Dic{d}, err

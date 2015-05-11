@@ -17,13 +17,18 @@ import (
 	"github.com/ikawaha/kagome/internal/lattice"
 )
 
+// TokenClass represents the token type.
 type TokenClass lattice.NodeClass
 
 const (
-	DUMMY   = TokenClass(lattice.DUMMY)
-	KNOWN   = TokenClass(lattice.KNOWN)
+	// DUMMY represents the dummy token.
+	DUMMY = TokenClass(lattice.DUMMY)
+	// KNOWN represents the token in the dictionary.
+	KNOWN = TokenClass(lattice.KNOWN)
+	// UNKNOWN represents the token which is not in the dictionary.
 	UNKNOWN = TokenClass(lattice.UNKNOWN)
-	USER    = TokenClass(lattice.USER)
+	// USER represents the token in the user dictionary.
+	USER = TokenClass(lattice.USER)
 )
 
 func (c TokenClass) String() string {

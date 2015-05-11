@@ -17,13 +17,17 @@ import (
 	"github.com/ikawaha/kagome/internal/lattice"
 )
 
+// TokenizeMode represents a mode of tokenize.
 type TokenizeMode int
 
 const (
 	initialNodePoolCapacity = 512
 
+	// Normal is the normal tokenize mode.
 	Normal TokenizeMode = iota + 1
+	// Search is the tokenize mode for search.
 	Search
+	// Extended is the experimental tokenize mode.
 	Extended
 )
 
@@ -34,7 +38,8 @@ type Tokenizer struct {
 }
 
 var (
-	BosEosID = lattice.BosEosID // BosEos means the begining a sentence or the end of a sentence
+	// BosEosID means the begining a sentence or the end of a sentence.
+	BosEosID = lattice.BosEosID
 )
 
 // New create a tokenizer.
