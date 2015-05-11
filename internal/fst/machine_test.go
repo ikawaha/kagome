@@ -319,3 +319,28 @@ func TestFSTSaveAndLoad01(t *testing.T) {
 		t.Errorf("prog:got %v, expected %v\n", rst.prog, org.prog)
 	}
 }
+
+func TestFSTOperationString(t *testing.T) {
+
+	ps := []struct {
+		ope  operation
+		name string
+	}{
+		{0, "OP0"},
+		{1, "ACC"},
+		{2, "ACB"},
+		{3, "MTC"},
+		{4, "BRK"},
+		{5, "OUT"},
+		{6, "OUB"},
+		{7, "OP7"},
+		{8, "NA[8]"},
+		{9, "NA[9]"},
+	}
+
+	for _, p := range ps {
+		if p.ope.String() != p.name {
+			t.Errorf("got %v, expected %v", p.ope.String(), p.name)
+		}
+	}
+}
