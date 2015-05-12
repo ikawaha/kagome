@@ -11,7 +11,7 @@ before_install:
 install:
 
 script:
-  - go test -v ./...
+  - go test ./...
   - /bin/sh ./go-coverall.sh
   - cd tokenizer; go test -bench .
 
