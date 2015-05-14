@@ -55,7 +55,9 @@ func newOption() (o *option) {
 }
 
 func (o *option) parse(args []string) (err error) {
-	o.flagSet.Parse(args)
+	if err = o.flagSet.Parse(args); err != nil {
+		return
+	}
 	// validations
 	if o.mode != "normal" && o.mode != "search" && o.mode != "extended" {
 		return fmt.Errorf("unknown mode: %v", o.mode)
@@ -134,7 +136,10 @@ func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "{\"status\":false,\"error\":\"%v\"}", e)
 		return
 	}
-	w.Write(j)
+	if _, e := w.Write(j); e != nil {
+		fmt.Fprintf(w, "{\"status\":false,\"error\":\"%v\"}", e)
+		return
+	}
 }
 
 type TokenizeDemoHandler struct {
@@ -174,7 +179,10 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		cmd.Stdin = r
 		cmd.Stdout = &buf
 		cmd.Stderr = errorWriter
-		cmd.Start()
+		if err := cmd.Start(); err != nil {
+			cmdErr = "Error"
+			log.Printf("process done with error = %v", err)
+		}
 		h.tokenizer.Dot(sen, w)
 		w.Close()
 
@@ -233,7 +241,9 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		RadioOpt string
 	}{Sentence: sen, Tokens: records, CmdErr: cmdErr, GraphSvg: template.HTML(svg), RadioOpt: opt}
 	t := template.Must(template.New("top").Parse(demoHTML))
-	t.Execute(w, d)
+	if e := t.Execute(w, d); e != nil {
+		http.Error(w, e.Error(), http.StatusInternalServerError)
+	}
 }
 
 func Run(args []string) error {

@@ -51,7 +51,9 @@ func newOption() (o *option) {
 }
 
 func (o *option) parse(args []string) (err error) {
-	o.flagSet.Parse(args)
+	if err = o.flagSet.Parse(args); err != nil {
+		return
+	}
 	// validations
 	if o.mode != "" && o.mode != "normal" && o.mode != "search" && o.mode != "extended" {
 		err = fmt.Errorf("invalid argument: -mode %v\n", o.mode)
