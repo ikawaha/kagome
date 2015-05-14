@@ -91,18 +91,19 @@ func buildMAST(input PairSlice) (m mast) {
 			buf[len(in)].IsFinal = true
 		}
 		for j := 1; j < prefixLen+1; j++ {
-			if buf[j-1].Output[in[j-1]] == out {
-				out = 0
-				break
-			}
-			var outSuff int32
-			outSuff = buf[j-1].Output[in[j-1]]
-			buf[j-1].removeOutput(in[j-1]) // clear the prev edge
-			for ch := range buf[j].Trans {
-				buf[j].setOutput(ch, outSuff)
-			}
-			if buf[j].IsFinal && outSuff != 0 {
-				buf[j].addTail(outSuff)
+			outSuff, ok := buf[j-1].Output[in[j-1]]
+			if ok {
+				if outSuff == out {
+					out = 0
+					break
+				}
+				buf[j-1].removeOutput(in[j-1]) // clear the prev edge
+				for ch := range buf[j].Trans {
+					buf[j].setOutput(ch, outSuff)
+				}
+				if buf[j].IsFinal && outSuff != 0 {
+					buf[j].addTail(outSuff)
+				}
 			}
 		}
 		if in != prev {

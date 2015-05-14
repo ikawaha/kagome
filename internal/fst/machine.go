@@ -94,24 +94,27 @@ func (m mast) buildMachine() (t FST, err error) {
 		for i, size := 0, len(edges); i < size; i++ {
 			ch := edges[size-1-i]
 			next := s.Trans[ch]
-			out := s.Output[ch]
 			addr, ok := addrMap[next.ID]
 			if !ok && !next.IsFinal {
 				err = fmt.Errorf("next addr is undefined: state(%v), input(%X)", s.ID, ch)
 				return
 			}
 			jump := len(prog) - addr + 1
+
 			var op operation
-			if out != 0 {
+			out, ok := s.Output[ch]
+			if !ok {
+				if i == 0 {
+					op = opBreak
+				} else {
+					op = opMatch
+				}
+			} else {
 				if i == 0 {
 					op = opOutputBreak
 				} else {
 					op = opOutput
 				}
-			} else if i == 0 {
-				op = opBreak
-			} else {
-				op = opMatch
 			}
 
 			if jump > maxUint16 {
@@ -120,7 +123,7 @@ func (m mast) buildMachine() (t FST, err error) {
 				prog = append(prog, code)
 				jump = 0
 			}
-			if out != 0 {
+			if ok {
 				p := unsafe.Pointer(&code[0])
 				(*(*int32)(p)) = int32(out)
 				prog = append(prog, code)
@@ -330,6 +333,7 @@ func (t *FST) run(input string) (snap []configuration, accept bool) {
 				c.out = t.data[from:to]
 				pc++
 			}
+			//fmt.Printf("conf: %+v\n", c) //XXX
 			snap = append(snap, c)
 			if hd == len(input) {
 				goto L_END
@@ -344,15 +348,17 @@ func (t *FST) run(input string) (snap []configuration, accept bool) {
 		}
 	}
 L_END:
+	//fmt.Printf("[[L_END]]pc:%d, op:%s, ch:[%X]\n", pc, op, ch) //XXX
 	if hd != len(input) {
 		return
 	}
 	if op != opAccept && op != opAcceptBreak {
-		//fmt.Printf("[[FINAL]]pc:%d, op:%s, ch:[%X], sz:%d, v:%d\n", pc, op, ch, sz, va) //XXX
+		//fmt.Printf("[[NOT ACCEPT]]pc:%d, op:%s, ch:[%X]\n", pc, op, ch) //XXX
 		return
 
 	}
 	accept = true
+	//fmt.Printf("[[ACCEPT]]pc:%d, op:%s, ch:[%X]\n", pc, op, ch) //XXX
 	return
 }
 

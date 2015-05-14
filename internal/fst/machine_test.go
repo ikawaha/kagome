@@ -10,6 +10,7 @@
 package fst
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"os"
@@ -58,6 +59,25 @@ func TestFSTRun02(t *testing.T) {
 	}
 	fmt.Println(config)
 
+}
+
+func TestFSTRun03(t *testing.T) {
+	inp := PairSlice{
+		{"feb", 0},
+		{"february", 1},
+	}
+	m := buildMAST(inp)
+	m.dot(os.Stdout)
+
+	fst, _ := m.buildMachine()
+	fmt.Println(fst)
+
+	input := "february"
+	config, ok := fst.run(input)
+	if !ok {
+		t.Errorf("input:%v, config:%+v, accept:%v", input, config, ok)
+	}
+	fmt.Println(config)
 }
 
 func TestFSTSearch01(t *testing.T) {
@@ -341,6 +361,41 @@ func TestFSTOperationString(t *testing.T) {
 	for _, p := range ps {
 		if p.ope.String() != p.name {
 			t.Errorf("got %v, expected %v", p.ope.String(), p.name)
+		}
+	}
+}
+
+func TestFSTStress(t *testing.T) {
+	fp, err := os.Open("./_test/words.txt")
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	var ps PairSlice
+	s := bufio.NewScanner(fp)
+	for i := 0; s.Scan(); i++ {
+		p := Pair{In: s.Text(), Out: int32(i)}
+		ps = append(ps, p)
+	}
+	if e := s.Err(); e != nil {
+		t.Fatalf("unexpected error, %v", e)
+	}
+	m := buildMAST(ps)
+	fst, err := m.buildMachine()
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+
+	for _, p := range ps {
+		ids := fst.Search(p.In)
+		if !func(s []int32, x int32) bool {
+			for i := range s {
+				if x == s[i] {
+					return true
+				}
+			}
+			return false
+		}(ids, p.Out) {
+			t.Errorf("input:%v, got %v, but not in %v", p.In, ids, p.Out)
 		}
 	}
 }

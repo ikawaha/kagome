@@ -55,9 +55,6 @@ func (n *state) removeOutput(ch byte) {
 }
 
 func (n *state) setOutput(ch byte, out int32) {
-	if out == 0 {
-		return
-	}
 	n.Output[ch] = out
 
 	const magic = 8191
