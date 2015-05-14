@@ -204,7 +204,9 @@ func TestLatticeBuild05(t *testing.T) {
 	inp := "ポポピポンポコナーノ"
 	var b bytes.Buffer
 	for i, step := 0, utf8.RuneCountInString(inp); i < maximumUnknownWordLength; i = i + step {
-		b.WriteString(inp)
+		if _, e := b.WriteString(inp); e != nil {
+			t.Fatalf("unexpected error: create the test input, %v", b.String())
+		}
 	}
 	la.Build(b.String())
 	for i := range la.list {
@@ -288,10 +290,10 @@ func TestLatticeNewAndFree(t *testing.T) {
 			t.Fatalf("unexpected error: lattice input initialize error, %+v", la.Input)
 		}
 		if len(la.Output) != 0 {
-			t.Fatal("unexpected error: lattice output initialize error, %+v", la.Output)
+			t.Fatalf("unexpected error: lattice output initialize error, %+v", la.Output)
 		}
 		if len(la.list) != 0 {
-			t.Fatal("unexpected error: lattice list initialize error, %+v", la.list)
+			t.Fatalf("unexpected error: lattice list initialize error, %+v", la.list)
 		}
 		la.Build("すべては科学する心に宿るのだ")
 		la.Free()
@@ -305,10 +307,10 @@ func TestLatticeNewAndFree(t *testing.T) {
 			t.Fatalf("unexpected error: lattice input initialize error, %+v", la.Input)
 		}
 		if len(la.Output) != 0 {
-			t.Fatal("unexpected error: lattice output initialize error, %+v", la.Output)
+			t.Fatalf("unexpected error: lattice output initialize error, %+v", la.Output)
 		}
 		if len(la.list) != 0 {
-			t.Fatal("unexpected error: lattice list initialize error, %+v", la.list)
+			t.Fatalf("unexpected error: lattice list initialize error, %+v", la.list)
 		}
 		la.Free()
 	}
