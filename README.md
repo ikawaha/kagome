@@ -35,9 +35,10 @@ usage: main <command>
 The commands are:
    tokenize - command line tokenize
    server - run tokenize server
+   lattice - lattice viewer
 ```
 
-### command line mode
+### Command line mode
 
 ```
 $ go run cmd/kagome/main.go tokenize -h
@@ -48,7 +49,7 @@ Usage of tokenize:
   -udic="": user dic
 ```
 
-### server mode
+### Server mode
 
 ```
 $ go run cmd/kagome/main.go server -h
@@ -124,6 +125,48 @@ $ kagome lattice -v すもももももももものうち  |dot -Tpng -o lattice.
 EOS
 ```
 ![lattice](https://raw.githubusercontent.com/wiki/ikawaha/kagome/images/lattice.png)
+
+# Programming example
+
+Below is a simple go example that demonstrates how a simple text can be segmented.
+
+sample code:
+
+```
+package main
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/ikawaha/kagome/tokenizer"
+)
+
+func main() {
+	t := tokenizer.New(tokenizer.SysDic())
+	tokens := t.Tokenize("こんにちは，世界．", tokenizer.Normal)
+	for _, token := range tokens {
+		if token.Class == tokenizer.DUMMY {
+			// BOS: Begin Of Sentence, EOS: End Of Sentence.
+			fmt.Printf("%s\n", token.Surface)
+			continue
+		}
+		features := strings.Join(token.Features(), ",")
+		fmt.Printf("%s\t%v\n", token.Surface, features)
+	}
+}
+```
+
+output:
+
+```
+BOS
+こんにちは	感動詞,*,*,*,*,*,こんにちは,コンニチハ,コンニチワ
+，		記号,読点,*,*,*,*,，,，,，
+世界		名詞,一般,*,*,*,*,世界,セカイ,セカイ
+．		記号,句点,*,*,*,*,．,．,．
+EOS
+```
 
 License
 ---
