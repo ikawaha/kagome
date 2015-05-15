@@ -2,7 +2,7 @@
  
 COV_PARTIAL_FILE=profile.cov.out
 COV_FILE=profile-all-coverage.cov.out
-COV_MODE=count
+COV_MODE=atomic
  
 HEADER="mode: $COV_MODE"
  
