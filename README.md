@@ -86,12 +86,12 @@ $ curl -XPUT localhost:8080/a -d'{"sentence":"すもももももももものう�
 
 ##### Demo
 
-Launch a server and access `http://localhost:6060`.
+Launch a server and access `http://localhost:8888`.
 (To draw a lattice, demo application uses [graphviz](http://www.graphviz.org/) . You need graphviz installed.)
 
 
 ```
-$ kagome -http=":6060" &
+$ kagome -http=":8888" &
 ```
 
 ![lattice](https://raw.githubusercontent.com/wiki/ikawaha/kagome/images/demoapp.png)
