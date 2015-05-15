@@ -12,9 +12,11 @@ install:
 
 script:
   - go test ./...
-  - /bin/sh ./go-coverall.sh
   - cd tokenizer; go test -bench .
+  - /bin/sh ./go-coverall.sh
 
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 
 #branches:
 #  only:
