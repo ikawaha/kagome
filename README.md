@@ -144,7 +144,7 @@ import (
 
 func main() {
 	t := tokenizer.New(tokenizer.SysDic())
-	tokens := t.Tokenize("こんにちは，世界．", tokenizer.Normal)
+	tokens := t.Tokenize("寿司が食べたい。", tokenizer.Normal)
 	for _, token := range tokens {
 		if token.Class == tokenizer.DUMMY {
 			// BOS: Begin Of Sentence, EOS: End Of Sentence.
@@ -161,10 +161,11 @@ output:
 
 ```
 BOS
-こんにちは	感動詞,*,*,*,*,*,こんにちは,コンニチハ,コンニチワ
-，		記号,読点,*,*,*,*,，,，,，
-世界		名詞,一般,*,*,*,*,世界,セカイ,セカイ
-．		記号,句点,*,*,*,*,．,．,．
+寿司	名詞,一般,*,*,*,*,寿司,スシ,スシ
+が	助詞,格助詞,一般,*,*,*,が,ガ,ガ
+食べ	動詞,自立,*,*,一段,連用形,食べる,タベ,タベ
+たい	助動詞,*,*,*,特殊・タイ,基本形,たい,タイ,タイ
+。	記号,句点,*,*,*,*,。,。,。
 EOS
 ```
 
