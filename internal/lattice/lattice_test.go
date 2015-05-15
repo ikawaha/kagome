@@ -332,7 +332,7 @@ func TestForward(t *testing.T) {
 	}
 }
 
-func TestBackward(t *testing.T) {
+func TestBackward01(t *testing.T) {
 	la := New(dic.SysDic(), nil)
 	if la == nil {
 		t.Fatal("unexpected error: cannot new a lattice")
@@ -344,7 +344,7 @@ func TestBackward(t *testing.T) {
 	la.Backward(Extended)
 
 	for _, m := range []TokenizeMode{Normal, Search, Extended} {
-		la.Build("わたしまけましたわ")
+		la.Build("わたしまけましたわ．ポポピ")
 		la.Forward(m)
 		la.Backward(m)
 	}
