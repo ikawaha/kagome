@@ -12,7 +12,7 @@ install:
 
 script:
   - go test ./...
-  - cd tokenizer; go test -bench .
+  - cd tokenizer; go test -bench .;cd ..
   - /bin/sh ./go-coverall.sh
 
 after_success:
