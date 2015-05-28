@@ -185,9 +185,7 @@ func (t FST) String() string {
 		ch = code[1]
 		v16 = (*(*uint16)(unsafe.Pointer(&code[2])))
 		switch operation(op) {
-		case opAccept:
-			fallthrough
-		case opAcceptBreak:
+		case opAccept, opAcceptBreak:
 			//fmt.Printf("%3d %v\t%X %d\n", pc, op, ch, v16) //XXX
 			ret += fmt.Sprintf("%3d %v\t%d %d\n", pc, op, ch, v16)
 			if ch == 0 {
@@ -201,9 +199,7 @@ func (t FST) String() string {
 			code = t.prog[pc]
 			from := (*(*int32)(unsafe.Pointer(&code[0])))
 			ret += fmt.Sprintf("%3d [%d] %v\n", pc, from, t.data[from:to]) //FIXME
-		case opMatch:
-			fallthrough
-		case opBreak:
+		case opMatch, opBreak:
 			//fmt.Printf("%3d %v\t%02X %d\n", pc, op, ch, v16) //XXX
 			ret += fmt.Sprintf("%3d %v\t%02X(%c) %d\n", pc, op, ch, ch, v16)
 			if v16 == 0 {
@@ -214,9 +210,7 @@ func (t FST) String() string {
 				ret += fmt.Sprintf("%3d jmp[%d]\n", pc, v32)
 				//break
 			}
-		case opOutput:
-			fallthrough
-		case opOutputBreak:
+		case opOutput, opOutputBreak:
 			//fmt.Printf("%3d %v\t%02X %d\n", pc, op, ch, v16) //XXX
 			ret += fmt.Sprintf("%3d %v\t%02X(%c) %d\n", pc, op, ch, ch, v16)
 			if v16 == 0 {
@@ -259,9 +253,7 @@ func (t *FST) run(input string) (snap []configuration, accept bool) {
 		v16 = (*(*uint16)(unsafe.Pointer(&code[2])))
 		//fmt.Printf("pc:%v,op:%v,hd:%v,v16:%v,out:%v\n", pc, op, hd, v16, out) //XXX
 		switch op {
-		case opMatch:
-			fallthrough
-		case opBreak:
+		case opMatch, opBreak:
 			if hd == len(input) {
 				goto L_END
 			}
@@ -286,9 +278,7 @@ func (t *FST) run(input string) (snap []configuration, accept bool) {
 			}
 			hd++
 			continue
-		case opOutput:
-			fallthrough
-		case opOutputBreak:
+		case opOutput, opOutputBreak:
 			if hd == len(input) {
 				goto L_END
 			}
@@ -317,9 +307,7 @@ func (t *FST) run(input string) (snap []configuration, accept bool) {
 			}
 			hd++
 			continue
-		case opAccept:
-			fallthrough
-		case opAcceptBreak:
+		case opAccept, opAcceptBreak:
 			c := configuration{pc: pc, hd: hd}
 			pc++
 			if ch == 0 {
@@ -445,9 +433,7 @@ func (t FST) WriteTo(w io.Writer) (n int64, err error) {
 		n += int64(tmp)
 		//fmt.Printf("%3d %v\t%X %d\n", pc, op, ch, v16) //XXX
 		switch operation(op) {
-		case opAccept:
-			fallthrough
-		case opAcceptBreak:
+		case opAccept, opAcceptBreak:
 			if ch == 0 {
 				break
 			}
@@ -467,9 +453,7 @@ func (t FST) WriteTo(w io.Writer) (n int64, err error) {
 			}
 			n += int64(binary.Size(v32))
 			//fmt.Printf("%3d \t[%d]\n", pc, v32) //XXX
-		case opMatch:
-			fallthrough
-		case opBreak:
+		case opMatch, opBreak:
 			if err = binary.Write(w, binary.LittleEndian, v16); err != nil {
 				return
 			}
@@ -485,9 +469,7 @@ func (t FST) WriteTo(w io.Writer) (n int64, err error) {
 			}
 			n += int64(binary.Size(v32))
 			//fmt.Printf("%3d \t[%d]\n", pc, v32) //XXX
-		case opOutput:
-			fallthrough
-		case opOutputBreak:
+		case opOutput, opOutputBreak:
 			if err = binary.Write(w, binary.LittleEndian, v16); err != nil {
 				return
 			}
@@ -561,9 +543,7 @@ func Read(r io.Reader) (t FST, e error) {
 			break
 		}
 		switch operation(op) {
-		case opAccept:
-			fallthrough
-		case opAcceptBreak:
+		case opAccept, opAcceptBreak:
 			code[0], code[1], code[2], code[3] = op, ch, 0, 0
 			t.prog = append(t.prog, code)
 			//fmt.Printf("%3d %v\t%X %d\n", pc, operation(op), ch, 0) //XXX
@@ -588,9 +568,7 @@ func Read(r io.Reader) (t FST, e error) {
 			//fmt.Printf("%3d \t[%d]\n", pc, v32) //XXX
 			//pc++                                //XXX
 			t.prog = append(t.prog, code)
-		case opMatch:
-			fallthrough
-		case opBreak:
+		case opMatch, opBreak:
 			code[0], code[1] = op, ch
 			if e = binary.Read(rd, binary.LittleEndian, &v16); e != nil {
 				break
@@ -612,9 +590,7 @@ func Read(r io.Reader) (t FST, e error) {
 			//fmt.Printf("%3d \t[%d]\n", pc, v32) //XXX
 			//pc++                                //XXX
 			t.prog = append(t.prog, code)
-		case opOutput:
-			fallthrough
-		case opOutputBreak:
+		case opOutput, opOutputBreak:
 			code[0], code[1] = op, ch
 			if e = binary.Read(rd, binary.LittleEndian, &v16); e != nil {
 				break
