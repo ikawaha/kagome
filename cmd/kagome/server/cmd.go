@@ -351,15 +351,15 @@ var demoHTML = `
       }
   </style>
   <meta charset="UTF-8">
-  <title>kagome demo - japanese morphological analyzer</title>
+  <title>Kagome demo - japanese morphological analyzer</title>
   <!-- for IE6-8 support of HTML elements -->
   <!--[if lt IE 9]>
   <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
   <body>
   <div id="center">
-  <h1>kagome</h1>
-    kagome is an open source Japanese morphological analyzer written in Golang
+  <h1>Kagome</h1>
+    Kagome is an open source Japanese morphological analyzer written in Golang
     <h2>Feature summary</h2>
     <ul>
       <li><strong>Word segmentation.</strong> Segmenting text into words (or morphemes)</li>
