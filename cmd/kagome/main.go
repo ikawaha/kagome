@@ -38,6 +38,7 @@ var subcommands = []struct {
 }
 
 func Usage() {
+	fmt.Fprintf(errorWriter, "Japanese Morphological Analyzer -- github.com/ikawaha/kagome\n")
 	fmt.Fprintf(errorWriter, "usage: %s <command>\n", path.Base(os.Args[0]))
 }
 
