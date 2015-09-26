@@ -58,10 +58,10 @@ func TestSystemDicIPAIndex01(t *testing.T) {
 	d := SysDicIPA()
 	type callAndResponse struct {
 		input string
-		ids   []int32
+		ids   []int
 	}
 	testSet := []callAndResponse{
-		{"すもも", []int32{36163}},
+		{"すもも", []int{36163}},
 	}
 	for _, cr := range testSet {
 		ids := d.Index.Search(cr.input)
@@ -76,26 +76,26 @@ func TestSystemDicIPAIndex02(t *testing.T) {
 	type callAndRespose struct {
 		input string
 		lens  []int
-		ids   [][]int32
+		ids   [][]int
 	}
 	testSet := []callAndRespose{
 		{input: "あい",
 			lens: []int{3, 6},
-			ids: [][]int32{
-				[]int32{122, 123, 124, 125},
-				[]int32{141, 142, 143, 144, 145}}},
+			ids: [][]int{
+				{122, 123, 124, 125},
+				{141, 142, 143, 144, 145}}},
 		{input: "あいあい",
 			lens: []int{3, 6, 12},
-			ids: [][]int32{
-				[]int32{122, 123, 124, 125},
-				[]int32{141, 142, 143, 144, 145},
-				[]int32{146}}},
+			ids: [][]int{
+				{122, 123, 124, 125},
+				{141, 142, 143, 144, 145},
+				{146}}},
 		{input: "すもも",
 			lens: []int{3, 6, 9},
-			ids: [][]int32{
-				[]int32{34563, 34564, 34565, 34566, 34567, 34568, 34569},
-				[]int32{36161},
-				[]int32{36163}}},
+			ids: [][]int{
+				{34563, 34564, 34565, 34566, 34567, 34568, 34569},
+				{36161},
+				{36163}}},
 	}
 	for _, cr := range testSet {
 		lens, ids := d.Index.CommonPrefixSearch(cr.input)
