@@ -151,10 +151,10 @@ func (la *Lattice) Build(inp string) {
 		}
 		// (3) UNKNOWN DIC
 		class := la.dic.CharactorCategory(ch)
-		if !anyMatches || la.dic.InvokeList[class] {
+		if !anyMatches || la.dic.InvokeList[int(class)] {
 			endPos := pos + utf8.RuneLen(ch)
 			unkWordLen := 1
-			if la.dic.GroupList[class] {
+			if la.dic.GroupList[int(class)] {
 				for i, w, size := endPos, 1, len(inp); i < size; i += w {
 					var c rune
 					c, w = utf8.DecodeRuneInString(inp[i:])
@@ -168,16 +168,13 @@ func (la *Lattice) Build(inp string) {
 					}
 				}
 			}
-			id := la.dic.UnkIndex[int(class)]
+			id := la.dic.UnkIndex[int32(class)]
 			for i, w := pos, 0; i < endPos; i += w {
 				_, w = utf8.DecodeRuneInString(inp[i:])
 				end := i + w
-				dup, ok := la.dic.UnkIndexDup[int(class)]
-				if !ok {
-					dup = 1
-				}
-				for x := 0; x < dup; x++ {
-					la.addNode(runePos, id+x, runePos,
+				dup, _ := la.dic.UnkIndexDup[int32(class)]
+				for x := 0; x < int(dup)+1; x++ {
+					la.addNode(runePos, int(id)+x, runePos,
 						UNKNOWN, inp[pos:end])
 				}
 			}
