@@ -20,8 +20,6 @@ import (
 	"os"
 	"sort"
 	"strings"
-
-	"github.com/ikawaha/kagome/internal/fst"
 )
 
 // UserDicContent represents contents of a word in a user dictionary.
@@ -33,22 +31,24 @@ type UserDicContent struct {
 
 // UserDic represents a user dictionary.
 type UserDic struct {
-	Index    Trie
+	Index    IndexTable
 	Contents []UserDicContent
 }
 
 // NewUserDic build a user dictionary from a file.
 func NewUserDic(path string) (udic *UserDic, err error) {
-	const userDicColumnSize = 4
-	var file *os.File
-	file, err = os.Open(path)
+	const (
+		userDicColumnSize = 4
+	)
+	udic = new(UserDic)
+	f, err := os.Open(path)
 	if err != nil {
 		return
 	}
-	defer file.Close()
+	defer f.Close()
 
 	var text []string
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "" || strings.HasPrefix(line, "#") {
@@ -56,16 +56,14 @@ func NewUserDic(path string) (udic *UserDic, err error) {
 		}
 		text = append(text, line)
 	}
-	if e := scanner.Err(); e != nil {
-		err = e
+	if err = scanner.Err(); err != nil {
 		return
 	}
 
 	sort.Strings(text)
 
-	udic = new(UserDic)
 	prev := ""
-	var keys fst.PairSlice
+	var keys []string
 	for _, line := range text {
 		record := strings.Split(line, ",")
 		if len(record) != userDicColumnSize {
@@ -77,7 +75,7 @@ func NewUserDic(path string) (udic *UserDic, err error) {
 			continue
 		}
 		prev = k
-		keys = append(keys, fst.Pair{In: k, Out: int32(len(keys))})
+		keys = append(keys, k)
 		tokens := strings.Split(record[1], " ")
 		yomi := strings.Split(record[2], " ")
 		if len(tokens) == 0 || len(tokens) != len(yomi) {
@@ -86,6 +84,6 @@ func NewUserDic(path string) (udic *UserDic, err error) {
 		}
 		udic.Contents = append(udic.Contents, UserDicContent{tokens, yomi, record[3]})
 	}
-	udic.Index, err = fst.Build(keys)
+	udic.Index, err = BuildIndexTable(keys)
 	return
 }

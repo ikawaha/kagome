@@ -34,7 +34,6 @@ import (
 	"golang.org/x/text/transform"
 
 	"github.com/ikawaha/kagome/internal/dic"
-	"github.com/ikawaha/kagome/internal/fst"
 )
 
 const (
@@ -67,7 +66,7 @@ const (
 type IpaDic struct {
 	Morphs       []dic.Morph
 	Contents     [][]string
-	Index        dic.Trie
+	Index        dic.IndexTable
 	Connection   dic.ConnectionTable
 	CharClass    []string
 	CharCategory []byte
@@ -75,8 +74,8 @@ type IpaDic struct {
 	GroupList    []bool
 
 	UnkMorphs   []dic.Morph
-	UnkIndex    map[int]int
-	UnkIndexDup map[int]int
+	UnkIndex    map[int32]int32
+	UnkIndexDup map[int32]int32
 	UnkContents [][]string
 }
 
@@ -111,11 +110,11 @@ func loadIpaDic(path ipaDicPath) (d *IpaDic, err error) {
 		if e != nil {
 			return e
 		}
-		t, e := fst.Read(f)
+		idx, e := dic.ReadIndexTable(f)
 		if e != nil {
 			return e
 		}
-		d.Index = t
+		d.Index = idx
 		return nil
 	}(); err != nil {
 		return
@@ -254,12 +253,7 @@ func saveIpaDic(d *IpaDic, base string, archive bool) (err error) {
 			defer f.Close()
 			out = f
 		}
-
-		t, ok := d.Index.(fst.FST)
-		if !ok {
-			return fmt.Errorf("invalid type assertions: %v", d.Index)
-		}
-		if _, e := t.WriteTo(out); e != nil {
+		if _, e := d.Index.WriteTo(out); e != nil {
 			return e
 		}
 		return nil
@@ -464,10 +458,9 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 	d = new(IpaDic)
 	d.Morphs = make([]dic.Morph, 0, len(records))
 	d.Contents = make([][]string, 0, len(records))
-	keywords := make(fst.PairSlice, 0, len(records))
-	for i, rec := range records {
-		keywords = append(keywords, fst.Pair{rec[ipaMrophRecordSurfaceIndex], int32(i)})
-
+	var keywords []string
+	for _, rec := range records {
+		keywords = append(keywords, rec[ipaMrophRecordSurfaceIndex])
 		var l, r, w int
 		if l, err = strconv.Atoi(rec[ipaMorphRecordLeftIDIndex]); err != nil {
 			return
@@ -482,7 +475,8 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 		d.Morphs = append(d.Morphs, m)
 		d.Contents = append(d.Contents, rec[ipaMorphRecordOtherContentsStartIndex:])
 	}
-	if d.Index, err = fst.Build(keywords); err != nil {
+
+	if d.Index, err = dic.BuildIndexTable(keywords); err != nil {
 		return
 	}
 
@@ -512,14 +506,14 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 		err = e
 		return
 	} else {
-		d.UnkIndex = make(map[int]int)
-		d.UnkIndexDup = make(map[int]int)
+		d.UnkIndex = make(map[int32]int32)
+		d.UnkIndexDup = make(map[int32]int32)
 		sort.Sort(ipaMorphRecordSlice(records))
 		for _, rec := range records {
-			catid := -1
+			catid := int32(-1)
 			for id, cat := range d.CharClass {
 				if cat == rec[ipaUnkRecordCategoryIndex] {
-					catid = id
+					catid = int32(id)
 					break
 				}
 			}
@@ -528,11 +522,8 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 				return
 			}
 			if _, ok := d.UnkIndex[catid]; !ok {
-				d.UnkIndex[catid] = len(d.UnkContents)
+				d.UnkIndex[catid] = int32(len(d.UnkContents))
 			} else {
-				if _, ok := d.UnkIndexDup[catid]; !ok {
-					d.UnkIndexDup[catid]++
-				}
 				d.UnkIndexDup[catid]++
 			}
 			var l, r, w int
