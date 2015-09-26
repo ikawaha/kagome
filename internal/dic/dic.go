@@ -19,8 +19,6 @@ import (
 	"encoding/gob"
 	"fmt"
 	"io"
-
-	"github.com/ikawaha/kagome/internal/fst"
 )
 
 // Dic represents a dictionary of a tokenizer.
@@ -28,16 +26,15 @@ type Dic struct {
 	Morphs       []Morph
 	Contents     [][]string
 	Connection   ConnectionTable
-	Index        Trie
+	Index        IndexTable
 	CharClass    []string
 	CharCategory []byte
 	InvokeList   []bool
 	GroupList    []bool
-
-	UnkMorphs   []Morph
-	UnkIndex    map[int]int
-	UnkIndexDup map[int]int
-	UnkContents [][]string
+	UnkMorphs    []Morph
+	UnkIndex     map[int32]int32
+	UnkIndexDup  map[int32]int32
+	UnkContents  [][]string
 }
 
 // CharactorCategory returns the category of a rune.
@@ -62,11 +59,11 @@ func (d *Dic) loadMorphDicPart(r io.Reader) error {
 }
 
 func (d *Dic) loadIndexDicPart(r io.Reader) error {
-	t, e := fst.Read(r)
+	idx, e := ReadIndexTable(r)
 	if e != nil {
 		return fmt.Errorf("dic initializer, Index: %v", e)
 	}
-	d.Index = t
+	d.Index = idx
 	return nil
 }
 
