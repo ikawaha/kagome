@@ -48,7 +48,7 @@ func main() {
 	if len(os.Args) < 2 {
 		Usage()
 		PrintDefaults()
-		os.Exit(1)
+		return
 	}
 	var cmd func([]string) error
 	for i := range subcommands {

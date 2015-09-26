@@ -23,8 +23,8 @@ import (
 // subcommand property
 var (
 	CommandName  = "ipa"
-	Description  = `dic tool`
-	usageMessage = "%s -mecab mecabdic-path -neologd neologd-path [-z]\n"
+	Description  = `ipa dic build tool`
+	usageMessage = "%s -mecab mecabdic-path [-neologd neologd-path] [-z]\n"
 	errorWriter  = os.Stderr
 )
 
@@ -77,6 +77,11 @@ func command(opt *option) error {
 }
 
 func Run(args []string) error {
+	if len(args) == 0 {
+		Usage()
+		PrintDefaults()
+		return nil
+	}
 	opt := newOption()
 	if e := opt.parse(args); e != nil {
 		Usage()
