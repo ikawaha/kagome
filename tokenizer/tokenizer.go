@@ -52,7 +52,7 @@ func New() (t Tokenizer) {
 	return Tokenizer{dic: dic.SysDic()}
 }
 
-// New create a tokenizer with specified dictionary.
+// NewWithDic create a tokenizer with specified dictionary.
 func NewWithDic(d Dic) (t Tokenizer) {
 	return Tokenizer{dic: d.dic}
 }
