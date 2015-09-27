@@ -6,6 +6,7 @@ go:
 sudo: false
 
 before_install:
+  - pip install --user codecov
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
@@ -18,5 +19,5 @@ script:
   - /bin/sh ./go-coverall.sh
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - codecov
 
