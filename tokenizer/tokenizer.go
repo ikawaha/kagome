@@ -67,8 +67,13 @@ func (t *Tokenizer) SetUserDic(d UserDic) {
 	t.udic = d.dic
 }
 
-// Tokenize returns morphs of a sentence.
-func (t Tokenizer) Tokenize(input string, mode TokenizeMode) (tokens []Token) {
+// Tokenize analyze a sentence in standard tokenize mode.
+func (t Tokenizer) Tokenize(input string) []Token {
+	return t.Analyze(input, Normal)
+}
+
+// Analyze tokenizes a sentence in the specified mode.
+func (t Tokenizer) Analyze(input string, mode TokenizeMode) (tokens []Token) {
 	la := lattice.New(t.dic, t.udic)
 	defer la.Free()
 	la.Build(input)
@@ -137,7 +142,7 @@ func (t Tokenizer) Dot(input string, w io.Writer) (tokens []Token) {
 		}
 		tokens = append(tokens, tok)
 	}
-	tokens = t.Tokenize(input, Normal)
+	tokens = t.Analyze(input, Normal)
 	la.Dot(w)
 	return
 }

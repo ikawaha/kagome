@@ -119,7 +119,7 @@ func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "{\"status\":true,\"tokens\":[]}")
 		return
 	}
-	tokens := h.tokenizer.Tokenize(body.Input, tokenizer.Normal)
+	tokens := h.tokenizer.Analyze(body.Input, tokenizer.Normal)
 	var rsp []record
 	for _, tok := range tokens {
 		if tok.ID == tokenizer.BosEosID {
@@ -171,11 +171,11 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	const cmdTimeout = 30 * time.Second
 	switch opt {
 	case "normal":
-		tokens = h.tokenizer.Tokenize(sen, tokenizer.Normal)
+		tokens = h.tokenizer.Analyze(sen, tokenizer.Normal)
 	case "search":
-		tokens = h.tokenizer.Tokenize(sen, tokenizer.Search)
+		tokens = h.tokenizer.Analyze(sen, tokenizer.Search)
 	case "extended":
-		tokens = h.tokenizer.Tokenize(sen, tokenizer.Extended)
+		tokens = h.tokenizer.Analyze(sen, tokenizer.Extended)
 	case "lattice":
 		if _, e := exec.LookPath("dot"); e != nil {
 			log.Print("graphviz is not in your future\n")

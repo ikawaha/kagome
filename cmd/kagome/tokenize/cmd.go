@@ -118,7 +118,7 @@ func command(opt *option) error {
 	scanner := bufio.NewScanner(fp)
 	for scanner.Scan() {
 		line := scanner.Text()
-		tokens := t.Tokenize(line, mode)
+		tokens := t.Analyze(line, mode)
 		for i, size := 1, len(tokens); i < size; i++ {
 			tok := tokens[i]
 			c := tok.Features()
