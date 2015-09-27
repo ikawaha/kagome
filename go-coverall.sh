@@ -1,11 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-function die() {
-    echo $*
-    exit 1
-}
-
-export GOPATH=`pwd`:$GOPATH
+#export GOPATH=`pwd`:$GOPATH
 echo "mode: count" > profile.cov
 
 ERROR=""
@@ -14,12 +9,13 @@ for pkg in `go list ./...`
 do
     touch profile_tmp.cov
     go test -v -covermode=count -coverprofile=profile_tmp.cov $pkg || ERROR="Error testing $pkg"
-    tail -n +2 profile_tmp.cov >> profile.cov || die "Unable to append coverage for $pkg"
+    tail -n +2 profile_tmp.cov >> profile.cov || (echo "Unable to append coverage for $pkg" && exit 1)
 done
 
 if [ ! -z "$ERROR" ]
 then
-    die "Encountered error, last error was: $ERROR"
+    echo "Encountered error, last error was: $ERROR"
+    exit 1
 fi
 
 GOVERALLS=$(echo $GOPATH | tr ':' '\n' | head -n 1)/bin/goveralls
