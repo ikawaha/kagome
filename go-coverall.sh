@@ -1,7 +1,7 @@
 #!/bin/bash
 
-COV_FILE=profile.cov.out
-COV_TMP_FILE=profile_tmp.cov
+COV_FILE=coverage.txt
+COV_TMP_FILE=coverage_tmp.cov
 ERROR=""
 
 echo "mode: count" > $COV_FILE
