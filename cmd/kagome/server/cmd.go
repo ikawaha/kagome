@@ -64,6 +64,9 @@ func (o *option) parse(args []string) (err error) {
 		return
 	}
 	// validations
+	if nonFlag := o.flagSet.Args(); len(nonFlag) != 0 {
+		return fmt.Errorf("invalid argument: %v", nonFlag)
+	}
 	if o.mode != "normal" && o.mode != "search" && o.mode != "extended" {
 		return fmt.Errorf("unknown mode: %v", o.mode)
 	}
@@ -79,7 +82,7 @@ func command(opt *option) error {
 			return err
 		}
 	}
-	t := tokenizer.New(tokenizer.SysDic())
+	t := tokenizer.New()
 	t.SetUserDic(udic)
 
 	mux := http.NewServeMux()
@@ -91,7 +94,7 @@ func command(opt *option) error {
 }
 
 type TokenizeHandler struct {
-	tokenizer *tokenizer.Tokenizer
+	tokenizer tokenizer.Tokenizer
 }
 
 func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -148,7 +151,7 @@ func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 type TokenizeDemoHandler struct {
-	tokenizer *tokenizer.Tokenizer
+	tokenizer tokenizer.Tokenizer
 }
 
 func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -256,8 +259,7 @@ func Run(args []string) error {
 	if e := opt.parse(args); e != nil {
 		Usage()
 		PrintDefaults()
-		fmt.Fprintf(errorWriter, "%v\n", e)
-		os.Exit(1)
+		return fmt.Errorf("%v, %v", CommandName, e)
 	}
 	return command(opt)
 }

@@ -38,6 +38,7 @@ type option struct {
 	dic     string
 	udic    string
 	mode    string
+	input   string
 	flagSet *flag.FlagSet
 }
 
@@ -60,6 +61,9 @@ func (o *option) parse(args []string) (err error) {
 		return
 	}
 	// validations
+	if nonFlag := o.flagSet.Args(); len(nonFlag) != 0 {
+		return fmt.Errorf("invalid argument: %v", nonFlag)
+	}
 	if o.mode != "" && o.mode != "normal" && o.mode != "search" && o.mode != "extended" {
 		err = fmt.Errorf("invalid argument: -mode %v\n", o.mode)
 		return
@@ -97,7 +101,7 @@ func command(opt *option) error {
 		defer fp.Close()
 	}
 
-	t := tokenizer.New(dic)
+	t := tokenizer.NewWithDic(dic)
 	t.SetUserDic(udic)
 
 	mode := tokenizer.Normal
@@ -133,8 +137,7 @@ func Run(args []string) error {
 	if e := opt.parse(args); e != nil {
 		Usage()
 		PrintDefaults()
-		fmt.Fprintf(errorWriter, "%v\n", e)
-		os.Exit(1)
+		return fmt.Errorf("%v, %v", CommandName, e)
 	}
 	return command(opt)
 }

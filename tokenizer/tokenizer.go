@@ -38,8 +38,8 @@ const (
 
 // Tokenizer represents morphological analyzer.
 type Tokenizer struct {
-	dic  *dic.Dic
-	udic *dic.UserDic
+	dic  *dic.Dic     // system dictionary
+	udic *dic.UserDic // user dictionary
 }
 
 var (
@@ -47,9 +47,14 @@ var (
 	BosEosID = lattice.BosEosID
 )
 
-// New create a tokenizer.
-func New(d Dic) (t *Tokenizer) {
-	return &Tokenizer{dic: d.dic}
+// New create a default tokenize.
+func New() (t Tokenizer) {
+	return Tokenizer{dic: dic.SysDic()}
+}
+
+// New create a tokenizer with specified dictionary.
+func NewWithDic(d Dic) (t Tokenizer) {
+	return Tokenizer{dic: d.dic}
 }
 
 // SetDic sets dictionary to dic.
@@ -63,7 +68,7 @@ func (t *Tokenizer) SetUserDic(d UserDic) {
 }
 
 // Tokenize returns morphs of a sentence.
-func (t *Tokenizer) Tokenize(input string, mode TokenizeMode) (tokens []Token) {
+func (t Tokenizer) Tokenize(input string, mode TokenizeMode) (tokens []Token) {
 	la := lattice.New(t.dic, t.udic)
 	defer la.Free()
 	la.Build(input)
@@ -104,7 +109,7 @@ func (t *Tokenizer) Tokenize(input string, mode TokenizeMode) (tokens []Token) {
 }
 
 // Dot returns morphs of a sentense and exports a lattice graph to dot format.
-func (t *Tokenizer) Dot(input string, w io.Writer) (tokens []Token) {
+func (t Tokenizer) Dot(input string, w io.Writer) (tokens []Token) {
 	la := lattice.New(t.dic, t.udic)
 	defer la.Free()
 	la.Build(input)

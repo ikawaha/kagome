@@ -65,7 +65,7 @@ func (o *option) parse(args []string) (err error) {
 
 // command main
 func command(opt *option) error {
-	t := tokenizer.New(tokenizer.SysDic())
+	t := tokenizer.New()
 	var out = os.Stdout
 	if opt.output != "" {
 		var err error
