@@ -13,6 +13,8 @@ do
     tail -n +2 $COV_TMP_FILE >> $COV_FILE || (echo "Unable to append coverage for $pkg" && exit 1)
 done
 
+rm $COV_TMP_FILE
+
 if [ ! -z "$ERROR" ]
 then
     echo "Encountered error, last error was: $ERROR"
