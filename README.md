@@ -23,7 +23,7 @@ Install
 ---
 
 ```
-% go get github.com/ikawaha/kagome/...
+% go get -u github.com/ikawaha/kagome/...
 ```
 
 Usage
@@ -132,7 +132,7 @@ Below is a simple go example that demonstrates how a simple text can be segmente
 
 sample code:
 
-```
+```go:example
 package main
 
 import (
@@ -143,7 +143,7 @@ import (
 )
 
 func main() {
-	t := tokenizer.New(tokenizer.SysDic())
+	t := tokenizer.New()
 	tokens := t.Tokenize("寿司が食べたい。", tokenizer.Normal)
 	for _, token := range tokens {
 		if token.Class == tokenizer.DUMMY {
@@ -159,7 +159,7 @@ func main() {
 
 output:
 
-```
+```text:outputs
 BOS
 寿司    名詞,一般,*,*,*,*,寿司,スシ,スシ
 が      助詞,格助詞,一般,*,*,*,が,ガ,ガ
