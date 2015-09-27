@@ -22,7 +22,7 @@ import (
 )
 
 func TestTokenize01(t *testing.T) {
-	tnz := New(SysDic())
+	tnz := New()
 	tokens := tnz.Tokenize("", Normal)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -44,7 +44,7 @@ func TestTokenize01(t *testing.T) {
 }
 
 func TestTokenize02(t *testing.T) {
-	tnz := New(SysDic())
+	tnz := New()
 	tokens := tnz.Tokenize("関西国際空港", Normal)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -67,7 +67,7 @@ func TestTokenize02(t *testing.T) {
 }
 
 func TestTokenize03(t *testing.T) {
-	tnz := New(SysDic())
+	tnz := New()
 	udic, e := NewUserDic("../_sample/userdic.txt")
 	if e != nil {
 		t.Fatalf("new user dic: unexpected error\n")
@@ -95,7 +95,7 @@ func TestTokenize03(t *testing.T) {
 }
 
 func TestTokenize04(t *testing.T) {
-	tnz := New(SysDic())
+	tnz := New()
 	tokens := tnz.Tokenize("ポポピ", Normal)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -118,7 +118,7 @@ func TestTokenize04(t *testing.T) {
 }
 
 func TestSearcModeTokenize01(t *testing.T) {
-	tnz := New(SysDic())
+	tnz := New()
 	tokens := tnz.Tokenize("", Search)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -140,7 +140,7 @@ func TestSearcModeTokenize01(t *testing.T) {
 }
 
 func TestSearchModeTokenize02(t *testing.T) {
-	tnz := New(SysDic())
+	tnz := New()
 	tokens := tnz.Tokenize("関西国際空港", Search)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -166,7 +166,7 @@ func TestSearchModeTokenize02(t *testing.T) {
 }
 
 func TestSearchModeTokenize03(t *testing.T) {
-	tnz := New(SysDic())
+	tnz := New()
 	udic, e := NewUserDic("../_sample/userdic.txt")
 	if e != nil {
 		t.Fatalf("new user dic: unexpected error\n")
@@ -194,7 +194,7 @@ func TestSearchModeTokenize03(t *testing.T) {
 }
 
 func TestSearchModeTokenize04(t *testing.T) {
-	tnz := New(SysDic())
+	tnz := New()
 	tokens := tnz.Tokenize("ポポピ", Search)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -217,7 +217,7 @@ func TestSearchModeTokenize04(t *testing.T) {
 }
 
 func TestExtendedModeTokenize01(t *testing.T) {
-	tnz := New(SysDic())
+	tnz := New()
 	tokens := tnz.Tokenize("", Extended)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -239,7 +239,7 @@ func TestExtendedModeTokenize01(t *testing.T) {
 }
 
 func TestExtendedModeTokenize02(t *testing.T) {
-	tnz := New(SysDic())
+	tnz := New()
 	tokens := tnz.Tokenize("関西国際空港", Extended)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -264,7 +264,7 @@ func TestExtendedModeTokenize02(t *testing.T) {
 }
 
 func TestExtendedModeTokenize03(t *testing.T) {
-	tnz := New(SysDic())
+	tnz := New()
 	udic, e := NewUserDic("../_sample/userdic.txt")
 	if e != nil {
 		t.Fatalf("new user dic: unexpected error\n")
@@ -292,7 +292,7 @@ func TestExtendedModeTokenize03(t *testing.T) {
 }
 
 func TestExtendedModeTokenize04(t *testing.T) {
-	tnz := New(SysDic())
+	tnz := New()
 	tokens := tnz.Tokenize("ポポピ", Extended)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -318,7 +318,7 @@ func TestExtendedModeTokenize04(t *testing.T) {
 
 func TestTokenizerSetDic(t *testing.T) {
 	d := SysDic()
-	tnz := New(d)
+	tnz := NewWithDic(d)
 
 	tnz.SetDic(d)
 	if tnz.dic != d.dic {
@@ -327,7 +327,7 @@ func TestTokenizerSetDic(t *testing.T) {
 }
 
 func TestTokenizerDot(t *testing.T) {
-	tnz := New(SysDic())
+	tnz := New()
 
 	// test empty case
 	var b bytes.Buffer
@@ -347,21 +347,21 @@ func TestTokenizerDot(t *testing.T) {
 var benchSampleText = "人魚は、南の方の海にばかり棲んでいるのではありません。北の海にも棲んでいたのであります。北方の海の色は、青うございました。ある時、岩の上に、女の人魚があがって、あたりの景色を眺めながら休んでいました。"
 
 func BenchmarkTokenizeNormal(b *testing.B) {
-	tnz := New(SysDic())
+	tnz := New()
 	for i := 0; i < b.N; i++ {
 		tnz.Tokenize(benchSampleText, Normal)
 	}
 }
 
 func BenchmarkTokenizeSearch(b *testing.B) {
-	tnz := New(SysDic())
+	tnz := New()
 	for i := 0; i < b.N; i++ {
 		tnz.Tokenize(benchSampleText, Search)
 	}
 }
 
 func BenchmarkTokenizeExtended(b *testing.B) {
-	tnz := New(SysDic())
+	tnz := New()
 	for i := 0; i < b.N; i++ {
 		tnz.Tokenize(benchSampleText, Extended)
 	}
