@@ -1,15 +1,16 @@
 #!/bin/bash
 
-#export GOPATH=`pwd`:$GOPATH
-echo "mode: count" > profile.cov
-
+COV_FILE=profile.cov.out
+COV_TMP_FILE=profile_tmp.cov
 ERROR=""
+
+echo "mode: count" > $COV_FILE
 
 for pkg in `go list ./...`
 do
-    touch profile_tmp.cov
-    go test -v -covermode=count -coverprofile=profile_tmp.cov $pkg || ERROR="Error testing $pkg"
-    tail -n +2 profile_tmp.cov >> profile.cov || (echo "Unable to append coverage for $pkg" && exit 1)
+    touch $COV_TMP_FILE
+    go test -covermode=count -coverprofile=$COV_TMP_FILE $pkg || ERROR="Error testing $pkg"
+    tail -n +2 $COV_TMP_FILE >> $COV_FILE || (echo "Unable to append coverage for $pkg" && exit 1)
 done
 
 if [ ! -z "$ERROR" ]
@@ -19,5 +20,5 @@ then
 fi
 
 GOVERALLS=$(echo $GOPATH | tr ':' '\n' | head -n 1)/bin/goveralls
-$GOVERALLS -coverprofile=profile.cov -service=travis-ci
+$GOVERALLS -coverprofile=COV_FILE -service=travis-ci
 
