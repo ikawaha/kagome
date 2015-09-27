@@ -53,7 +53,7 @@ func main() {
 	if len(os.Args) < 2 {
 		Usage()
 		PrintDefaults()
-		os.Exit(1)
+		return
 	}
 	var cmd func([]string) error
 	for i := range subcommands {
@@ -64,7 +64,7 @@ func main() {
 	if cmd == nil {
 		Usage()
 		PrintDefaults()
-		os.Exit(1)
+		return
 	}
 	if e := cmd(os.Args[2:]); e != nil {
 		fmt.Fprintf(errorWriter, "%v\n", e)
