@@ -34,6 +34,8 @@ const (
 	Search
 	// Extended is the experimental tokenize mode.
 	Extended
+	// BosEosID means the begining a sentence or the end of a sentence.
+	BosEosID = lattice.BosEosID
 )
 
 // Tokenizer represents morphological analyzer.
@@ -41,11 +43,6 @@ type Tokenizer struct {
 	dic  *dic.Dic     // system dictionary
 	udic *dic.UserDic // user dictionary
 }
-
-var (
-	// BosEosID means the begining a sentence or the end of a sentence.
-	BosEosID = lattice.BosEosID
-)
 
 // New create a default tokenize.
 func New() (t Tokenizer) {
