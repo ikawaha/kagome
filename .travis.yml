@@ -1,20 +1,23 @@
 language: go
 
 go:
-  - release
+  - tip
+
+sudo: false
 
 before_install:
+  - pip install --user codecov
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
-  - if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi 
+  - go get golang.org/x/tools/cmd/cover
 
 install:
 
 script:
-  - go test -v .
-  - $HOME/gopath/bin/goveralls -repotoken 5glf4xLR99hc2ZOsU6s4Jj1TXpE63XxLr
-  - go test -coverprofile=coverage.txt -covermode=atomic
+  - go test ./...
+  - cd tokenizer; go test -bench .;cd ..
+  - /bin/sh ./go-coverall.sh
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - codecov
 
