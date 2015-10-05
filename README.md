@@ -144,7 +144,7 @@ import (
 
 func main() {
 	t := tokenizer.New()
-	tokens := t.Tokenize("寿司が食べたい。", tokenizer.Normal)
+	tokens := t.Tokenize("寿司が食べたい。") // t.Analyze("寿司が食べたい。", tokenizer.Normal)
 	for _, token := range tokens {
 		if token.Class == tokenizer.DUMMY {
 			// BOS: Begin Of Sentence, EOS: End Of Sentence.
