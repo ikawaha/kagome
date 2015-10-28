@@ -67,7 +67,7 @@ func (s Spliter) isFollower(r rune) bool {
 }
 
 func (s Spliter) ScanSentences(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	if atEOF || len(data) == 0 {
+	if atEOF && len(data) == 0 {
 		return 0, nil, nil
 	}
 	var (
@@ -128,13 +128,14 @@ func (s Spliter) ScanSentences(data []byte, atEOF bool) (advance int, token []by
 		}
 		return p, data[start:end], nil
 	}
+	if !atEOF {
+		// Request more data
+		for i := end; i < len(data); i++ {
+			data[i] = ' '
+		}
+		return start, nil, nil
+	}
 	// If we're at EOF, we have a final, non-terminated line. Return it.
-	if atEOF {
-		return len(data), data[start:end], nil
-	}
-	// Request more data
-	for i := end; i < len(data); i++ {
-		data[i] = ' '
-	}
-	return start, nil, nil
+	return len(data), data[start:end], nil
+
 }
