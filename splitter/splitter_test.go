@@ -1,4 +1,4 @@
-package spliter
+package splitter
 
 import (
 	"bufio"
