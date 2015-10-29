@@ -16,7 +16,7 @@ type SentenceSplitter struct {
 
 var (
 	// default sentence splitter
-	splitter = &SentenceSplitter{
+	defaultSpliter = &SentenceSplitter{
 		Delim:               []rune{'。', '．'},
 		Follower:            []rune{'」', '』'},
 		SkipWhiteSpace:      true,
@@ -27,7 +27,7 @@ var (
 
 // ScanSentences is a split function for a Scanner that returns each sentece of text.
 func ScanSentences(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	return splitter.ScanSentences(data, atEOF)
+	return defaultSpliter.ScanSentences(data, atEOF)
 }
 
 func (s SentenceSplitter) isDelim(r rune) bool {
