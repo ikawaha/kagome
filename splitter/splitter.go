@@ -5,7 +5,8 @@ import (
 	"unicode/utf8"
 )
 
-type Spliter struct {
+// SentenceSplitter is a tiny sentence splitter for japanese texts.
+type SentenceSplitter struct {
 	Delim               []rune
 	Follower            []rune
 	SkipWhiteSpace      bool
@@ -14,7 +15,8 @@ type Spliter struct {
 }
 
 var (
-	spliter = &Spliter{
+	// default sentence splitter
+	splitter = &SentenceSplitter{
 		Delim:               []rune{'。', '．'},
 		Follower:            []rune{'」', '』'},
 		SkipWhiteSpace:      true,
@@ -23,11 +25,12 @@ var (
 	}
 )
 
+// ScanSentences is a split function for a Scanner that returns each sentece of text.
 func ScanSentences(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	return spliter.ScanSentences(data, atEOF)
+	return splitter.ScanSentences(data, atEOF)
 }
 
-func (s Spliter) isDelim(r rune) bool {
+func (s SentenceSplitter) isDelim(r rune) bool {
 	for _, d := range s.Delim {
 		if r == d {
 			return true
@@ -36,7 +39,7 @@ func (s Spliter) isDelim(r rune) bool {
 	return false
 }
 
-func (s Spliter) isFollower(r rune) bool {
+func (s SentenceSplitter) isFollower(r rune) bool {
 	for _, d := range s.Follower {
 		if r == d {
 			return true
@@ -45,7 +48,8 @@ func (s Spliter) isFollower(r rune) bool {
 	return false
 }
 
-func (s Spliter) ScanSentences(data []byte, atEOF bool) (advance int, token []byte, err error) {
+// ScanSentences is a split function for a Scanner that returns each sentece of text.
+func (s SentenceSplitter) ScanSentences(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if atEOF && len(data) == 0 {
 		return 0, nil, nil
 	}
@@ -85,7 +89,7 @@ func (s Spliter) ScanSentences(data []byte, atEOF bool) (advance int, token []by
 		nn = false
 		for p < len(data) {
 			r, size := utf8.DecodeRune(data[p:])
-			if s.SkipWhiteSpace && isSpace(r) {
+			if s.SkipWhiteSpace && unicode.IsSpace(r) {
 				p += size
 				if s.DoubleLineFeedSplit && r == '\n' {
 					if nn {
