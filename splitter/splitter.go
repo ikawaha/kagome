@@ -1,30 +1,9 @@
 package splitter
 
 import (
+	"unicode"
 	"unicode/utf8"
 )
-
-func isSpace(r rune) bool {
-	if r <= '\u00FF' {
-		// Obvious ASCII ones: \t through \r plus space. Plus two Latin-1 oddballs.
-		switch r {
-		case ' ', '\t', '\n', '\v', '\f', '\r':
-			return true
-		case '\u0085', '\u00A0':
-			return true
-		}
-		return false
-	}
-	// High-valued ones.
-	if '\u2000' <= r && r <= '\u200a' {
-		return true
-	}
-	switch r {
-	case '\u1680', '\u2028', '\u2029', '\u202f', '\u205f', '\u3000':
-		return true
-	}
-	return false
-}
 
 type Spliter struct {
 	Delim               []rune
@@ -77,7 +56,7 @@ func (s Spliter) ScanSentences(data []byte, atEOF bool) (advance int, token []by
 	head = true
 	for p := 0; p < len(data); {
 		r, size := utf8.DecodeRune(data[p:])
-		if s.SkipWhiteSpace && isSpace(r) {
+		if s.SkipWhiteSpace && unicode.IsSpace(r) {
 			p += size
 			if head {
 				start, end = p, p
