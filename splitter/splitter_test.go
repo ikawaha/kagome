@@ -48,7 +48,7 @@ func TestDefaultSplitter(t *testing.T) {
 
 	for _, d := range testdata {
 		scanner := bufio.NewScanner(strings.NewReader(d.input))
-		scanner.Split(splitter.ScanSentences)
+		scanner.Split(ScanSentences)
 		r := make([]string, 0, len(d.expect))
 		for scanner.Scan() {
 			r = append(r, scanner.Text())
@@ -63,15 +63,16 @@ func TestDefaultSplitter(t *testing.T) {
 func TestScanSentences(t *testing.T) {
 	testdata := []struct {
 		atEnd   bool
+		data    []byte
 		advance int
 		token   []byte
 		err     error
 	}{
-		{atEnd: true, advance: 0, token: []byte{}, err: nil},
-		{atEnd: false, advance: 0, token: []byte{}, err: nil},
+		{atEnd: true, data: []byte{}, advance: 0, token: []byte{}, err: nil},
+		{atEnd: false, data: []byte{}, advance: 0, token: []byte{}, err: nil},
 	}
 	for _, d := range testdata {
-		advance, token, err := splitter.ScanSentences([]byte{}, true)
+		advance, token, err := ScanSentences(d.data, d.atEnd)
 		if err != nil {
 			t.Errorf("got err=%+v, expected nil", d.err)
 		}
