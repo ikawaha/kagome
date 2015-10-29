@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestDefaultSplit(t *testing.T) {
+func TestDefaultSplitter(t *testing.T) {
 	testdata := []struct {
 		input  string
 		expect []string
@@ -58,4 +58,28 @@ func TestDefaultSplit(t *testing.T) {
 		}
 	}
 
+}
+
+func TestScanSentences(t *testing.T) {
+	testdata := []struct {
+		atEnd   bool
+		advance int
+		token   []byte
+		err     error
+	}{
+		{atEnd: true, advance: 0, token: []byte{}, err: nil},
+		{atEnd: false, advance: 0, token: []byte{}, err: nil},
+	}
+	for _, d := range testdata {
+		advance, token, err := splitter.ScanSentences([]byte{}, true)
+		if err != nil {
+			t.Errorf("got err=%+v, expected nil", d.err)
+		}
+		if advance != 0 {
+			t.Errorf("got advance %v, expected 0", d.advance)
+		}
+		if reflect.DeepEqual(token, d.token) {
+			t.Errorf("got token=%+v, expected []", d.token)
+		}
+	}
 }
