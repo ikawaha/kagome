@@ -21,11 +21,11 @@ import (
 
 // SentenceSplitter is a tiny sentence splitter for japanese texts.
 type SentenceSplitter struct {
-	Delim               []rune
-	Follower            []rune
-	SkipWhiteSpace      bool
-	DoubleLineFeedSplit bool
-	MaxRuneLen          int
+	Delim               []rune // delimiter set. ex. {'。','．'}
+	Follower            []rune // allow following after delimiters. ex. {'」','』'}
+	SkipWhiteSpace      bool   // eliminate white space or not
+	DoubleLineFeedSplit bool   // splite at '\n\n' or not
+	MaxRuneLen          int    // max sentence length
 }
 
 var (
