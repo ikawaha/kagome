@@ -18,6 +18,3 @@ script:
   - cd tokenizer; go test -bench .;cd ..
   - /bin/sh ./go-coverall.sh
 
-after_success:
-  - codecov
-
