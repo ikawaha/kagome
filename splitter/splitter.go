@@ -31,8 +31,8 @@ type SentenceSplitter struct {
 var (
 	// default sentence splitter
 	defaultSpliter = &SentenceSplitter{
-		Delim:               []rune{'。', '．'},
-		Follower:            []rune{'」', '』'},
+		Delim:               []rune{'。', '．', '！', '!', '？', '?'},
+		Follower:            []rune{'.', '｣', '」', '』', ')', '）', '｝', '}', '〉', '》'},
 		SkipWhiteSpace:      true,
 		DoubleLineFeedSplit: true,
 		MaxRuneLen:          256,
