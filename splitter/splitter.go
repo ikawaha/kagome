@@ -78,6 +78,8 @@ func (s SentenceSplitter) ScanSentences(data []byte, atEOF bool) (advance int, t
 			p += size
 			if head {
 				start, end = p, p
+			} else if s.isDelim(r) {
+				return p, data[start:end], nil
 			} else if s.DoubleLineFeedSplit && r == '\n' {
 				if nn {
 					return p, data[start:end], nil
