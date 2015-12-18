@@ -17,6 +17,8 @@ package lattice
 import (
 	"flag"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"os"
 	"strings"
 
@@ -40,9 +42,12 @@ type option struct {
 	flagSet *flag.FlagSet
 }
 
-func newOption() (o *option) {
+// ContinueOnError ErrorHandling // Return a descriptive error.
+// ExitOnError                   // Call os.Exit(2).
+// PanicOnError                  // Call panic with a descriptive error.flag.ContinueOnError
+func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	o = &option{
-		flagSet: flag.NewFlagSet(CommandName, flag.ContinueOnError),
+		flagSet: flag.NewFlagSet(CommandName, eh),
 	}
 	// option settings
 	o.flagSet.StringVar(&o.udic, "udic", "", "user dic")
@@ -61,6 +66,14 @@ func (o *option) parse(args []string) (err error) {
 	}
 	o.input = strings.Join(o.flagSet.Args(), " ")
 	return
+}
+
+func OptionCheck(args []string) (err error) {
+	opt := newOption(ioutil.Discard, flag.ContinueOnError)
+	if e := opt.parse(args); e != nil {
+		return fmt.Errorf("%v, %v", CommandName, e)
+	}
+	return nil
 }
 
 // command main
@@ -111,11 +124,11 @@ func command(opt *option) error {
 }
 
 func Run(args []string) error {
-	opt := newOption()
+	opt := newOption(ErrorWriter, flag.ExitOnError)
 	if e := opt.parse(args); e != nil {
 		Usage()
-		PrintDefaults()
-		return e
+		PrintDefaults(flag.ExitOnError)
+		return fmt.Errorf("%v, %v", CommandName, e)
 	}
 	return command(opt)
 }
@@ -124,7 +137,7 @@ func Usage() {
 	fmt.Fprintf(ErrorWriter, UsageMessage, CommandName)
 }
 
-func PrintDefaults() {
-	o := newOption()
+func PrintDefaults(eh flag.ErrorHandling) {
+	o := newOption(ErrorWriter, eh)
 	o.flagSet.PrintDefaults()
 }

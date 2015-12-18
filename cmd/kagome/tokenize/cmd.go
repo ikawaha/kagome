@@ -18,6 +18,8 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"os"
 	"strings"
 
@@ -25,11 +27,14 @@ import (
 )
 
 // subcommand property
-var (
+const (
 	CommandName  = "tokenize"
 	Description  = `command line tokenize`
 	usageMessage = "%s [-file input_file] [-dic dic_file] [-udic userdic_file] [-mode (normal|search|extended)]\n"
-	errorWriter  = os.Stderr
+)
+
+var (
+	ErrorWriter = os.Stderr
 )
 
 // options
@@ -42,12 +47,15 @@ type option struct {
 	flagSet *flag.FlagSet
 }
 
-func newOption() (o *option) {
+// ContinueOnError ErrorHandling // Return a descriptive error.
+// ExitOnError                   // Call os.Exit(2).
+// PanicOnError                  // Call panic with a descriptive error.flag.ContinueOnError
+func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	o = &option{
-		flagSet: flag.NewFlagSet(CommandName, flag.ExitOnError),
+		flagSet: flag.NewFlagSet(CommandName, eh),
 	}
 	// option settings
-	o.flagSet.SetOutput(errorWriter)
+	o.flagSet.SetOutput(w)
 	o.flagSet.StringVar(&o.file, "file", "", "input file")
 	o.flagSet.StringVar(&o.dic, "dic", "", "dic")
 	o.flagSet.StringVar(&o.udic, "udic", "", "user dic")
@@ -65,10 +73,17 @@ func (o *option) parse(args []string) (err error) {
 		return fmt.Errorf("invalid argument: %v", nonFlag)
 	}
 	if o.mode != "" && o.mode != "normal" && o.mode != "search" && o.mode != "extended" {
-		err = fmt.Errorf("invalid argument: -mode %v\n", o.mode)
-		return
+		return fmt.Errorf("invalid argument: -mode %v\n", o.mode)
 	}
 	return
+}
+
+func OptionCheck(args []string) (err error) {
+	opt := newOption(ioutil.Discard, flag.ContinueOnError)
+	if e := opt.parse(args); e != nil {
+		return fmt.Errorf("%v, %v", CommandName, e)
+	}
+	return nil
 }
 
 // command main
@@ -133,20 +148,20 @@ func command(opt *option) error {
 }
 
 func Run(args []string) error {
-	opt := newOption()
+	opt := newOption(ErrorWriter, flag.ExitOnError)
 	if e := opt.parse(args); e != nil {
 		Usage()
-		PrintDefaults()
+		PrintDefaults(flag.ExitOnError)
 		return fmt.Errorf("%v, %v", CommandName, e)
 	}
 	return command(opt)
 }
 
 func Usage() {
-	fmt.Fprintf(errorWriter, usageMessage, CommandName)
+	fmt.Fprintf(ErrorWriter, usageMessage, CommandName)
 }
 
-func PrintDefaults() {
-	o := newOption()
+func PrintDefaults(eh flag.ErrorHandling) {
+	o := newOption(ErrorWriter, eh)
 	o.flagSet.PrintDefaults()
 }

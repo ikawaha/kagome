@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -36,7 +37,7 @@ var (
 	CommandName  = "server"
 	Description  = `run tokenize server`
 	usageMessage = "%s [-http=:6060] [-udic userdic_file] [-mode (normal|search|extended)]\n"
-	errorWriter  = os.Stderr
+	ErrorWriter  = os.Stderr
 )
 
 // options
@@ -47,9 +48,12 @@ type option struct {
 	flagSet *flag.FlagSet
 }
 
-func newOption() (o *option) {
+// ContinueOnError ErrorHandling // Return a descriptive error.
+// ExitOnError                   // Call os.Exit(2).
+// PanicOnError                  // Call panic with a descriptive error.flag.ContinueOnError
+func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	o = &option{
-		flagSet: flag.NewFlagSet(CommandName, flag.ExitOnError),
+		flagSet: flag.NewFlagSet(CommandName, eh),
 	}
 	// option settings
 	o.flagSet.StringVar(&o.http, "http", ":6060", "HTTP service address (e.g., ':6060')")
@@ -71,6 +75,14 @@ func (o *option) parse(args []string) (err error) {
 		return fmt.Errorf("unknown mode: %v", o.mode)
 	}
 	return
+}
+
+func OptionCheck(args []string) (err error) {
+	opt := newOption(ioutil.Discard, flag.ContinueOnError)
+	if e := opt.parse(args); e != nil {
+		return fmt.Errorf("%v, %v", CommandName, e)
+	}
+	return nil
 }
 
 // command main
@@ -186,7 +198,7 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		r, w := io.Pipe()
 		cmd.Stdin = r
 		cmd.Stdout = &buf
-		cmd.Stderr = errorWriter
+		cmd.Stderr = ErrorWriter
 		if err := cmd.Start(); err != nil {
 			cmdErr = "Error"
 			log.Printf("process done with error = %v", err)
@@ -255,10 +267,10 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 }
 
 func Run(args []string) error {
-	opt := newOption()
+	opt := newOption(ErrorWriter, flag.ExitOnError)
 	if e := opt.parse(args); e != nil {
 		Usage()
-		PrintDefaults()
+		PrintDefaults(flag.ExitOnError)
 		return fmt.Errorf("%v, %v", CommandName, e)
 	}
 	return command(opt)
@@ -268,8 +280,8 @@ func Usage() {
 	fmt.Fprintf(os.Stderr, usageMessage, CommandName)
 }
 
-func PrintDefaults() {
-	o := newOption()
+func PrintDefaults(eh flag.ErrorHandling) {
+	o := newOption(ErrorWriter, eh)
 	o.flagSet.PrintDefaults()
 }
 

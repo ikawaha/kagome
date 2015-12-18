@@ -15,6 +15,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"path"
@@ -24,18 +25,36 @@ import (
 	"github.com/ikawaha/kagome/cmd/kagome/tokenize"
 )
 
-var errorWriter = os.Stderr
+var (
+	errorWriter = os.Stderr
 
-var subcommands = []struct {
-	Name        string
-	Description string
-	Run         func([]string) error
-}{
-	// subcommands
-	{tokenize.CommandName, tokenize.Description, tokenize.Run},
-	{server.CommandName, server.Description, server.Run},
-	{lattice.CommandName, lattice.Description, lattice.Run},
-}
+	subcommands = []struct {
+		Name          string
+		Description   string
+		Run           func([]string) error
+		Usage         func()
+		OptionCheck   func([]string) error
+		PrintDefaults func(flag.ErrorHandling)
+	}{
+		{
+			tokenize.CommandName, tokenize.Description,
+			tokenize.Run,
+			tokenize.Usage, tokenize.OptionCheck, tokenize.PrintDefaults,
+		},
+		{
+			server.CommandName, server.Description,
+			server.Run,
+			server.Usage, server.OptionCheck, server.PrintDefaults,
+		},
+		{
+			lattice.CommandName, lattice.Description,
+			lattice.Run,
+			lattice.Usage, lattice.OptionCheck, lattice.PrintDefaults,
+		},
+	}
+
+	defaultSubcommand = subcommands[0]
+)
 
 func Usage() {
 	fmt.Fprintf(errorWriter, "Japanese Morphological Analyzer -- github.com/ikawaha/kagome\n")
@@ -45,28 +64,40 @@ func Usage() {
 func PrintDefaults() {
 	fmt.Fprintln(errorWriter, "The commands are:")
 	for _, c := range subcommands {
-		fmt.Fprintf(errorWriter, "   %s - %s\n", c.Name, c.Description)
+		if c.Name == defaultSubcommand.Name {
+			fmt.Fprintf(errorWriter, "   [%s] - %s (*default)\n", c.Name, c.Description)
+		} else {
+			fmt.Fprintf(errorWriter, "   %s - %s\n", c.Name, c.Description)
+		}
 	}
 }
 
 func main() {
-	if len(os.Args) < 2 {
-		Usage()
-		PrintDefaults()
-		return
-	}
-	var cmd func([]string) error
-	for i := range subcommands {
-		if os.Args[1] == subcommands[i].Name {
-			cmd = subcommands[i].Run
+	var (
+		cmd     func([]string) error
+		options []string
+	)
+	if len(os.Args) >= 2 {
+		options = os.Args[2:]
+		for i := range subcommands {
+			if os.Args[1] == subcommands[i].Name {
+				cmd = subcommands[i].Run
+			}
 		}
 	}
 	if cmd == nil {
-		Usage()
-		PrintDefaults()
-		return
+		options = os.Args[1:]
+		if e := defaultSubcommand.OptionCheck(options); e != nil {
+			Usage()
+			PrintDefaults()
+			fmt.Fprintln(errorWriter)
+			defaultSubcommand.Usage()
+			defaultSubcommand.PrintDefaults(flag.ExitOnError)
+			os.Exit(1)
+		}
+		cmd = defaultSubcommand.Run
 	}
-	if e := cmd(os.Args[2:]); e != nil {
+	if e := cmd(options); e != nil {
 		fmt.Fprintf(errorWriter, "%v\n", e)
 		os.Exit(1)
 	}
