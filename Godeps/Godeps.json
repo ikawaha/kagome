@@ -1,0 +1,8 @@
+{
+	"ImportPath": "github.com/ikawaha/kagome",
+	"GoVersion": "go1.5.2",
+	"Packages": [
+		"./..."
+	],
+	"Deps": []
+}
