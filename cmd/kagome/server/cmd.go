@@ -194,6 +194,7 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		tokens = h.tokenizer.Analyze(sen, tokenizer.Extended)
 	case "lattice":
 		if _, e := exec.LookPath("dot"); e != nil {
+			cmdErr = "Error: graphviz is not in your furure"
 			log.Print("graphviz is not in your future\n")
 			break
 		}
