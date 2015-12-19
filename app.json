@@ -1,0 +1,6 @@
+{
+    "name": "kagome",
+    "env": {
+	"BUILDPACK_URL": "https://github.com/kr/heroku-buildpack-multi.git"
+    }
+}
