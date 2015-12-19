@@ -220,7 +220,7 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 			if err := cmd.Process.Kill(); err != nil {
 				log.Fatal("failed to kill: ", err)
 			}
-			cmdErr = "Time out"
+			cmdErr = "Error: Graphviz time out"
 			<-done
 		case err := <-done:
 			if err != nil {
