@@ -21,6 +21,7 @@ then
     exit 1
 fi
 
+$GOPAHT=$HOME/gopath
 GOVERALLS=$(echo $GOPATH | tr ':' '\n' | head -n 1)/bin/goveralls
 $GOVERALLS -coverprofile=$COV_FILE -service=travis-ci
 
