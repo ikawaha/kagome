@@ -176,11 +176,15 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	}
 	sen := r.FormValue("s")
 	opt := r.FormValue("r")
-	var records []record
-	var tokens []tokenizer.Token
-	var svg string
-	var cmdErr string
-	const cmdTimeout = 30 * time.Second
+
+	const cmdTimeout = 15 * time.Second
+	var (
+		records []record
+		tokens  []tokenizer.Token
+		svg     string
+		cmdErr  string
+	)
+
 	switch opt {
 	case "normal":
 		tokens = h.tokenizer.Analyze(sen, tokenizer.Normal)
