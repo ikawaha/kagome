@@ -94,6 +94,8 @@ Launch a server and access `http://localhost:8888`.
 $ kagome -http=":8888" &
 ```
 
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+
 ![lattice](https://raw.githubusercontent.com/wiki/ikawaha/kagome/images/demoapp.png)
 
 #### User Dictionary
