@@ -176,11 +176,15 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	}
 	sen := r.FormValue("s")
 	opt := r.FormValue("r")
-	var records []record
-	var tokens []tokenizer.Token
-	var svg string
-	var cmdErr string
-	const cmdTimeout = 30 * time.Second
+
+	const cmdTimeout = 15 * time.Second
+	var (
+		records []record
+		tokens  []tokenizer.Token
+		svg     string
+		cmdErr  string
+	)
+
 	switch opt {
 	case "normal":
 		tokens = h.tokenizer.Analyze(sen, tokenizer.Normal)
@@ -190,6 +194,7 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		tokens = h.tokenizer.Analyze(sen, tokenizer.Extended)
 	case "lattice":
 		if _, e := exec.LookPath("dot"); e != nil {
+			cmdErr = "Error: graphviz is not in your furure"
 			log.Print("graphviz is not in your future\n")
 			break
 		}
@@ -215,7 +220,7 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 			if err := cmd.Process.Kill(); err != nil {
 				log.Fatal("failed to kill: ", err)
 			}
-			cmdErr = "Time out"
+			cmdErr = "Error: Graphviz time out"
 			<-done
 		case err := <-done:
 			if err != nil {
