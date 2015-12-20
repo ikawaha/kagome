@@ -7,7 +7,7 @@ Kagome is an open source Japanese morphological analyzer written in pure golang.
 The MeCab-IPADIC dictionary/statiscal model is used and packaged in Kagome binary.
 
 ```
-% kagome tokenize
+% kagome
 すもももももももものうち
 すもも	名詞,一般,*,*,*,*,すもも,スモモ,スモモ
 も	助詞,係助詞,*,*,*,*,も,モ,モ
@@ -31,22 +31,44 @@ Usage
 
 ```
 $ kagome -h
-usage: main <command>
+Japanese Morphological Analyzer -- github.com/ikawaha/kagome
+usage: kagome <command>
 The commands are:
-   tokenize - command line tokenize
-   server - run tokenize server
-   lattice - lattice viewer
+   [tokenize] - command line tokenize (*default)
+      server - run tokenize server
+         lattice - lattice viewer
+
+tokenize [-file input_file] [-dic dic_file] [-udic userdic_file] [-mode (normal|search|extended)]
+  -dic string
+       dic
+  -file string
+       input file
+  -mode string
+       tokenize mode (normal|search|extended) (default "normal")
+  -udic string
+       user dic
 ```
 
 ### Command line mode
 
 ```
+$ go run cmd/kagome/main.go -h
+```
+or
+```
 $ go run cmd/kagome/main.go tokenize -h
+```
+
+```
 Usage of tokenize:
-  -dic="": dic
-  -file="": input file
-  -mode="normal": tokenize mode (normal|search|extended)
-  -udic="": user dic
+  -dic string
+       dic
+  -file string
+       input file
+  -mode string
+       tokenize mode (normal|search|extended) (default "normal")
+  -udic string
+       user dic
 ```
 
 ### Server mode
@@ -54,9 +76,12 @@ Usage of tokenize:
 ```
 $ go run cmd/kagome/main.go server -h
 Usage of server:
-  -http=":6060": HTTP service address (e.g., ':6060')
-  -mode="normal": tokenize mode (normal|search|extended)
-  -udic="": user dictionary
+  -http string
+        HTTP service address (e.g., ':6060') (default ":6060")
+  -mode string
+        tokenize mode (normal|search|extended) (default "normal")
+  -udic string
+        user dictionary
 ```
 
 #### Segmentation mode for search
