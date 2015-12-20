@@ -7,7 +7,7 @@ Kagome is an open source Japanese morphological analyzer written in pure golang.
 The MeCab-IPADIC dictionary/statiscal model is used and packaged in Kagome binary.
 
 ```
-% kagome tokenize
+% kagome
 すもももももももものうち
 すもも	名詞,一般,*,*,*,*,すもも,スモモ,スモモ
 も	助詞,係助詞,*,*,*,*,も,モ,モ
