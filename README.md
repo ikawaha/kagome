@@ -35,8 +35,8 @@ Japanese Morphological Analyzer -- github.com/ikawaha/kagome
 usage: kagome <command>
 The commands are:
    [tokenize] - command line tokenize (*default)
-      server - run tokenize server
-         lattice - lattice viewer
+   server - run tokenize server
+   lattice - lattice viewer
 
 tokenize [-file input_file] [-dic dic_file] [-udic userdic_file] [-mode (normal|search|extended)]
   -dic string
