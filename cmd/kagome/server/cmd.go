@@ -544,12 +544,20 @@ function cb(data, status) {
         });
       }
 }
+
 function tokenize() {
   var s = document.getElementById("inp").value;
   var m = $('input[name="r"]').filter(':checked').val();
   var o = {"sentence" : s, "mode" : m};
   $.post('./a', JSON.stringify(o), cb, 'json');
 }
+
+$('input[name="r"]:radio').change( function() {
+  var s = document.getElementById("inp").value;
+  var m = $('input[name="r"]').filter(':checked').val();
+  var o = {"sentence" : s, "mode" : m};
+  $.post('./a', JSON.stringify(o), cb, 'json');
+})
 </script>
 
 </body>
