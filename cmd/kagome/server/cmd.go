@@ -483,9 +483,9 @@ var demoHTML = `
     <textarea id="inp" class="txar" rows="3" name="s"
        placeholder="Enter Japanese text below.">{{.Sentence}}</textarea>
     <div id="rbox">
-      <div><input type="radio" name="r" value="Normal" checked>Normal</div>
-      <div><input type="radio" name="r" value="Search" {{if eq .RadioOpt "search"}}checked{{end}}>Search</div>
-      <div><input type="radio" name="r" value="Extended" {{if eq .RadioOpt "extended"}}checked{{end}}>Extended</div>
+      <div><label><input type="radio" name="r" value="Normal" checked>Normal</label></div>
+      <div><label><input type="radio" name="r" value="Search" {{if eq .RadioOpt "search"}}checked{{end}}>Search</label></div>
+      <div><label><input type="radio" name="r" value="Extended" {{if eq .RadioOpt "extended"}}checked{{end}}>Extended</label></div>
     </div>
     <p><input class="btn" type="submit" name="lattice" value="Lattice"/></p>
     </div>
