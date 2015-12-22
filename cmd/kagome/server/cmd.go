@@ -443,7 +443,7 @@ function cb(data, status) {
 }
 function tokenize() {
   var s = document.getElementById("inp").value;
-  $.post('http://localhost:6060/a', '{"sentence": "'+ s +'" }', cb, 'json');
+  $.post('./a', '{"sentence": "'+ s +'" }', cb, 'json');
 }
 </script>
 
