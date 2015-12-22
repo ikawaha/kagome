@@ -370,25 +370,17 @@ var demoHTML = `
       }
   </style>
   <meta charset="UTF-8">
-  <title>Kagome demo - japanese morphological analyzer</title>
+  <title>Kagome demo - Japanese morphological analyzer</title>
   <!-- for IE6-8 support of HTML elements -->
   <!--[if lt IE 9]>
   <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
   <body>
   <div id="center">
-  <h1>Kagome</h1>
-    Kagome is an open source Japanese morphological analyzer written in Golang
-    <h2>Feature summary</h2>
-    <ul>
-      <li><strong>Word segmentation.</strong> Segmenting text into words (or morphemes)</li>
-      <li><strong>Part-of-speech tagging.</strong> Assign word-categories (nouns, verbs, particles, adjectives, etc.)</li>
-      <li><strong>Lemmatization.</strong> Get dictionary forms for inflected verbs and adjectives</li>
-      <li><strong>Readings.</strong> Extract readings for kanji.</li>
-    </ul>
+  <h1>Kagome demo</h1>
   <form class="frm" action="/_demo" method="POST">
     <div id="box">
-    <textarea class="txar" rows="3" name="s" placeholder="Enter Japanese text below in UTF-8 and click tokenize.">{{.Sentence}}</textarea>
+    <textarea class="txar" rows="3" name="s" placeholder="Enter Japanese text below and click tokenize.">{{.Sentence}}</textarea>
     <div id="rbox">
       <div><input type="radio" name="r" value="normal" checked>Normal</div>
       <div><input type="radio" name="r" value="search" {{if eq .RadioOpt "search"}}checked{{end}}>Search</div>
