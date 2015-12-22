@@ -243,7 +243,7 @@ Parameters
 |sentence|string|Required|Sentenct to tokenize.|
 |mode|string|Optional|Mode to tokenize the sentence. Default is the "normal". Selectable value is "normal", "search" or "extended".|
 
-##### Demo
+##### [Demo](https://kagome.herokuapp.com/_demo)
 
 Launch a server and access `http://localhost:8888`.
 (To draw a lattice, demo application uses [graphviz](http://www.graphviz.org/) . You need graphviz installed.)
