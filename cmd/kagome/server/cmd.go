@@ -375,12 +375,14 @@ var demoHTML = `
   <!--[if lt IE 9]>
   <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
-  <body>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js"></script>
+</head>
+<body>
   <div id="center">
   <h1>Kagome demo</h1>
-  <form class="frm" action="/_demo" method="POST">
+  <form class="frm" action="/_demo" method="POST" oninput="tokenize()">
     <div id="box">
-    <textarea class="txar" rows="3" name="s" placeholder="Enter Japanese text below and click tokenize.">{{.Sentence}}</textarea>
+    <textarea id="inp" class="txar" rows="3" name="s" placeholder="Enter Japanese text below and click tokenize.">{{.Sentence}}</textarea>
     <div id="rbox">
       <div><input type="radio" name="r" value="normal" checked>Normal</div>
       <div><input type="radio" name="r" value="search" {{if eq .RadioOpt "search"}}checked{{end}}>Search</div>
@@ -396,7 +398,7 @@ var demoHTML = `
   {{if .GraphSvg}}
     {{.GraphSvg}}
   {{end}}
-  {{if .Tokens}}
+
   <table class="tbl">
     <thread><tr>
       <th>Surface</th>
@@ -405,7 +407,7 @@ var demoHTML = `
       <th>Reading</th>
       <th>Pronounciation</th>
     </tr></thread>
-    <tbody>
+    <tbody id="morphs">
     {{range .Tokens}}
       <tr>
       <td>{{.Surface}}</td>
@@ -417,8 +419,34 @@ var demoHTML = `
     {{end}}
     </tbody>
   </table>
-  {{end}}
   </div>
-  </body>
+
+<script>
+function cb(data, status) {
+      console.log(data);
+      console.log(status);
+      if(status == "success"){
+        $("#morphs").empty();
+        $.each(data.tokens, function(i, val) {
+          $("#morphs").append(
+          "<tr>"+"<td>"+val.surface+"</td>" +
+                 "<td>"+val.features[0]+"</td>"+
+                 "<td>*</td>" + //base form
+                 "<td>*</td>" + //reading
+                 "<td>*</td>" + //pronoun.
+          "</tr>"
+          );
+        });
+      }else{
+        alert("取得失敗");
+      }
+}
+function tokenize() {
+  var s = document.getElementById("inp").value;
+  $.post('http://localhost:6060/a', '{"sentence": "'+ s +'" }', cb, 'json');
+}
+</script>
+
+</body>
 </html>
 `
