@@ -255,7 +255,7 @@ $ kagome -http=":8888" &
 
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
-![lattice](https://raw.githubusercontent.com/wiki/ikawaha/kagome/images/demoapp.png)
+![Demo](https://raw.githubusercontent.com/wiki/ikawaha/kagome/images/demoapp.gif)
 
 #### User Dictionary
 User dictionary format is same as Kuromoji. There is a sample in `_sample` dir.
