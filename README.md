@@ -77,9 +77,7 @@ Usage of tokenize:
 $ go run cmd/kagome/main.go server -h
 Usage of server:
   -http string
-        HTTP service address (e.g., ':6060') (default ":6060")
-  -mode string
-        tokenize mode (normal|search|extended) (default "normal")
+        HTTP service address (default ":6060")
   -udic string
         user dictionary
 ```
@@ -105,11 +103,147 @@ Kagome has segmentation mode for search such as [Kuromoji](http://www.atilika.co
 
 ```
 $ kagome server -http=":8080" &
-$ curl -XPUT localhost:8080/a -d'{"sentence":"すもももももももものうち"}'
-{"status":true,"tokens":[{"id":36163,"start":0,"end":3,"surface":"すもも","class":"KNOWN","features":["名詞","一般","*","*","*","*","すもも","スモモ","スモモ"]},{"id":73244,"start":3,"end":4,"surface":"も","class":"KNOWN","features":["助詞","係助詞","*","*","*","*","も","モ","モ"]},{"id":74989,"start":4,"end":6,"surface":"もも","class":"KNOWN","features":["名詞","一般","*","*","*","*","もも","モモ","モモ"]},{"id":73244,"start":6,"end":7,"surface":"も","class":"KNOWN","features":["助詞","係助詞","*","*","*","*","も","モ","モ"]},{"id":74989,"start":7,"end":9,"surface":"もも","class":"KNOWN","features":["名詞","一般","*","*","*","*","もも","モモ","モモ"]},{"id":55829,"start":9,"end":10,"surface":"の","class":"KNOWN","features":["助詞","連体化","*","*","*","*","の","ノ","ノ"]},{"id":8024,"start":10,"end":12,"surface":"うち","class":"KNOWN","features":["名詞","非自立","副詞可能","*","*","*","うち","ウチ","ウチ"]}]}
+$ curl -XPUT localhost:8080/a -d'{"sentence":"すもももももももものうち", "mode":"normal"}'|jq .
+{
+  "status": true,
+  "tokens": [
+    {
+      "id": 36163,
+      "start": 0,
+      "end": 3,
+      "surface": "すもも",
+      "class": "KNOWN",
+      "features": [
+        "名詞",
+        "一般",
+        "*",
+        "*",
+        "*",
+        "*",
+        "すもも",
+        "スモモ",
+        "スモモ"
+      ]
+    },
+    {
+      "id": 73244,
+      "start": 3,
+      "end": 4,
+      "surface": "も",
+      "class": "KNOWN",
+      "features": [
+        "助詞",
+        "係助詞",
+        "*",
+        "*",
+        "*",
+        "*",
+        "も",
+        "モ",
+        "モ"
+      ]
+    },
+    {
+      "id": 74989,
+      "start": 4,
+      "end": 6,
+      "surface": "もも",
+      "class": "KNOWN",
+      "features": [
+        "名詞",
+        "一般",
+        "*",
+        "*",
+        "*",
+        "*",
+        "もも",
+        "モモ",
+        "モモ"
+      ]
+    },
+    {
+      "id": 73244,
+      "start": 6,
+      "end": 7,
+      "surface": "も",
+      "class": "KNOWN",
+      "features": [
+        "助詞",
+        "係助詞",
+        "*",
+        "*",
+        "*",
+        "*",
+        "も",
+        "モ",
+        "モ"
+      ]
+    },
+    {
+      "id": 74989,
+      "start": 7,
+      "end": 9,
+      "surface": "もも",
+      "class": "KNOWN",
+      "features": [
+        "名詞",
+        "一般",
+        "*",
+        "*",
+        "*",
+        "*",
+        "もも",
+        "モモ",
+        "モモ"
+      ]
+    },
+    {
+      "id": 55829,
+      "start": 9,
+      "end": 10,
+      "surface": "の",
+      "class": "KNOWN",
+      "features": [
+        "助詞",
+        "連体化",
+        "*",
+        "*",
+        "*",
+        "*",
+        "の",
+        "ノ",
+        "ノ"
+      ]
+    },
+    {
+      "id": 8024,
+      "start": 10,
+      "end": 12,
+      "surface": "うち",
+      "class": "KNOWN",
+      "features": [
+        "名詞",
+        "非自立",
+        "副詞可能",
+        "*",
+        "*",
+        "*",
+        "うち",
+        "ウチ",
+        "ウチ"
+      ]
+    }
+  ]
+}
 ```
+Parameters
 
-##### Demo
+|Parameter|Type|Required|Description|
+|:---|:---|:---|:---|
+|sentence|string|Required|Sentenct to tokenize.|
+|mode|string|Optional|Mode to tokenize the sentence. Default is the "normal". Selectable value is "normal", "search" or "extended".|
+
+##### [Demo](https://kagome.herokuapp.com/_demo)
 
 Launch a server and access `http://localhost:8888`.
 (To draw a lattice, demo application uses [graphviz](http://www.graphviz.org/) . You need graphviz installed.)

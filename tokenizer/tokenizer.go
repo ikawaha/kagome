@@ -110,13 +110,27 @@ func (t Tokenizer) Analyze(input string, mode TokenizeMode) (tokens []Token) {
 	return
 }
 
-// Dot returns morphs of a sentense and exports a lattice graph to dot format.
+// Dot returns morphs of a sentense and exports a lattice graph to dot format in standard tokenize mode.
 func (t Tokenizer) Dot(input string, w io.Writer) (tokens []Token) {
+	return t.AnalyzeGraph(input, Normal, w)
+}
+
+// GraphView returns morphs of a sentense and exports a lattice graph to dot format.
+func (t Tokenizer) AnalyzeGraph(input string, mode TokenizeMode, w io.Writer) (tokens []Token) {
 	la := lattice.New(t.dic, t.udic)
 	defer la.Free()
 	la.Build(input)
-	la.Forward(lattice.Normal)
-	la.Backward(lattice.Normal)
+	m := lattice.Normal
+	switch mode {
+	case Normal:
+		m = lattice.Normal
+	case Search:
+		m = lattice.Search
+	case Extended:
+		m = lattice.Extended
+	}
+	la.Forward(m)
+	la.Backward(m)
 	size := len(la.Output)
 	tokens = make([]Token, 0, size)
 	for i := range la.Output {

@@ -359,6 +359,26 @@ func TestTokenizerDot(t *testing.T) {
 	}
 }
 
+func TestTokenizerAnalyzeGraph(t *testing.T) {
+	tnz := New()
+
+	// test empty case
+	for _, mode := range []TokenizeMode{Normal, Search, Extended} {
+		var b bytes.Buffer
+		tnz.AnalyzeGraph("", mode, &b)
+		if b.String() == "" {
+			t.Errorf("got empty string")
+		}
+
+		// only idling
+		b.Reset()
+		tnz.Dot("わたしまけましたわ", &b)
+		if b.String() == "" {
+			t.Errorf("got empty string")
+		}
+	}
+}
+
 var benchSampleText = "人魚は、南の方の海にばかり棲んでいるのではありません。北の海にも棲んでいたのであります。北方の海の色は、青うございました。ある時、岩の上に、女の人魚があがって、あたりの景色を眺めながら休んでいました。"
 
 func BenchmarkAnalyzeNormal(b *testing.B) {
