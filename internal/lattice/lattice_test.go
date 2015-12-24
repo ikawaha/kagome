@@ -285,6 +285,8 @@ node [shape=box, style=filled, fillcolor="#e8e8f0", fontname=Helvetica]
 	}
 	b.Reset()
 	la.Build("わたしまけましたわ")
+	la.Forward(Normal)
+	la.Backward(Normal)
 	la.Dot(&b)
 	if b.String() == "" {
 		t.Errorf("got empty string")
