@@ -212,9 +212,9 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 
 	m := tokenizer.Normal
 	switch mode {
-	case "search":
+	case "Search":
 		m = tokenizer.Search
-	case "extended":
+	case "Extended":
 		m = tokenizer.Extended
 	}
 	if _, e := exec.LookPath(graphvizCmd); e != nil {
