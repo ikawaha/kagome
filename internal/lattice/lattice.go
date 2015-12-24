@@ -308,7 +308,7 @@ func (la *Lattice) Dot(w io.Writer) {
 	}
 	fmt.Fprintln(w, "graph lattice {")
 	fmt.Fprintln(w, "dpi=48;")
-	fmt.Fprintln(w, "\tgraph [style=filled, splines=true, ovarlap=false, fontsize=30, rankdir=LR]")
+	fmt.Fprintln(w, "graph [style=filled, splines=true, overlap=false, fontsize=30, rankdir=LR]")
 	fmt.Fprintln(w, "edge [fontname=Helvetica, fontcolor=red, color=\"#606060\"]")
 	fmt.Fprintln(w, "node [shape=box, style=filled, fillcolor=\"#e8e8f0\", fontname=Helvetica]")
 	for i, list := range la.list {
