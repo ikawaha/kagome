@@ -271,7 +271,13 @@ func TestLatticeDot(t *testing.T) {
 	}
 	defer la.Free()
 
-	expected := "graph lattice {\n\tdpi=48;\n\tgraph [style=filled, rankdir=LR]\n}\n"
+	expected := `graph lattice {
+dpi=48;
+graph [style=filled, splines=true, overlap=false, fontsize=30, rankdir=LR]
+edge [fontname=Helvetica, fontcolor=red, color="#606060"]
+node [shape=box, style=filled, fillcolor="#e8e8f0", fontname=Helvetica]
+}
+`
 	var b bytes.Buffer
 	la.Dot(&b)
 	if b.String() != expected {
