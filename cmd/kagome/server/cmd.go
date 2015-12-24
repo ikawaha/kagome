@@ -199,7 +199,10 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	const cmdTimeout = 15 * time.Second
+	const (
+		graphvizCmd = "circo" // "dot"
+		cmdTimeout  = 15 * time.Second
+	)
 	var (
 		records []record
 		tokens  []tokenizer.Token
@@ -209,12 +212,12 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 
 	m := tokenizer.Normal
 	switch mode {
-	case "search":
+	case "Search":
 		m = tokenizer.Search
-	case "extended":
+	case "Extended":
 		m = tokenizer.Extended
 	}
-	if _, e := exec.LookPath("dot"); e != nil {
+	if _, e := exec.LookPath(graphvizCmd); e != nil {
 		cmdErr = "Error: graphviz is not in your furure"
 		log.Print("graphviz is not in your future\n")
 	} else {

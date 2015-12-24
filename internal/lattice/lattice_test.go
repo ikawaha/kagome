@@ -271,7 +271,13 @@ func TestLatticeDot(t *testing.T) {
 	}
 	defer la.Free()
 
-	expected := "graph lattice {\n\tdpi=48;\n\tgraph [style=filled, rankdir=LR]\n}\n"
+	expected := `graph lattice {
+dpi=48;
+graph [style=filled, splines=true, overlap=false, fontsize=30, rankdir=LR]
+edge [fontname=Helvetica, fontcolor=red, color="#606060"]
+node [shape=box, style=filled, fillcolor="#e8e8f0", fontname=Helvetica]
+}
+`
 	var b bytes.Buffer
 	la.Dot(&b)
 	if b.String() != expected {
@@ -279,6 +285,8 @@ func TestLatticeDot(t *testing.T) {
 	}
 	b.Reset()
 	la.Build("わたしまけましたわ")
+	la.Forward(Normal)
+	la.Backward(Normal)
 	la.Dot(&b)
 	if b.String() == "" {
 		t.Errorf("got empty string")
@@ -332,7 +340,7 @@ func TestForward(t *testing.T) {
 	la.Forward(Extended)
 
 	for _, m := range []TokenizeMode{Normal, Search, Extended} {
-		la.Build("わたしまけましたわ．関西国際空港．ポポポポポポポポポポ")
+		la.Build("わたしまけましたわ．関西国際空港．ポポポポポポポポポポ．\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363")
 		la.Forward(m)
 	}
 }

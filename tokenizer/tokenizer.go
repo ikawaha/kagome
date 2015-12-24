@@ -153,7 +153,6 @@ func (t Tokenizer) AnalyzeGraph(input string, mode TokenizeMode, w io.Writer) (t
 		}
 		tokens = append(tokens, tok)
 	}
-	tokens = t.Analyze(input, Normal)
 	la.Dot(w)
 	return
 }
