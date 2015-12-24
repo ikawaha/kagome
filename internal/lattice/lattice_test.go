@@ -332,7 +332,7 @@ func TestForward(t *testing.T) {
 	la.Forward(Extended)
 
 	for _, m := range []TokenizeMode{Normal, Search, Extended} {
-		la.Build("わたしまけましたわ．関西国際空港．ポポポポポポポポポポ")
+		la.Build("わたしまけましたわ．関西国際空港．ポポポポポポポポポポ．\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363")
 		la.Forward(m)
 	}
 }
