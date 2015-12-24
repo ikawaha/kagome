@@ -322,7 +322,7 @@ func (la *Lattice) Dot(w io.Writer) {
 				}
 			}
 			if _, ok := bests[n]; ok {
-				fmt.Fprintf(w, "\t\"%p\" [label=\"%s\\n%d\",shape=doublecircle];\n", n, surf, n.Weight)
+				fmt.Fprintf(w, "\t\"%p\" [label=\"%s\\n%d\",shape=ellipse, peripheries=2];\n", n, surf, n.Weight)
 			} else {
 				fmt.Fprintf(w, "\t\"%p\" [label=\"%s\\n%d\"];\n", n, surf, n.Weight)
 			}
