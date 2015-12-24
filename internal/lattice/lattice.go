@@ -307,8 +307,10 @@ func (la *Lattice) Dot(w io.Writer) {
 		bests[n] = struct{}{}
 	}
 	fmt.Fprintln(w, "graph lattice {")
-	fmt.Fprintln(w, "\tdpi=48;")
-	fmt.Fprintln(w, "\tgraph [style=filled, rankdir=LR]")
+	fmt.Fprintln(w, "dpi=48;")
+	fmt.Fprintln(w, "\tgraph [style=filled, splines=true, ovarlap=false, fontsize=30, rankdir=LR]")
+	fmt.Fprintln(w, "edge [fontname=Helvetica, fontcolor=red, color=\"#606060\"]")
+	fmt.Fprintln(w, "node [shape=box, style=filled, fillcolor=\"#e8e8f0\", fontname=Helvetica]")
 	for i, list := range la.list {
 		for _, n := range list {
 			surf := n.Surface
@@ -319,7 +321,11 @@ func (la *Lattice) Dot(w io.Writer) {
 					surf = "EOS"
 				}
 			}
-			fmt.Fprintf(w, "\t\"%p\" [label=\"%s\\n%d\"];\n", n, surf, n.Weight)
+			if _, ok := bests[n]; ok {
+				fmt.Fprintf(w, "\t\"%p\" [label=\"%s\\n%d\",shape=doublecircle];\n", n, surf, n.Weight)
+			} else {
+				fmt.Fprintf(w, "\t\"%p\" [label=\"%s\\n%d\"];\n", n, surf, n.Weight)
+			}
 		}
 	}
 	for _, e := range edges {
@@ -330,7 +336,7 @@ func (la *Lattice) Dot(w io.Writer) {
 		_, l := bests[e.from]
 		_, r := bests[e.to]
 		if l && r {
-			fmt.Fprintf(w, "\t\"%p\" -- \"%p\" [label=\"%d\",color=blue,style=bold];\n",
+			fmt.Fprintf(w, "\t\"%p\" -- \"%p\" [label=\"%d\", style=bold, color=blue, fontcolor=blue];\n",
 				e.from, e.to, c)
 		} else {
 			fmt.Fprintf(w, "\t\"%p\" -- \"%p\" [label=\"%d\"];\n",
