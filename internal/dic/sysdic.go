@@ -24,11 +24,15 @@ import (
 const (
 	// IPADicPath represents the internal IPA dictionary path.
 	IPADicPath = "dic/ipa"
+	// UniDicPath represents the internal UniDic dictionary path.
+	UniDicPath = "dic/uni"
 )
 
 var (
 	sysDicIPA     *Dic
 	initSysDicIPA sync.Once
+	sysDicUni     *Dic
+	initSysDicUni sync.Once
 )
 
 // SysDic returns the kagome system dictionary.
@@ -42,6 +46,14 @@ func SysDicIPA() *Dic {
 		sysDicIPA = loadInternalSysDic(IPADicPath)
 	})
 	return sysDicIPA
+}
+
+// SysDicUni returns the UniDic system dictionary.
+func SysDicUni() *Dic {
+	initSysDicUni.Do(func() {
+		sysDicUni = loadInternalSysDic(UniDicPath)
+	})
+	return sysDicUni
 }
 
 func loadInternalSysDic(path string) (d *Dic) {

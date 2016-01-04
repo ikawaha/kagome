@@ -29,13 +29,14 @@ import (
 var (
 	CommandName  = "lattice"
 	Description  = `lattice viewer`
-	UsageMessage = "%s [-udic userdic_file] [-output output_file] [-v] sentence\n"
+	UsageMessage = "%s [-udic userdic_file] [-sysdic (ipa|uni)] [-output output_file] [-v] sentence\n"
 	ErrorWriter  = os.Stderr
 )
 
 // options
 type option struct {
 	udic    string
+	sysdic  string
 	output  string
 	verbose bool
 	input   string
@@ -51,6 +52,7 @@ func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	}
 	// option settings
 	o.flagSet.StringVar(&o.udic, "udic", "", "user dic")
+	o.flagSet.StringVar(&o.sysdic, "sysdic", "ipa", "system dic type (ipa|uni)")
 	o.flagSet.StringVar(&o.output, "output", "", "output file")
 	o.flagSet.BoolVar(&o.verbose, "v", false, "verbose mode")
 	return
@@ -63,6 +65,9 @@ func (o *option) parse(args []string) (err error) {
 	// validations
 	if o.flagSet.NArg() == 0 {
 		return fmt.Errorf("input is empty")
+	}
+	if o.sysdic != "" && o.sysdic != "ipa" && o.sysdic != "uni" {
+		return fmt.Errorf("invalid argument: -sysdic %v\n", o.sysdic)
 	}
 	o.input = strings.Join(o.flagSet.Args(), " ")
 	return
@@ -78,7 +83,15 @@ func OptionCheck(args []string) (err error) {
 
 // command main
 func command(opt *option) error {
-	t := tokenizer.New()
+	var dic tokenizer.Dic
+	if opt.sysdic == "ipa" {
+		dic = tokenizer.SysDicIPA()
+	} else if opt.sysdic == "uni" {
+		dic = tokenizer.SysDicUni()
+	} else {
+		dic = tokenizer.SysDic()
+	}
+	t := tokenizer.NewWithDic(dic)
 	var out = os.Stdout
 	if opt.output != "" {
 		var err error
