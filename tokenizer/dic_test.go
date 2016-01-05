@@ -32,3 +32,27 @@ func TestNewDic(t *testing.T) {
 		t.Errorf("got %v, expected %v\n", c, expected)
 	}
 }
+
+func TestSysDic(t *testing.T) {
+	a := SysDic()
+	b := SysDic()
+	if a.dic != b.dic {
+		t.Errorf("got %p and %p, expected singleton", a.dic, b.dic)
+	}
+}
+
+func TestSysDicIPA(t *testing.T) {
+	a := SysDicIPA()
+	b := SysDicIPA()
+	if a.dic != b.dic {
+		t.Errorf("got %p and %p, expected singleton", a.dic, b.dic)
+	}
+}
+
+func TestSysDicUni(t *testing.T) {
+	a := SysDicUni()
+	b := SysDicUni()
+	if a.dic != b.dic {
+		t.Errorf("got %p and %p, expected singleton", a.dic, b.dic)
+	}
+}
