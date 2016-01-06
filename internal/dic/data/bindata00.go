@@ -20,7 +20,7 @@ func dicIpaChardefDic() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "dic/ipa/chardef.dic", size: 65696, mode: os.FileMode(420), modTime: time.Unix(1443273987, 0)}
+	info := bindataFileInfo{name: "dic/ipa/chardef.dic", size: 65696, mode: os.FileMode(420), modTime: time.Unix(1443284310, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

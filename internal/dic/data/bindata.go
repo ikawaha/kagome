@@ -5,7 +5,6 @@
 // dic/ipa/index.dic
 // dic/ipa/morph.dic
 // dic/ipa/unk.dic
-// dic/uni/bindata.go
 // dic/uni/chardef.dic
 // dic/uni/connection.dic
 // dic/uni/index.dic
@@ -135,7 +134,6 @@ var _bindata = map[string]func() (*asset, error){
 	"dic/ipa/index.dic": dicIpaIndexDic,
 	"dic/ipa/morph.dic": dicIpaMorphDic,
 	"dic/ipa/unk.dic": dicIpaUnkDic,
-	"dic/uni/bindata.go": dicUniBindataGo,
 	"dic/uni/chardef.dic": dicUniChardefDic,
 	"dic/uni/connection.dic": dicUniConnectionDic,
 	"dic/uni/index.dic": dicUniIndexDic,
@@ -192,7 +190,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"unk.dic": &bintree{dicIpaUnkDic, map[string]*bintree{}},
 		}},
 		"uni": &bintree{nil, map[string]*bintree{
-			"bindata.go": &bintree{dicUniBindataGo, map[string]*bintree{}},
 			"chardef.dic": &bintree{dicUniChardefDic, map[string]*bintree{}},
 			"connection.dic": &bintree{dicUniConnectionDic, map[string]*bintree{}},
 			"index.dic": &bintree{dicUniIndexDic, map[string]*bintree{}},
