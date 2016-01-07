@@ -20,6 +20,7 @@ import (
 	"path"
 
 	"./ipa"
+	"./uni"
 )
 
 var errorWriter = os.Stderr
@@ -31,6 +32,7 @@ var subcommands = []struct {
 }{
 	// subcommands
 	{ipa.CommandName, ipa.Description, ipa.Run},
+	{uni.CommandName, uni.Description, uni.Run},
 }
 
 func Usage() {
