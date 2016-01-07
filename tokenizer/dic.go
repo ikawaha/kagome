@@ -26,9 +26,19 @@ type UserDic struct {
 	dic *dic.UserDic
 }
 
-// SysDic returns the system dictionary.
+// SysDic returns the system dictionary (IPA dictionary).
 func SysDic() Dic {
 	return Dic{dic.SysDic()}
+}
+
+// SysDicIPA returns the IPA dictionary as the system dictionary.
+func SysDicIPA() Dic {
+	return Dic{dic.SysDicIPA()}
+}
+
+// SysDicUni returns the UniDic dictionary as the system dictionary.
+func SysDicUni() Dic {
+	return Dic{dic.SysDicUni()}
 }
 
 // NewDic loads a dictionary from a file.
