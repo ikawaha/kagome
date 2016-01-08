@@ -33,7 +33,7 @@ import (
 	"golang.org/x/text/encoding/japanese"
 	"golang.org/x/text/transform"
 
-	"github.com/ikawaha/kagome/internal/dic"
+	"github.com/ikawaha/kagome/interna/dic"
 )
 
 const (

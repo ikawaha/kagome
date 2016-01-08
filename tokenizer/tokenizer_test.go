@@ -19,7 +19,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ikawaha/kagome/internal/lattice"
+	"github.com/ikawaha/kagome/interna/lattice"
 )
 
 const (
