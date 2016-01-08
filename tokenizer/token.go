@@ -18,8 +18,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ikawaha/kagome/internal/dic"
-	"github.com/ikawaha/kagome/internal/lattice"
+	"github.com/ikawaha/kagome/interna/dic"
+	"github.com/ikawaha/kagome/interna/lattice"
 )
 
 // TokenClass represents the token type.
