@@ -15,6 +15,7 @@ install:
 
 script:
   - go test ./...
-  - cd tokenizer; go test -bench .;cd ..
+  - cd tokenizer; go test -benchmem -bench .; cd ..
+  - cd internal/dic; go test -benchmem -bench .; cd ../..
   - /bin/sh ./go-coverall.sh
 

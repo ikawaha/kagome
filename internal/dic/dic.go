@@ -19,6 +19,7 @@ import (
 	"encoding/gob"
 	"fmt"
 	"io"
+	"io/ioutil"
 )
 
 // Dic represents a dictionary of a tokenizer.
@@ -51,10 +52,15 @@ func (d *Dic) loadMorphDicPart(r io.Reader) error {
 		return fmt.Errorf("dic initializer, Morphs: %v", e)
 	}
 	d.Morphs = m
-	dec := gob.NewDecoder(r)
-	if e := dec.Decode(&d.Contents); e != nil {
-		return fmt.Errorf("dic initializer, Contents: %v", e)
+	return nil
+}
+
+func (d *Dic) loadContentDicPart(r io.Reader) error {
+	buf, err := ioutil.ReadAll(r)
+	if err != nil {
+		return fmt.Errorf("dic initializer, Contents: %v", err)
 	}
+	d.Contents = NewContents(buf)
 	return nil
 }
 
@@ -115,7 +121,7 @@ func Load(path string) (d *Dic, err error) {
 	d = new(Dic)
 	r, err := zip.OpenReader(path)
 	if err != nil {
-		return
+		return d, err
 	}
 	defer r.Close()
 
@@ -128,23 +134,27 @@ func Load(path string) (d *Dic, err error) {
 			rc.Close()
 			switch f.Name {
 			case "morph.dic":
-				if e = d.loadMorphDicPart(rc); err != nil {
+				if e = d.loadMorphDicPart(rc); e != nil {
+					return e
+				}
+			case "content.dic":
+				if e = d.loadContentDicPart(rc); e != nil {
 					return e
 				}
 			case "index.dic":
-				if e = d.loadIndexDicPart(rc); err != nil {
+				if e = d.loadIndexDicPart(rc); e != nil {
 					return e
 				}
 			case "connection.dic":
-				if e = d.loadConnectionDicPart(rc); err != nil {
+				if e = d.loadConnectionDicPart(rc); e != nil {
 					return e
 				}
 			case "chardef.dic":
-				if e = d.loadCharDefDicPart(rc); err != nil {
+				if e = d.loadCharDefDicPart(rc); e != nil {
 					return e
 				}
 			case "unk.dic":
-				if e = d.loadUnkDicPart(rc); err != nil {
+				if e = d.loadUnkDicPart(rc); e != nil {
 					return e
 				}
 			}

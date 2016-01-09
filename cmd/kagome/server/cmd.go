@@ -36,7 +36,7 @@ import (
 var (
 	CommandName  = "server"
 	Description  = `run tokenize server`
-	usageMessage = "%s [-http=:6060] [-udic userdic_file]\n"
+	usageMessage = "%s [-http=:6060] [-udic userdic_file] [-sysdic (ipa|uni)]\n"
 	ErrorWriter  = os.Stderr
 )
 
@@ -44,6 +44,7 @@ var (
 type option struct {
 	http    string
 	udic    string
+	sysdic  string
 	flagSet *flag.FlagSet
 }
 
@@ -57,6 +58,7 @@ func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	// option settings
 	o.flagSet.StringVar(&o.http, "http", ":6060", "HTTP service address")
 	o.flagSet.StringVar(&o.udic, "udic", "", "user dictionary")
+	o.flagSet.StringVar(&o.sysdic, "sysdic", "ipa", "system dictionary type (ipa|uni)")
 
 	return
 }
@@ -68,6 +70,9 @@ func (o *option) parse(args []string) (err error) {
 	// validations
 	if nonFlag := o.flagSet.Args(); len(nonFlag) != 0 {
 		return fmt.Errorf("invalid argument: %v", nonFlag)
+	}
+	if o.sysdic != "" && o.sysdic != "ipa" && o.sysdic != "uni" {
+		return fmt.Errorf("invalid argument: -sysdic %v\n", o.sysdic)
 	}
 	return
 }
@@ -82,6 +87,14 @@ func OptionCheck(args []string) (err error) {
 
 // command main
 func command(opt *option) error {
+	var dic tokenizer.Dic
+	if opt.sysdic == "ipa" {
+		dic = tokenizer.SysDicIPA()
+	} else if opt.sysdic == "uni" {
+		dic = tokenizer.SysDicUni()
+	} else {
+		dic = tokenizer.SysDic()
+	}
 	var udic tokenizer.UserDic
 	if opt.udic != "" {
 		var err error
@@ -89,7 +102,7 @@ func command(opt *option) error {
 			return err
 		}
 	}
-	t := tokenizer.New()
+	t := tokenizer.NewWithDic(dic)
 	t.SetUserDic(udic)
 
 	mux := http.NewServeMux()
@@ -201,7 +214,7 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 
 	const (
 		graphvizCmd = "circo" // "dot"
-		cmdTimeout  = 15 * time.Second
+		cmdTimeout  = 25 * time.Second
 	)
 	var (
 		records []record
@@ -262,6 +275,11 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 			m := record{Surface: tok.Surface}
 			fs := tok.Features()
 			switch len(fs) {
+			case 17: // unidic
+				m.Pos = strings.Join(fs[0:5], ",")
+				m.Baseform = fs[10]
+				m.Reading = fs[6]
+				m.Pronounciation = fs[9]
 			case 9:
 				m.Pos = strings.Join(fs[0:5], ",")
 				m.Baseform = fs[6]
@@ -272,11 +290,17 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 				m.Baseform = fs[6]
 				m.Reading = "*"
 				m.Pronounciation = "*"
+			case 6: // unidic
+				m.Pos = strings.Join(fs[0:5], ",")
+				m.Baseform = "*"
+				m.Reading = "*"
+				m.Pronounciation = "*"
 			case 3:
 				m.Pos = fs[0]
 				m.Baseform = fs[1]
 				m.Reading = fs[2]
 				m.Pronounciation = "*"
+
 			}
 			records = append(records, m)
 		}
@@ -509,8 +533,8 @@ var demoHTML = `
 
 <script>
 function cb(data, status) {
-      console.log(data);
-      console.log(status);
+      //console.log(data);
+      //console.log(status);
       if(status == "success" && Array.isArray(data.tokens)){
         $("#morphs").empty();
         $.each(data.tokens, function(i, val) {
@@ -520,17 +544,26 @@ function cb(data, status) {
             len = val.features.length;
           }
           switch (len) {
-          case 9:
+          case 17: // unidic
+            pos = val.features.slice(0,5).join(",")
+            base = val.features[10];
+            reading = val.features[6];
+            pronoun = val.features[9];
+            break;
+          case 9: // ipa
             pos = val.features.slice(0,5).join(",")
             base = val.features[6];
             reading = val.features[7];
             pronoun = val.features[8];
             break;
-          case 7:
+          case 7: // ipa
             pos = val.features.slice(0,5).join(",")
             base = val.features[6];
             break;
-          case 3:
+          case 6: // unidic
+            pos = val.features.slice(0,5).join(",")
+            break;
+          case 3: // ipa
             pos = val.features[0];
             base = val.features[1];
             reading = val.features[2];

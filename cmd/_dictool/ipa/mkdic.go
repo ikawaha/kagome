@@ -43,6 +43,7 @@ const (
 
 	ipaDicArchiveFileName    = "ipa.dic"
 	ipaDicMorphFileName      = "morph.dic"
+	ipaDicContentFileName    = "content.dic"
 	ipaDicIndexFileName      = "index.dic"
 	ipaDicConnectionFileName = "connection.dic"
 	ipaDicCharDefFileName    = "chardef.dic"
@@ -218,18 +219,28 @@ func saveIpaDic(d *IpaDic, base string, archive bool) (err error) {
 		if _, e = dic.MorphSlice(d.Morphs).WriteTo(out); e != nil {
 			return
 		}
-		// if e = enc.Encode(d.Morphs); e != nil {
-		// 	return
-		// }
-		// if _, e = buf.WriteTo(out); e != nil {
-		// 	return
-		// }
-		var buf bytes.Buffer
-		enc := gob.NewEncoder(&buf)
-		if e = enc.Encode(d.Contents); e != nil {
-			return
+		return
+	}(); err != nil {
+		return
+	}
+
+	if err = func() (e error) {
+		p := path.Join(base, ipaDicContentFileName)
+		var out io.Writer
+		if archive {
+			out, e = zw.Create(p)
+			if e != nil {
+				return
+			}
+		} else {
+			var f *os.File
+			if f, e = os.OpenFile(p, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0666); e != nil {
+				return
+			}
+			defer f.Close()
+			out = f
 		}
-		if _, e = buf.WriteTo(out); e != nil {
+		if _, e = dic.Contents(d.Contents).WriteTo(out); e != nil {
 			return
 		}
 		return
