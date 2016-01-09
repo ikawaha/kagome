@@ -69,6 +69,11 @@ func loadInternalSysDic(path string) (d *Dic) {
 	if err = d.loadMorphDicPart(bytes.NewBuffer(buf)); err != nil {
 		panic(err)
 	}
+	// content.dic
+	if buf, err = data.Asset(path + "/content.dic"); err != nil {
+		panic(err)
+	}
+	d.Contents = NewContents(buf)
 	// index.dic
 	if buf, err = data.Asset(path + "/index.dic"); err != nil {
 		panic(err)
