@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ipa
+package uni
 
 import (
 	"archive/zip"
@@ -30,41 +30,38 @@ import (
 	"strconv"
 	"strings"
 
-	"golang.org/x/text/encoding/japanese"
-	"golang.org/x/text/transform"
-
 	"github.com/ikawaha/kagome/internal/dic"
 )
 
 const (
-	ipaMatrixDefFileName = "matrix.def"
-	ipaCharDefFileName   = "char.def"
-	ipaUnkDefFileName    = "unk.def"
+	uniMatrixDefFileName = "matrix.def"
+	uniCharDefFileName   = "char.def"
+	uniUnkDefFileName    = "unk.def"
 
-	ipaDicArchiveFileName    = "ipa.dic"
-	ipaDicMorphFileName      = "morph.dic"
-	ipaDicContentFileName    = "content.dic"
-	ipaDicIndexFileName      = "index.dic"
-	ipaDicConnectionFileName = "connection.dic"
-	ipaDicCharDefFileName    = "chardef.dic"
-	ipaDicUnkFileName        = "unk.dic"
+	uniDicArchiveFileName    = "uni.dic"
+	uniDicMorphFileName      = "morph.dic"
+	uniDicContentFileName    = "content.dic"
+	uniDicIndexFileName      = "index.dic"
+	uniDicConnectionFileName = "connection.dic"
+	uniDicCharDefFileName    = "chardef.dic"
+	uniDicUnkFileName        = "unk.dic"
 
-	ipaMorphCsvColSize                    = 13
-	ipaMrophRecordSurfaceIndex            = 0
-	ipaMorphRecordLeftIDIndex             = 1
-	ipaMorphRecordRightIDIndex            = 2
-	ipaMorphRecordWeightIndex             = 3
-	ipaMorphRecordOtherContentsStartIndex = 4
+	uniMorphCsvColSize                    = 21
+	uniMrophRecordSurfaceIndex            = 0
+	uniMorphRecordLeftIDIndex             = 1
+	uniMorphRecordRightIDIndex            = 2
+	uniMorphRecordWeightIndex             = 3
+	uniMorphRecordOtherContentsStartIndex = 4
 
-	ipaUnkRecordSize                    = 11
-	ipaUnkRecordCategoryIndex           = 0
-	ipaUnkRecordLeftIDIndex             = 1
-	ipaUnkRecordRightIndex              = 2
-	ipaUnkRecordWeigthIndex             = 3
-	ipaUnkRecordOtherContentsStartIndex = 4
+	uniUnkRecordSize                    = 10
+	uniUnkRecordCategoryIndex           = 0
+	uniUnkRecordLeftIDIndex             = 1
+	uniUnkRecordRightIndex              = 2
+	uniUnkRecordWeigthIndex             = 3
+	uniUnkRecordOtherContentsStartIndex = 4
 )
 
-type IpaDic struct {
+type UniDic struct {
 	Morphs       []dic.Morph
 	Contents     [][]string
 	Index        dic.IndexTable
@@ -80,7 +77,7 @@ type IpaDic struct {
 	UnkContents [][]string
 }
 
-type ipaDicPath struct {
+type uniDicPath struct {
 	Morph      string
 	Index      string
 	Connection string
@@ -88,8 +85,8 @@ type ipaDicPath struct {
 	Unk        string
 }
 
-func loadIpaDic(path ipaDicPath) (d *IpaDic, err error) {
-	d = new(IpaDic)
+func loadUniDic(path uniDicPath) (d *UniDic, err error) {
+	d = new(UniDic)
 	if err = func() error {
 		f, e := os.Open(path.Morph)
 		if e != nil {
@@ -182,16 +179,16 @@ func loadIpaDic(path ipaDicPath) (d *IpaDic, err error) {
 	return
 }
 
-type ipaMorphRecordSlice [][]string
+type uniMorphRecordSlice [][]string
 
-func (p ipaMorphRecordSlice) Len() int           { return len(p) }
-func (p ipaMorphRecordSlice) Less(i, j int) bool { return p[i][0] < p[j][0] }
-func (p ipaMorphRecordSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+func (p uniMorphRecordSlice) Len() int           { return len(p) }
+func (p uniMorphRecordSlice) Less(i, j int) bool { return p[i][0] < p[j][0] }
+func (p uniMorphRecordSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
-func saveIpaDic(d *IpaDic, base string, archive bool) (err error) {
+func saveUniDic(d *UniDic, base string, archive bool) (err error) {
 	var zw *zip.Writer
 	if archive {
-		p := path.Join(base, ipaDicArchiveFileName)
+		p := path.Join(base, uniDicArchiveFileName)
 		f, e := os.Create(p)
 		if e != nil {
 			return e
@@ -201,7 +198,7 @@ func saveIpaDic(d *IpaDic, base string, archive bool) (err error) {
 	}
 
 	if err = func() (e error) {
-		p := path.Join(base, ipaDicMorphFileName)
+		p := path.Join(base, uniDicMorphFileName)
 		var out io.Writer
 		if archive {
 			out, e = zw.Create(p)
@@ -225,7 +222,7 @@ func saveIpaDic(d *IpaDic, base string, archive bool) (err error) {
 	}
 
 	if err = func() (e error) {
-		p := path.Join(base, ipaDicContentFileName)
+		p := path.Join(base, uniDicContentFileName)
 		var out io.Writer
 		if archive {
 			out, e = zw.Create(p)
@@ -249,7 +246,7 @@ func saveIpaDic(d *IpaDic, base string, archive bool) (err error) {
 	}
 
 	if err = func() (e error) {
-		p := path.Join(base, ipaDicIndexFileName)
+		p := path.Join(base, uniDicIndexFileName)
 		var out io.Writer
 		if archive {
 			if out, e = zw.Create(p); e != nil {
@@ -273,7 +270,7 @@ func saveIpaDic(d *IpaDic, base string, archive bool) (err error) {
 	}
 
 	if err = func() (e error) {
-		p := path.Join(base, ipaDicConnectionFileName)
+		p := path.Join(base, uniDicConnectionFileName)
 		var out io.Writer
 		if archive {
 			if out, e = zw.Create(p); e != nil {
@@ -305,7 +302,7 @@ func saveIpaDic(d *IpaDic, base string, archive bool) (err error) {
 	}
 
 	if err = func() (e error) {
-		p := path.Join(base, ipaDicCharDefFileName)
+		p := path.Join(base, uniDicCharDefFileName)
 		var out io.Writer
 		if archive {
 			if out, e = zw.Create(p); e != nil {
@@ -352,7 +349,7 @@ func saveIpaDic(d *IpaDic, base string, archive bool) (err error) {
 	}
 
 	if err = func() (e error) {
-		p := path.Join(base, ipaDicUnkFileName)
+		p := path.Join(base, uniDicUnkFileName)
 		var out io.Writer
 		if archive {
 			if out, e = zw.Create(p); e != nil {
@@ -404,14 +401,14 @@ func saveIpaDic(d *IpaDic, base string, archive bool) (err error) {
 	return
 }
 
-func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
+func buildUniDic(mecabPath, neologdPath string) (d *UniDic, err error) {
 	// Morphs, Contents, Index
 	var files []string
 	files, err = filepath.Glob(mecabPath + "/*.csv")
 	if err != nil {
 		return
 	}
-	var records ipaMorphRecordSlice
+	var records uniMorphRecordSlice
 	for _, file := range files {
 		if err = func() error {
 			f, e := os.Open(file)
@@ -419,7 +416,7 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 				return e
 			}
 			defer f.Close()
-			r := csv.NewReader(transform.NewReader(f, japanese.EUCJP.NewDecoder()))
+			r := csv.NewReader(f)
 			r.Comma = ','
 			for {
 				rec, e := r.Read()
@@ -427,7 +424,7 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 					break
 				} else if e != nil {
 					return e
-				} else if len(rec) != ipaMorphCsvColSize {
+				} else if len(rec) != uniMorphCsvColSize {
 					return fmt.Errorf("invalid format csv: %v, %v", file, rec)
 				}
 				records = append(records, rec)
@@ -455,7 +452,7 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 				break
 			} else if e != nil {
 				return e
-			} else if len(rec) != ipaMorphCsvColSize {
+			} else if len(rec) != uniMorphCsvColSize {
 				return fmt.Errorf("invalid format csv: %v, %v", neologdPath, rec)
 			}
 			records = append(records, rec)
@@ -466,25 +463,25 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 	}
 
 	sort.Sort(records)
-	d = new(IpaDic)
+	d = new(UniDic)
 	d.Morphs = make([]dic.Morph, 0, len(records))
 	d.Contents = make([][]string, 0, len(records))
 	var keywords []string
 	for _, rec := range records {
-		keywords = append(keywords, rec[ipaMrophRecordSurfaceIndex])
+		keywords = append(keywords, rec[uniMrophRecordSurfaceIndex])
 		var l, r, w int
-		if l, err = strconv.Atoi(rec[ipaMorphRecordLeftIDIndex]); err != nil {
+		if l, err = strconv.Atoi(rec[uniMorphRecordLeftIDIndex]); err != nil {
 			return
 		}
-		if r, err = strconv.Atoi(rec[ipaMorphRecordRightIDIndex]); err != nil {
+		if r, err = strconv.Atoi(rec[uniMorphRecordRightIDIndex]); err != nil {
 			return
 		}
-		if w, err = strconv.Atoi(rec[ipaMorphRecordWeightIndex]); err != nil {
+		if w, err = strconv.Atoi(rec[uniMorphRecordWeightIndex]); err != nil {
 			return
 		}
 		m := dic.Morph{LeftID: int16(l), RightID: int16(r), Weight: int16(w)}
 		d.Morphs = append(d.Morphs, m)
-		d.Contents = append(d.Contents, rec[ipaMorphRecordOtherContentsStartIndex:])
+		d.Contents = append(d.Contents, rec[uniMorphRecordOtherContentsStartIndex:])
 	}
 
 	if d.Index, err = dic.BuildIndexTable(keywords); err != nil {
@@ -492,7 +489,7 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 	}
 
 	// ConnectionTable
-	if r, c, v, e := loadIpaMatrixDefFile(mecabPath + "/" + ipaMatrixDefFileName); e != nil {
+	if r, c, v, e := loadUniMatrixDefFile(mecabPath + "/" + uniMatrixDefFileName); e != nil {
 		err = e
 		return
 	} else {
@@ -502,7 +499,7 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 	}
 
 	// CharDef
-	if cc, cm, inv, grp, e := loadIpaCharClassDefFile(mecabPath + "/" + ipaCharDefFileName); e != nil {
+	if cc, cm, inv, grp, e := loadUniCharClassDefFile(mecabPath + "/" + uniCharDefFileName); e != nil {
 		err = e
 		return
 	} else {
@@ -513,23 +510,23 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 	}
 
 	// Unk
-	if records, e := loadIpaUnkFile(mecabPath + "/" + ipaUnkDefFileName); e != nil {
+	if records, e := loadUniUnkFile(mecabPath + "/" + uniUnkDefFileName); e != nil {
 		err = e
 		return
 	} else {
 		d.UnkIndex = make(map[int32]int32)
 		d.UnkIndexDup = make(map[int32]int32)
-		sort.Sort(ipaMorphRecordSlice(records))
+		sort.Sort(uniMorphRecordSlice(records))
 		for _, rec := range records {
 			catid := int32(-1)
 			for id, cat := range d.CharClass {
-				if cat == rec[ipaUnkRecordCategoryIndex] {
+				if cat == rec[uniUnkRecordCategoryIndex] {
 					catid = int32(id)
 					break
 				}
 			}
 			if catid < 0 {
-				err = fmt.Errorf("unknown unk category: %v", rec[ipaUnkRecordCategoryIndex])
+				err = fmt.Errorf("unknown unk category: %v", rec[uniUnkRecordCategoryIndex])
 				return
 			}
 			if _, ok := d.UnkIndex[catid]; !ok {
@@ -538,31 +535,31 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 				d.UnkIndexDup[catid]++
 			}
 			var l, r, w int
-			if l, err = strconv.Atoi(rec[ipaUnkRecordLeftIDIndex]); err != nil {
+			if l, err = strconv.Atoi(rec[uniUnkRecordLeftIDIndex]); err != nil {
 				return
 			}
-			if r, err = strconv.Atoi(rec[ipaUnkRecordRightIndex]); err != nil {
+			if r, err = strconv.Atoi(rec[uniUnkRecordRightIndex]); err != nil {
 				return
 			}
-			if w, err = strconv.Atoi(rec[ipaUnkRecordWeigthIndex]); err != nil {
+			if w, err = strconv.Atoi(rec[uniUnkRecordWeigthIndex]); err != nil {
 				return
 			}
 			m := dic.Morph{LeftID: int16(l), RightID: int16(r), Weight: int16(w)}
 			d.UnkMorphs = append(d.UnkMorphs, m)
-			d.UnkContents = append(d.UnkContents, rec[ipaUnkRecordOtherContentsStartIndex:])
+			d.UnkContents = append(d.UnkContents, rec[uniUnkRecordOtherContentsStartIndex:])
 		}
 	}
 	return
 }
 
-func loadIpaMorphFile(path string) (records [][]string, err error) {
+func loadUniMorphFile(path string) (records [][]string, err error) {
 	var f *os.File
 	f, err = os.Open(path)
 	if err != nil {
 		return
 	}
 	defer f.Close()
-	r := csv.NewReader(transform.NewReader(f, japanese.EUCJP.NewDecoder()))
+	r := csv.NewReader(f)
 	r.Comma = ','
 	for {
 		record, e := r.Read()
@@ -577,7 +574,7 @@ func loadIpaMorphFile(path string) (records [][]string, err error) {
 	return
 }
 
-func loadIpaMatrixDefFile(path string) (rowSize, colSize int64, vec []int16, err error) {
+func loadUniMatrixDefFile(path string) (rowSize, colSize int64, vec []int16, err error) {
 	var file *os.File
 	file, err = os.Open(path)
 	if err != nil {
@@ -634,7 +631,7 @@ func loadIpaMatrixDefFile(path string) (rowSize, colSize int64, vec []int16, err
 	return
 }
 
-func loadIpaCharClassDefFile(path string) (charClass []string, charCategory []byte, invokeMap, groupMap []bool, err error) {
+func loadUniCharClassDefFile(path string) (charClass []string, charCategory []byte, invokeMap, groupMap []bool, err error) {
 	var file *os.File
 	file, err = os.Open(path)
 	if err != nil {
@@ -683,13 +680,14 @@ func loadIpaCharClassDefFile(path string) (charClass []string, charCategory []by
 	return
 }
 
-func loadIpaUnkFile(path string) (records [][]string, err error) {
-	var file *os.File
-	file, err = os.Open(path)
+func loadUniUnkFile(path string) (records [][]string, err error) {
+	var f *os.File
+	f, err = os.Open(path)
 	if err != nil {
 		return
 	}
-	r := csv.NewReader(transform.NewReader(file, japanese.EUCJP.NewDecoder()))
+	defer f.Close()
+	r := csv.NewReader(f)
 	r.Comma = ','
 	for {
 		rec, e := r.Read()
@@ -698,8 +696,8 @@ func loadIpaUnkFile(path string) (records [][]string, err error) {
 		} else if e != nil {
 			err = e
 			return
-		} else if len(rec) != ipaUnkRecordSize {
-			err = fmt.Errorf("invalid format csv: %v, %v", file, rec)
+		} else if len(rec) != uniUnkRecordSize {
+			err = fmt.Errorf("invalid format csv: %v, %v", f, rec)
 			return
 		}
 		records = append(records, rec)
