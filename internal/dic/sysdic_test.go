@@ -754,7 +754,12 @@ func TestSystemDicUniGroupList01(t *testing.T) {
 func BenchmarkSysDicIPA(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		loadInternalSysDic(IPADicPath)
+	}
+}
 
+func BenchmarkSysDicUni(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		loadInternalSysDic(UniDicPath)
 	}
 }
 
