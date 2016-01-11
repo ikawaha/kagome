@@ -2,11 +2,13 @@
 // sources:
 // dic/ipa/chardef.dic
 // dic/ipa/connection.dic
+// dic/ipa/content.dic
 // dic/ipa/index.dic
 // dic/ipa/morph.dic
 // dic/ipa/unk.dic
 // dic/uni/chardef.dic
 // dic/uni/connection.dic
+// dic/uni/content.dic
 // dic/uni/index.dic
 // dic/uni/morph.dic
 // dic/uni/unk.dic
@@ -131,11 +133,13 @@ func AssetNames() []string {
 var _bindata = map[string]func() (*asset, error){
 	"dic/ipa/chardef.dic": dicIpaChardefDic,
 	"dic/ipa/connection.dic": dicIpaConnectionDic,
+	"dic/ipa/content.dic": dicIpaContentDic,
 	"dic/ipa/index.dic": dicIpaIndexDic,
 	"dic/ipa/morph.dic": dicIpaMorphDic,
 	"dic/ipa/unk.dic": dicIpaUnkDic,
 	"dic/uni/chardef.dic": dicUniChardefDic,
 	"dic/uni/connection.dic": dicUniConnectionDic,
+	"dic/uni/content.dic": dicUniContentDic,
 	"dic/uni/index.dic": dicUniIndexDic,
 	"dic/uni/morph.dic": dicUniMorphDic,
 	"dic/uni/unk.dic": dicUniUnkDic,
@@ -185,6 +189,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"ipa": &bintree{nil, map[string]*bintree{
 			"chardef.dic": &bintree{dicIpaChardefDic, map[string]*bintree{}},
 			"connection.dic": &bintree{dicIpaConnectionDic, map[string]*bintree{}},
+			"content.dic": &bintree{dicIpaContentDic, map[string]*bintree{}},
 			"index.dic": &bintree{dicIpaIndexDic, map[string]*bintree{}},
 			"morph.dic": &bintree{dicIpaMorphDic, map[string]*bintree{}},
 			"unk.dic": &bintree{dicIpaUnkDic, map[string]*bintree{}},
@@ -192,6 +197,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"uni": &bintree{nil, map[string]*bintree{
 			"chardef.dic": &bintree{dicUniChardefDic, map[string]*bintree{}},
 			"connection.dic": &bintree{dicUniConnectionDic, map[string]*bintree{}},
+			"content.dic": &bintree{dicUniContentDic, map[string]*bintree{}},
 			"index.dic": &bintree{dicUniIndexDic, map[string]*bintree{}},
 			"morph.dic": &bintree{dicUniMorphDic, map[string]*bintree{}},
 			"unk.dic": &bintree{dicUniUnkDic, map[string]*bintree{}},
