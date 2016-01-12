@@ -4,7 +4,7 @@ Kagome Japanese Morphological Analyzer
 ===
 
 Kagome is an open source Japanese morphological analyzer written in pure golang.
-The MeCab-IPADIC dictionary/statiscal model is used and packaged in Kagome binary.
+The [MeCab-IPADIC](http://taku910.github.io/mecab/) and [UniDic (unidic-mecab)](http://pj.ninjal.ac.jp/corpus_center/unidic/) dictionary/statiscal models are packaged in Kagome binary.
 
 ```
 % kagome
@@ -38,13 +38,15 @@ The commands are:
    server - run tokenize server
    lattice - lattice viewer
 
-tokenize [-file input_file] [-dic dic_file] [-udic userdic_file] [-mode (normal|search|extended)]
+tokenize [-file input_file] [-dic dic_file] [-udic userdic_file] [-sysdic (ipa|uni)] [-mode (normal|search|extended)]
   -dic string
        dic
   -file string
        input file
   -mode string
        tokenize mode (normal|search|extended) (default "normal")
+  -sysdic string
+       system dic type (ipa|uni) (default "ipa")
   -udic string
        user dic
 ```
@@ -67,6 +69,8 @@ Usage of tokenize:
        input file
   -mode string
        tokenize mode (normal|search|extended) (default "normal")
+  -sysdic string
+       system dic type (ipa|uni) (default "ipa")
   -udic string
        user dic
 ```
@@ -78,6 +82,8 @@ $ go run cmd/kagome/main.go server -h
 Usage of server:
   -http string
         HTTP service address (default ":6060")
+  -sysdic string
+       system dic type (ipa|uni) (default "ipa")
   -udic string
         user dictionary
 ```
