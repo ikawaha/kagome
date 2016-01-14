@@ -1,9 +1,10 @@
 language: go
 
 go:
-  - 1.5.2
+  - 1.5.3
 
 sudo: false
+cache: bundler
 
 before_install:
   - pip install --user codecov
