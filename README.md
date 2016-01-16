@@ -338,4 +338,4 @@ EOS
 
 License
 ---
-Kagome is licensed under the Apache License v2.0 and uses the MeCab-IPADIC dictionary/statistical model. See NOTICE.txt for license details.
+Kagome is licensed under the Apache License v2.0 and uses the MeCab-IPADIC, UniDic dictionary/statistical model. See NOTICE.txt for license details.
