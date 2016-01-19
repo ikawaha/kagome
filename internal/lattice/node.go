@@ -16,7 +16,7 @@ package lattice
 
 import "sync"
 
-// Reserved identifier of node id.
+// BosEosID represents Reserved identifier of node id.
 const BosEosID int = -1
 
 // NodeClass codes.

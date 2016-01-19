@@ -273,6 +273,9 @@ func TestDaTorture(t *testing.T) {
 	sort.Strings(keys)
 
 	d, err := Build(keys)
+	if err != nil {
+		t.Fatalf("unexpected build error, %v", err)
+	}
 	for _, k := range keys {
 		id, ok := d.Find(k)
 		if !ok || id < 1 {

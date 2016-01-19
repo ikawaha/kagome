@@ -1,0 +1,10 @@
+linter:
+  gometalinter:
+      options:
+          skip: './cmd'
+          vendor: true
+          cyclo-over: 15
+          tests: true
+          errors: true
+          disable:
+            - dupl

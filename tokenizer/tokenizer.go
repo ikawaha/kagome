@@ -26,8 +26,6 @@ import (
 type TokenizeMode int
 
 const (
-	initialNodePoolCapacity = 512
-
 	// Normal is the normal tokenize mode.
 	Normal TokenizeMode = iota + 1
 	// Search is the tokenize mode for search.
@@ -115,7 +113,7 @@ func (t Tokenizer) Dot(input string, w io.Writer) (tokens []Token) {
 	return t.AnalyzeGraph(input, Normal, w)
 }
 
-// GraphView returns morphs of a sentense and exports a lattice graph to dot format.
+// AnalyzeGraph returns morphs of a sentense and exports a lattice graph to dot format.
 func (t Tokenizer) AnalyzeGraph(input string, mode TokenizeMode, w io.Writer) (tokens []Token) {
 	la := lattice.New(t.dic, t.udic)
 	defer la.Free()

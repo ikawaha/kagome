@@ -44,7 +44,6 @@ type option struct {
 	udic    string
 	sysdic  string
 	mode    string
-	input   string
 	flagSet *flag.FlagSet
 }
 

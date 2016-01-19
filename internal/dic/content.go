@@ -22,8 +22,8 @@ import (
 )
 
 const (
-	RowDelimiter = "\n"
-	ColDelimiter = "\a"
+	rowDelimiter = "\n"
+	colDelimiter = "\a"
 )
 
 // Contents represents dictionary contents.
@@ -32,14 +32,14 @@ type Contents [][]string
 // WriteTo implements the io.WriterTo interface
 func (c Contents) WriteTo(w io.Writer) (n int64, err error) {
 	for i := 0; i < len(c)-1; i++ {
-		x, e := fmt.Fprintf(w, "%s%s", strings.Join(c[i], ColDelimiter), RowDelimiter)
+		x, e := fmt.Fprintf(w, "%s%s", strings.Join(c[i], colDelimiter), rowDelimiter)
 		if e != nil {
 			return
 		}
 		n += int64(x)
 	}
 	if i := len(c) - 1; i > 0 {
-		x, e := fmt.Fprintf(w, "%s", strings.Join(c[i], ColDelimiter))
+		x, e := fmt.Fprintf(w, "%s", strings.Join(c[i], colDelimiter))
 		if e != nil {
 			return n, e
 		}
@@ -51,10 +51,10 @@ func (c Contents) WriteTo(w io.Writer) (n int64, err error) {
 // NewContents creates dictionary contents from byte slice
 func NewContents(b []byte) [][]string {
 	str := *(*string)(unsafe.Pointer(&b))
-	rows := strings.Split(str, RowDelimiter)
+	rows := strings.Split(str, rowDelimiter)
 	m := make([][]string, len(rows))
 	for i, r := range rows {
-		m[i] = strings.Split(r, ColDelimiter)
+		m[i] = strings.Split(r, colDelimiter)
 	}
 	return m
 }
