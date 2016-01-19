@@ -26,8 +26,6 @@ import (
 type TokenizeMode int
 
 const (
-	initialNodePoolCapacity = 512
-
 	// Normal is the normal tokenize mode.
 	Normal TokenizeMode = iota + 1
 	// Search is the tokenize mode for search.
