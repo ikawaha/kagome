@@ -32,7 +32,7 @@ const (
 	Search
 	// Extended is the experimental tokenize mode.
 	Extended
-	// BosEosID means the begining a sentence or the end of a sentence.
+	// BosEosID means the beginning a sentence or the end of a sentence.
 	BosEosID = lattice.BosEosID
 )
 
