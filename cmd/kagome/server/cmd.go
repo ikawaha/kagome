@@ -77,6 +77,7 @@ func (o *option) parse(args []string) (err error) {
 	return
 }
 
+//OptionCheck receives a slice of args and returns an error if it was not successfully parsed
 func OptionCheck(args []string) (err error) {
 	opt := newOption(ioutil.Discard, flag.ContinueOnError)
 	if e := opt.parse(args); e != nil {
@@ -113,6 +114,7 @@ func command(opt *option) error {
 	return nil
 }
 
+// TokenizeHandler represents the tokenizer API server struct
 type TokenizeHandler struct {
 	tokenizer tokenizer.Tokenizer
 }
@@ -184,6 +186,7 @@ func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//TokenizeDemoHandler represents the tokenizer demo server struct
 type TokenizeDemoHandler struct {
 	tokenizer tokenizer.Tokenizer
 }
@@ -231,8 +234,8 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		m = tokenizer.Extended
 	}
 	if _, e := exec.LookPath(graphvizCmd); e != nil {
-		cmdErr = "Error: graphviz is not in your furure"
-		log.Print("graphviz is not in your future\n")
+		cmdErr = "Error: circo/graphviz is not installed in your $PATH"
+		log.Print("Error: circo/graphviz is not installed in your $PATH\n")
 	} else {
 		var buf bytes.Buffer
 		cmd := exec.Command("dot", "-Tsvg")
@@ -318,6 +321,7 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
+// Run receives the slice of args and executes the server
 func Run(args []string) error {
 	opt := newOption(ErrorWriter, flag.ExitOnError)
 	if e := opt.parse(args); e != nil {
@@ -328,10 +332,12 @@ func Run(args []string) error {
 	return command(opt)
 }
 
+// Usage provides information on the use of the server
 func Usage() {
 	fmt.Fprintf(os.Stderr, usageMessage, CommandName)
 }
 
+// PrintDefaults prints out the default flags
 func PrintDefaults(eh flag.ErrorHandling) {
 	o := newOption(ErrorWriter, eh)
 	o.flagSet.PrintDefaults()
