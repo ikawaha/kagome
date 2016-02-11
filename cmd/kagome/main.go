@@ -56,11 +56,13 @@ var (
 	defaultSubcommand = subcommands[0]
 )
 
+//Usage prints to stdout information about the tool
 func Usage() {
 	fmt.Fprintf(errorWriter, "Japanese Morphological Analyzer -- github.com/ikawaha/kagome\n")
 	fmt.Fprintf(errorWriter, "usage: %s <command>\n", path.Base(os.Args[0]))
 }
 
+// PrintDefaults prints out the default flags
 func PrintDefaults() {
 	fmt.Fprintln(errorWriter, "The commands are:")
 	for _, c := range subcommands {

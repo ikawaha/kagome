@@ -33,6 +33,7 @@ const (
 	usageMessage = "%s [-file input_file] [-dic dic_file] [-udic userdic_file] [-sysdic (ipa|uni)] [-mode (normal|search|extended)]\n"
 )
 
+// ErrorWriter writes to stderr
 var (
 	ErrorWriter = os.Stderr
 )
@@ -82,6 +83,7 @@ func (o *option) parse(args []string) (err error) {
 	return
 }
 
+//OptionCheck receives a slice of args and returns an error if it was not successfully parsed
 func OptionCheck(args []string) (err error) {
 	opt := newOption(ioutil.Discard, flag.ContinueOnError)
 	if e := opt.parse(args); e != nil {
@@ -157,6 +159,7 @@ func command(opt *option) error {
 	return scanner.Err()
 }
 
+// Run receives the slice of args and executes the tokenize tool
 func Run(args []string) error {
 	opt := newOption(ErrorWriter, flag.ExitOnError)
 	if e := opt.parse(args); e != nil {
@@ -167,10 +170,12 @@ func Run(args []string) error {
 	return command(opt)
 }
 
+// Usage provides information on the use of the tokenize tool
 func Usage() {
 	fmt.Fprintf(ErrorWriter, usageMessage, CommandName)
 }
 
+// PrintDefaults prints out the default flags
 func PrintDefaults(eh flag.ErrorHandling) {
 	o := newOption(ErrorWriter, eh)
 	o.flagSet.PrintDefaults()
