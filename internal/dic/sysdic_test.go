@@ -310,8 +310,8 @@ func TestSystemDicIPACharCategory01(t *testing.T) {
 		{input: 0x2FD5, category: KANJI},    // 0x2F00..0x2FD5  KANJI
 		//{input: 0x3005, category: KANJI},        // 0x3005          KANJI
 		//{input: 0x3007, category: KANJI},        // 0x3007          KANJI
-		{input: 0x3400, category: KANJI}, // 0x3400..0x4DB5  KANJI # CJK Unified Ideographs Extention
-		{input: 0x4DB5, category: KANJI}, // 0x3400..0x4DB5  KANJI # CJK Unified Ideographs Extention
+		{input: 0x3400, category: KANJI}, // 0x3400..0x4DB5  KANJI # CJK Unified Ideographs Extension
+		{input: 0x4DB5, category: KANJI}, // 0x3400..0x4DB5  KANJI # CJK Unified Ideographs Extension
 		//{input: 0x4E00, category: KANJI},        // 0x4E00..0x9FA5  KANJI
 		{input: 0x9FA5, category: KANJI},        // 0x4E00..0x9FA5  KANJI
 		{input: 0xF900, category: KANJI},        // 0xF900..0xFA2D  KANJI
@@ -411,7 +411,7 @@ func TestSystemDicIPACharCategory01(t *testing.T) {
 		if category != cr.category {
 			t.Errorf("input %04X, got %v, expected %v\n", cr.input, category, cr.category)
 		}
-		category = d.CharactorCategory(rune(cr.input))
+		category = d.CharacterCategory(rune(cr.input))
 		if category != cr.category {
 			t.Errorf("input %04X, got %v, expected %v\n", cr.input, category, cr.category)
 		}
@@ -491,8 +491,8 @@ func TestSystemDicUniCharCategory01(t *testing.T) {
 		{input: 0x2FD5, category: KANJI},    // 0x2F00..0x2FD5  KANJI
 		//{input: 0x3005, category: KANJI},        // 0x3005          KANJI
 		//{input: 0x3007, category: KANJI},        // 0x3007          KANJI
-		{input: 0x3400, category: KANJI}, // 0x3400..0x4DB5  KANJI # CJK Unified Ideographs Extention
-		{input: 0x4DB5, category: KANJI}, // 0x3400..0x4DB5  KANJI # CJK Unified Ideographs Extention
+		{input: 0x3400, category: KANJI}, // 0x3400..0x4DB5  KANJI # CJK Unified Ideographs Extension
+		{input: 0x4DB5, category: KANJI}, // 0x3400..0x4DB5  KANJI # CJK Unified Ideographs Extension
 		//{input: 0x4E00, category: KANJI},        // 0x4E00..0x9FA5  KANJI
 		{input: 0x9FA5, category: KANJI},        // 0x4E00..0x9FA5  KANJI
 		{input: 0xF900, category: KANJI},        // 0xF900..0xFA2D  KANJI
@@ -592,7 +592,7 @@ func TestSystemDicUniCharCategory01(t *testing.T) {
 		if category != cr.category {
 			t.Errorf("input %04X, got %v, expected %v\n", cr.input, category, cr.category)
 		}
-		category = d.CharactorCategory(rune(cr.input))
+		category = d.CharacterCategory(rune(cr.input))
 		if category != cr.category {
 			t.Errorf("input %04X, got %v, expected %v\n", cr.input, category, cr.category)
 		}
