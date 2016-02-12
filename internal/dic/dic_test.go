@@ -197,8 +197,8 @@ func TestDicCharCategory01(t *testing.T) {
 		{input: 0x2FD5, category: KANJI},    // 0x2F00..0x2FD5  KANJI
 		//{input: 0x3005, category: KANJI},        // 0x3005          KANJI
 		//{input: 0x3007, category: KANJI},        // 0x3007          KANJI
-		{input: 0x3400, category: KANJI}, // 0x3400..0x4DB5  KANJI # CJK Unified Ideographs Extention
-		{input: 0x4DB5, category: KANJI}, // 0x3400..0x4DB5  KANJI # CJK Unified Ideographs Extention
+		{input: 0x3400, category: KANJI}, // 0x3400..0x4DB5  KANJI # CJK Unified Ideographs Extension
+		{input: 0x4DB5, category: KANJI}, // 0x3400..0x4DB5  KANJI # CJK Unified Ideographs Extension
 		//{input: 0x4E00, category: KANJI},        // 0x4E00..0x9FA5  KANJI
 		{input: 0x9FA5, category: KANJI},        // 0x4E00..0x9FA5  KANJI
 		{input: 0xF900, category: KANJI},        // 0xF900..0xFA2D  KANJI
@@ -298,7 +298,7 @@ func TestDicCharCategory01(t *testing.T) {
 		if category != cr.category {
 			t.Errorf("input %04X, got %v, expected %v\n", cr.input, category, cr.category)
 		}
-		category = dic.CharactorCategory(rune(cr.input))
+		category = dic.CharacterCategory(rune(cr.input))
 		if category != cr.category {
 			t.Errorf("input %04X, got %v, expected %v\n", cr.input, category, cr.category)
 		}
@@ -310,7 +310,7 @@ func TestCharCategory02(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	c := dic.CharactorCategory(rune(len(dic.CharCategory) + 1))
+	c := dic.CharacterCategory(rune(len(dic.CharCategory) + 1))
 	expected := dic.CharCategory[0]
 	if c != expected {
 		t.Errorf("got %v, expected %v", c, expected)

@@ -150,7 +150,7 @@ func (la *Lattice) Build(inp string) {
 			}
 		}
 		// (3) UNKNOWN DIC
-		class := la.dic.CharactorCategory(ch)
+		class := la.dic.CharacterCategory(ch)
 		if !anyMatches || la.dic.InvokeList[int(class)] {
 			endPos := pos + utf8.RuneLen(ch)
 			unkWordLen := 1
@@ -158,7 +158,7 @@ func (la *Lattice) Build(inp string) {
 				for i, w, size := endPos, 1, len(inp); i < size; i += w {
 					var c rune
 					c, w = utf8.DecodeRuneInString(inp[i:])
-					if la.dic.CharactorCategory(c) != class {
+					if la.dic.CharacterCategory(c) != class {
 						break
 					}
 					endPos += w

@@ -38,8 +38,8 @@ type Dic struct {
 	UnkContents  [][]string
 }
 
-// CharactorCategory returns the category of a rune.
-func (d Dic) CharactorCategory(r rune) byte {
+// CharacterCategory returns the category of a rune.
+func (d Dic) CharacterCategory(r rune) byte {
 	if int(r) <= len(d.CharCategory) {
 		return d.CharCategory[r]
 	}
