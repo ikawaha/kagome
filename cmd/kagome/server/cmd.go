@@ -40,6 +40,11 @@ var (
 	ErrorWriter  = os.Stderr
 )
 
+const (
+	graphvizCmd = "circo" // "dot"
+	cmdTimeout  = 25 * time.Second
+)
+
 // options
 type option struct {
 	http    string
@@ -191,14 +196,97 @@ type TokenizeDemoHandler struct {
 	tokenizer tokenizer.Tokenizer
 }
 
-func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	type record struct {
-		Surface        string
-		Pos            string
-		Baseform       string
-		Reading        string
-		Pronounciation string
+type record struct {
+	Surface        string
+	Pos            string
+	Baseform       string
+	Reading        string
+	Pronounciation string
+}
+
+func (h *TokenizeDemoHandler) analyze(sen, mode string) (string, []record, error) {
+	m := tokenizer.Normal
+	switch mode {
+	case "Search":
+		m = tokenizer.Search
+	case "Extended":
+		m = tokenizer.Extended
 	}
+	var buf bytes.Buffer
+	cmd := exec.Command("dot", "-Tsvg")
+	r, w := io.Pipe()
+	cmd.Stdin = r
+	cmd.Stdout = &buf
+	cmd.Stderr = ErrorWriter
+	if err := cmd.Start(); err != nil {
+		log.Printf("process done with error = %v", err)
+		return "", nil, fmt.Errorf("process done with error, %v", err)
+	}
+	tokens := h.tokenizer.AnalyzeGraph(sen, m, w)
+	w.Close()
+
+	done := make(chan error, 1)
+	go func() {
+		done <- cmd.Wait()
+	}()
+	select {
+	case <-time.After(cmdTimeout):
+		if err := cmd.Process.Kill(); err != nil {
+			log.Fatal("failed to kill: ", err)
+		}
+		<-done
+		return "", nil, fmt.Errorf("graphviz time out")
+	case err := <-done:
+		if err != nil {
+			log.Printf("process done with error = %v", err)
+			return "", nil, fmt.Errorf("process done with error, %v", err)
+		}
+	}
+	svg := buf.String()
+	if pos := strings.Index(svg, "<svg"); pos > 0 {
+		svg = svg[pos:]
+	}
+	var records []record
+	for _, tok := range tokens {
+		if tok.ID == tokenizer.BosEosID {
+			continue
+		}
+		m := record{Surface: tok.Surface}
+		fs := tok.Features()
+		switch len(fs) {
+		case 17: // unidic
+			m.Pos = strings.Join(fs[0:5], ",")
+			m.Baseform = fs[10]
+			m.Reading = fs[6]
+			m.Pronounciation = fs[9]
+		case 9:
+			m.Pos = strings.Join(fs[0:5], ",")
+			m.Baseform = fs[6]
+			m.Reading = fs[7]
+			m.Pronounciation = fs[8]
+		case 7:
+			m.Pos = strings.Join(fs[0:5], ",")
+			m.Baseform = fs[6]
+			m.Reading = "*"
+			m.Pronounciation = "*"
+		case 6: // unidic
+			m.Pos = strings.Join(fs[0:5], ",")
+			m.Baseform = "*"
+			m.Reading = "*"
+			m.Pronounciation = "*"
+		case 3:
+			m.Pos = fs[0]
+			m.Baseform = fs[1]
+			m.Reading = fs[2]
+			m.Pronounciation = "*"
+
+		}
+		records = append(records, m)
+	}
+	return svg, records, nil
+}
+
+func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	sen := r.FormValue("s")
 	mode := r.FormValue("r")
 	lattice := r.FormValue("lattice")
@@ -215,97 +303,20 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	const (
-		graphvizCmd = "circo" // "dot"
-		cmdTimeout  = 25 * time.Second
-	)
 	var (
 		records []record
-		tokens  []tokenizer.Token
 		svg     string
 		cmdErr  string
+		err     error
 	)
 
-	m := tokenizer.Normal
-	switch mode {
-	case "Search":
-		m = tokenizer.Search
-	case "Extended":
-		m = tokenizer.Extended
-	}
 	if _, e := exec.LookPath(graphvizCmd); e != nil {
 		cmdErr = "Error: circo/graphviz is not installed in your $PATH"
 		log.Print("Error: circo/graphviz is not installed in your $PATH\n")
 	} else {
-		var buf bytes.Buffer
-		cmd := exec.Command("dot", "-Tsvg")
-		r0, w0 := io.Pipe()
-		cmd.Stdin = r0
-		cmd.Stdout = &buf
-		cmd.Stderr = ErrorWriter
-		if err := cmd.Start(); err != nil {
-			cmdErr = "Error"
-			log.Printf("process done with error = %v", err)
-		}
-		tokens = h.tokenizer.AnalyzeGraph(sen, m, w0)
-		w0.Close()
-
-		done := make(chan error, 1)
-		go func() {
-			done <- cmd.Wait()
-		}()
-		select {
-		case <-time.After(cmdTimeout):
-			if err := cmd.Process.Kill(); err != nil {
-				log.Fatal("failed to kill: ", err)
-			}
-			cmdErr = "Error: Graphviz time out"
-			<-done
-		case err := <-done:
-			if err != nil {
-				cmdErr = "Error"
-				log.Printf("process done with error = %v", err)
-			}
-		}
-		svg = buf.String()
-		if pos := strings.Index(svg, "<svg"); pos > 0 {
-			svg = svg[pos:]
-		}
-		for _, tok := range tokens {
-			if tok.ID == tokenizer.BosEosID {
-				continue
-			}
-			m := record{Surface: tok.Surface}
-			fs := tok.Features()
-			switch len(fs) {
-			case 17: // unidic
-				m.Pos = strings.Join(fs[0:5], ",")
-				m.Baseform = fs[10]
-				m.Reading = fs[6]
-				m.Pronounciation = fs[9]
-			case 9:
-				m.Pos = strings.Join(fs[0:5], ",")
-				m.Baseform = fs[6]
-				m.Reading = fs[7]
-				m.Pronounciation = fs[8]
-			case 7:
-				m.Pos = strings.Join(fs[0:5], ",")
-				m.Baseform = fs[6]
-				m.Reading = "*"
-				m.Pronounciation = "*"
-			case 6: // unidic
-				m.Pos = strings.Join(fs[0:5], ",")
-				m.Baseform = "*"
-				m.Reading = "*"
-				m.Pronounciation = "*"
-			case 3:
-				m.Pos = fs[0]
-				m.Baseform = fs[1]
-				m.Reading = fs[2]
-				m.Pronounciation = "*"
-
-			}
-			records = append(records, m)
+		svg, records, err = h.analyze(sen, mode)
+		if err != nil {
+			cmdErr = fmt.Sprintf("Error: %v", err)
 		}
 	}
 	d := struct {
