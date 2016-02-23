@@ -129,8 +129,8 @@ func (la *Lattice) Build(inp string) {
 			lens, outputs := la.udic.Index.CommonPrefixSearch(inp[pos:])
 			for i, ids := range outputs {
 				for j := range ids {
-					la.addNode(runePos, int(ids[j]), runePos,
-						USER, inp[pos:pos+int(lens[i])])
+					la.addNode(runePos, ids[j], runePos,
+						USER, inp[pos:pos+lens[i]])
 				}
 			}
 			anyMatches = (len(lens) > 0)
@@ -144,7 +144,7 @@ func (la *Lattice) Build(inp string) {
 			anyMatches = true
 			for i, ids := range outputs {
 				for j := range ids {
-					la.addNode(runePos, int(ids[j]), runePos,
+					la.addNode(runePos, ids[j], runePos,
 						KNOWN, inp[pos:pos+lens[i]])
 				}
 			}
