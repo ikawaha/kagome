@@ -106,6 +106,62 @@ func (la *Lattice) addNode(pos, id, start int, class NodeClass, surface string) 
 	la.list[p] = append(la.list[p], n)
 }
 
+func (la *Lattice) buildUserDicNode(runePos int, inp string) bool {
+	if la.udic == nil {
+		return false
+	}
+	lens, outputs := la.udic.Index.CommonPrefixSearch(inp)
+	for i, ids := range outputs {
+		for j := range ids {
+			la.addNode(runePos, int(ids[j]), runePos,
+				USER, inp[:int(lens[i])])
+		}
+	}
+	return (len(lens) > 0)
+}
+
+func (la *Lattice) buildKnownDicNode(runePos int, inp string) bool {
+	if lens, outputs := la.dic.Index.CommonPrefixSearch(inp); len(lens) > 0 {
+		for i, ids := range outputs {
+			for j := range ids {
+				la.addNode(runePos, int(ids[j]), runePos,
+					KNOWN, inp[:lens[i]])
+			}
+		}
+		return true
+	}
+	return false
+}
+
+func (la *Lattice) buildUnknownNode(ch rune, class byte, runePos int, inp string) {
+	endPos := utf8.RuneLen(ch)
+	unkWordLen := 1
+	if la.dic.GroupList[int(class)] {
+		for i, w, size := endPos, 1, len(inp); i < size; i += w {
+			var c rune
+			c, w = utf8.DecodeRuneInString(inp[i:])
+			if la.dic.CharacterCategory(c) != class {
+				break
+			}
+			endPos += w
+			unkWordLen++
+			if unkWordLen >= maximumUnknownWordLength {
+				break
+			}
+		}
+	}
+	id := la.dic.UnkIndex[int32(class)]
+	for i, w := 0, 0; i < endPos; i += w {
+		_, w = utf8.DecodeRuneInString(inp[i:])
+		end := i + w
+		dup, _ := la.dic.UnkIndexDup[int32(class)]
+		for x := 0; x < int(dup)+1; x++ {
+			la.addNode(runePos, int(id)+x, runePos,
+				UNKNOWN, inp[:end])
+		}
+	}
+}
+
 // Build builds a lattice from the inputs.
 func (la *Lattice) Build(inp string) {
 	rc := utf8.RuneCountInString(inp)
@@ -125,59 +181,17 @@ func (la *Lattice) Build(inp string) {
 		anyMatches := false
 
 		// (1) USER DIC
-		if la.udic != nil {
-			lens, outputs := la.udic.Index.CommonPrefixSearch(inp[pos:])
-			for i, ids := range outputs {
-				for j := range ids {
-					la.addNode(runePos, ids[j], runePos,
-						USER, inp[pos:pos+lens[i]])
-				}
-			}
-			anyMatches = (len(lens) > 0)
-		}
-		if anyMatches {
+		if anyMatches = la.buildUserDicNode(runePos, inp[pos:]); anyMatches {
 			continue
 		}
 
 		// (2) KNOWN DIC
-		if lens, outputs := la.dic.Index.CommonPrefixSearch(inp[pos:]); len(lens) > 0 {
-			anyMatches = true
-			for i, ids := range outputs {
-				for j := range ids {
-					la.addNode(runePos, ids[j], runePos,
-						KNOWN, inp[pos:pos+lens[i]])
-				}
-			}
-		}
+		anyMatches = la.buildKnownDicNode(runePos, inp[pos:])
+
 		// (3) UNKNOWN DIC
 		class := la.dic.CharacterCategory(ch)
 		if !anyMatches || la.dic.InvokeList[int(class)] {
-			endPos := pos + utf8.RuneLen(ch)
-			unkWordLen := 1
-			if la.dic.GroupList[int(class)] {
-				for i, w, size := endPos, 1, len(inp); i < size; i += w {
-					var c rune
-					c, w = utf8.DecodeRuneInString(inp[i:])
-					if la.dic.CharacterCategory(c) != class {
-						break
-					}
-					endPos += w
-					unkWordLen++
-					if unkWordLen >= maximumUnknownWordLength {
-						break
-					}
-				}
-			}
-			id := la.dic.UnkIndex[int32(class)]
-			for i, w := pos, 0; i < endPos; i += w {
-				_, w = utf8.DecodeRuneInString(inp[i:])
-				end := i + w
-				dup, _ := la.dic.UnkIndexDup[int32(class)]
-				for x := 0; x < int(dup)+1; x++ {
-					la.addNode(runePos, int(id)+x, runePos,
-						UNKNOWN, inp[pos:end])
-				}
-			}
+			la.buildUnknownNode(ch, class, runePos, inp[pos:])
 		}
 	}
 	return
@@ -283,12 +297,12 @@ func (la *Lattice) Backward(m TokenizeMode) {
 	}
 }
 
-// Dot outputs the lattice in the graphviz dot format.
-func (la *Lattice) Dot(w io.Writer) {
-	type edge struct {
-		from *node
-		to   *node
-	}
+type edge struct {
+	from *node
+	to   *node
+}
+
+func (la *Lattice) createEdges() []edge {
 	edges := make([]edge, 0, 1024)
 	for i, size := 1, len(la.list); i < size; i++ {
 		currents := la.list[i]
@@ -302,6 +316,12 @@ func (la *Lattice) Dot(w io.Writer) {
 			}
 		}
 	}
+	return edges
+}
+
+// Dot outputs the lattice in the graphviz dot format.
+func (la *Lattice) Dot(w io.Writer) {
+	edges := la.createEdges()
 	bests := make(map[*node]struct{})
 	for _, n := range la.Output {
 		bests[n] = struct{}{}
