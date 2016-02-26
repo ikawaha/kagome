@@ -308,7 +308,9 @@ func (la *Lattice) Dot(w io.Writer) {
 			}
 			for _, from := range prevs {
 				if from.Class == UNKNOWN {
-					continue
+					if _, ok := bests[from]; !ok {
+						continue
+					}
 				}
 				edges = append(edges, edge{from, to})
 			}
@@ -322,7 +324,7 @@ func (la *Lattice) Dot(w io.Writer) {
 	for i, list := range la.list {
 		for _, n := range list {
 			if n.Class == UNKNOWN {
-				if _, ok := bests[n]; ok {
+				if _, ok := bests[n]; !ok {
 					continue
 				}
 			}
