@@ -284,7 +284,7 @@ node [shape=box, style=filled, fillcolor="#e8e8f0", fontname=Helvetica]
 		t.Errorf("got %v, expected: %v", b.String(), expected)
 	}
 	b.Reset()
-	la.Build("わたしまけましたわ")
+	la.Build("わたしまけましたわポポピ")
 	la.Forward(Normal)
 	la.Backward(Normal)
 	la.Dot(&b)
