@@ -231,7 +231,7 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	case "Search":
 		m = tokenizer.Search
 	case "Extended":
-		m = tokenizer.Extended
+		// use Normal mode
 	}
 	if _, e := exec.LookPath(graphvizCmd); e != nil {
 		cmdErr = "Error: circo/graphviz is not installed in your $PATH"
