@@ -285,6 +285,10 @@ func (la *Lattice) Backward(m TokenizeMode) {
 
 // Dot outputs the lattice in the graphviz dot format.
 func (la *Lattice) Dot(w io.Writer) {
+	bests := make(map[*node]struct{})
+	for _, n := range la.Output {
+		bests[n] = struct{}{}
+	}
 	type edge struct {
 		from *node
 		to   *node
@@ -293,18 +297,24 @@ func (la *Lattice) Dot(w io.Writer) {
 	for i, size := 1, len(la.list); i < size; i++ {
 		currents := la.list[i]
 		for _, to := range currents {
+			if to.Class == UNKNOWN {
+				if _, ok := bests[to]; !ok {
+					continue
+				}
+			}
 			prevs := la.list[to.Start]
 			if len(prevs) == 0 {
 				continue
 			}
 			for _, from := range prevs {
+				if from.Class == UNKNOWN {
+					if _, ok := bests[from]; !ok {
+						continue
+					}
+				}
 				edges = append(edges, edge{from, to})
 			}
 		}
-	}
-	bests := make(map[*node]struct{})
-	for _, n := range la.Output {
-		bests[n] = struct{}{}
 	}
 	fmt.Fprintln(w, "graph lattice {")
 	fmt.Fprintln(w, "dpi=48;")
@@ -313,6 +323,11 @@ func (la *Lattice) Dot(w io.Writer) {
 	fmt.Fprintln(w, "node [shape=box, style=filled, fillcolor=\"#e8e8f0\", fontname=Helvetica]")
 	for i, list := range la.list {
 		for _, n := range list {
+			if n.Class == UNKNOWN {
+				if _, ok := bests[n]; !ok {
+					continue
+				}
+			}
 			surf := n.Surface
 			if n.ID == BosEosID {
 				if i == 0 {
@@ -323,7 +338,7 @@ func (la *Lattice) Dot(w io.Writer) {
 			}
 			if _, ok := bests[n]; ok {
 				fmt.Fprintf(w, "\t\"%p\" [label=\"%s\\n%d\",shape=ellipse, peripheries=2];\n", n, surf, n.Weight)
-			} else {
+			} else if n.Class != UNKNOWN {
 				fmt.Fprintf(w, "\t\"%p\" [label=\"%s\\n%d\"];\n", n, surf, n.Weight)
 			}
 		}
