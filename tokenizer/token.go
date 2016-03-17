@@ -80,6 +80,15 @@ func (t Token) Features() (features []string) {
 	return
 }
 
+// Pos returns the first element of features.
+func (t Token) Pos() string {
+	f := t.Features()
+	if len(f) < 1 {
+		return ""
+	}
+	return f[0]
+}
+
 // String returns a string representation of a token.
 func (t Token) String() string {
 	return fmt.Sprintf("%v(%v, %v)%v[%v]", t.Surface, t.Start, t.End, t.Class, t.ID)
