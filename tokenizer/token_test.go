@@ -41,7 +41,7 @@ func TestTokenClassString(t *testing.T) {
 	}
 }
 
-func TestFeatures01(t *testing.T) {
+func TestFeaturesAndPos01(t *testing.T) {
 	tok := Token{
 		ID:      0,
 		Class:   TokenClass(lattice.KNOWN),
@@ -56,9 +56,12 @@ func TestFeatures01(t *testing.T) {
 	if !reflect.DeepEqual(f, expected) {
 		t.Errorf("got %v, expected %v", f, expected)
 	}
+	if p := tok.Pos(); p != f[0] {
+		t.Errorf("got %v, expected %v", p, f[0])
+	}
 }
 
-func TestFeatures02(t *testing.T) {
+func TestFeaturesAndPos02(t *testing.T) {
 	tok := Token{
 		ID:      0,
 		Class:   TokenClass(lattice.UNKNOWN),
@@ -73,9 +76,12 @@ func TestFeatures02(t *testing.T) {
 	if !reflect.DeepEqual(f, expected) {
 		t.Errorf("got %v, expected %v", f, expected)
 	}
+	if p := tok.Pos(); p != f[0] {
+		t.Errorf("got %v, expected %v", p, f[0])
+	}
 }
 
-func TestFeatures03(t *testing.T) {
+func TestFeaturesAndPos03(t *testing.T) {
 	tok := Token{
 		ID:      0,
 		Class:   TokenClass(lattice.USER),
@@ -95,9 +101,12 @@ func TestFeatures03(t *testing.T) {
 	if !reflect.DeepEqual(f, expected) {
 		t.Errorf("got %v, expected %v", f, expected)
 	}
+	if p := tok.Pos(); p != f[0] {
+		t.Errorf("got %v, expected %v", p, f[0])
+	}
 }
 
-func TestFeatures04(t *testing.T) {
+func TestFeaturesAndPos04(t *testing.T) {
 	tok := Token{
 		ID:      0,
 		Class:   DUMMY,
@@ -115,6 +124,9 @@ func TestFeatures04(t *testing.T) {
 	f := tok.Features()
 	if len(f) != 0 {
 		t.Errorf("got %v, expected empty", f)
+	}
+	if p := tok.Pos(); p != "" {
+		t.Errorf("got %v, expected empty", p)
 	}
 }
 
