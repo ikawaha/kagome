@@ -17,6 +17,7 @@ package dic
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"sort"
 	"strings"
@@ -35,20 +36,14 @@ type UserDic struct {
 	Contents []UserDicContent
 }
 
-// NewUserDic build a user dictionary from a file.
-func NewUserDic(path string) (udic *UserDic, err error) {
+// NewUserDicFromReader build a user dictionary from io.Reader.
+func NewUserDicFromReader(r io.Reader) (udic *UserDic, err error) {
+	udic = new(UserDic)
 	const (
 		userDicColumnSize = 4
 	)
-	udic = new(UserDic)
-	f, err := os.Open(path)
-	if err != nil {
-		return
-	}
-	defer f.Close()
-
 	var text []string
-	scanner := bufio.NewScanner(f)
+	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "" || strings.HasPrefix(line, "#") {
@@ -86,4 +81,14 @@ func NewUserDic(path string) (udic *UserDic, err error) {
 	}
 	udic.Index, err = BuildIndexTable(keys)
 	return
+}
+
+// NewUserDic build a user dictionary from a file.
+func NewUserDic(path string) (udic *UserDic, err error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+	return NewUserDicFromReader(f)
 }
