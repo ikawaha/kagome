@@ -14,7 +14,11 @@
 
 package tokenizer
 
-import "github.com/ikawaha/kagome/internal/dic"
+import (
+	"io"
+
+	"github.com/ikawaha/kagome/internal/dic"
+)
 
 // Dic represents a dictionary.
 type Dic struct {
@@ -45,6 +49,12 @@ func SysDicUni() Dic {
 func NewDic(path string) (Dic, error) {
 	d, err := dic.Load(path)
 	return Dic{d}, err
+}
+
+// NewUserDicFromReader build a user dictionary from io.Reader.
+func NewUserDicFromReader(r io.Reader) (UserDic, error) {
+	d, err := dic.NewUserDicFromReader(r)
+	return UserDic{d}, err
 }
 
 // NewUserDic build a user dictionary from a file.
