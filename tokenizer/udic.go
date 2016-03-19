@@ -45,6 +45,7 @@ func NewUserDic(path string) (UserDic, error) {
 	return r.NewUserDic()
 }
 
+// UserDicRecord represents a record of the user dictionary file format.
 type UserDicRecord struct {
 	Text   string   `json:"text"`
 	Tokens []string `json:"tokens"`
@@ -52,12 +53,14 @@ type UserDicRecord struct {
 	Pos    string   `json:"pos"`
 }
 
+// UserDicRecords represents user dictionary data.
 type UserDicRecords []UserDicRecord
 
 func (u UserDicRecords) Len() int           { return len(u) }
 func (u UserDicRecords) Swap(i, j int)      { u[i], u[j] = u[j], u[i] }
 func (u UserDicRecords) Less(i, j int) bool { return u[i].Text < u[j].Text }
 
+// NewUserDicRecords loads user dictionary data from io.Reader.
 func NewUserDicRecords(r io.Reader) (UserDicRecords, error) {
 	var text []string
 	scanner := bufio.NewScanner(r)
@@ -94,6 +97,7 @@ func NewUserDicRecords(r io.Reader) (UserDicRecords, error) {
 	return records, nil
 }
 
+// NewUserDic builds a user dictionary.
 func (u UserDicRecords) NewUserDic() (UserDic, error) {
 	udic := new(dic.UserDic)
 	sort.Sort(u)

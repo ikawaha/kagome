@@ -119,7 +119,7 @@ func TestNewUserDicRecords02(t *testing.T) {
 
 func TestUserDicRecordsLoadFromJSON(t *testing.T) {
 	var rec UserDicRecords
-	json.Unmarshal([]byte(`[
+	_ = json.Unmarshal([]byte(`[
         {
             "text":"日本経済新聞",
             "tokens":["日本","経済","新聞"],
