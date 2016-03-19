@@ -117,6 +117,42 @@ func TestNewUserDicRecords02(t *testing.T) {
 
 }
 
+func TestNewUserDicRecords03(t *testing.T) {
+	r := UserDicRecords{
+		{
+			Text:   "日本経済新聞",
+			Tokens: []string{"日本", "経済", "新聞"},
+			Yomi:   []string{"ニホン", "ケイザイ"},
+			Pos:    "カスタム名詞",
+		},
+	}
+	_, err := r.NewUserDic()
+	if err == nil {
+		t.Errorf("expected error, but nil")
+	}
+}
+
+func TestNewUserDicRecords04(t *testing.T) {
+	r := UserDicRecords{
+		{
+			Text:   "日本経済新聞",
+			Tokens: []string{"日本", "経済", "新聞"},
+			Yomi:   []string{"ニホン", "ケイザイ", "シンブン"},
+			Pos:    "カスタム名詞",
+		},
+		{
+			Text:   "日本経済新聞",
+			Tokens: []string{"日本", "経済", "新聞"},
+			Yomi:   []string{"ニホン", "ケイザイ", "シンブン"},
+			Pos:    "カスタム名詞",
+		},
+	}
+	_, err := r.NewUserDic()
+	if err == nil {
+		t.Errorf("expected error, but nil")
+	}
+}
+
 func TestUserDicRecordsLoadFromJSON(t *testing.T) {
 	var rec UserDicRecords
 	_ = json.Unmarshal([]byte(`[
