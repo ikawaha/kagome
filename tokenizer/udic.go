@@ -107,12 +107,12 @@ func (u UserDicRecords) NewUserDic() (UserDic, error) {
 	for _, r := range u {
 		k := strings.TrimSpace(r.Text)
 		if prev == k {
-			continue
+			return UserDic{}, fmt.Errorf("duplicated error, %+v", r)
 		}
 		prev = k
 		keys = append(keys, k)
 		if len(r.Tokens) == 0 || len(r.Tokens) != len(r.Yomi) {
-			return UserDic{}, fmt.Errorf("invalid format: %s", r)
+			return UserDic{}, fmt.Errorf("invalid format, %+v", r)
 		}
 		c := dic.UserDicContent{
 			Tokens: r.Tokens,
