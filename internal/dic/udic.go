@@ -35,11 +35,11 @@ type UserDic struct {
 	Contents []UserDicContent
 }
 
+// UserDicColumnSize is the column size of the user dictionary.
+const UserDicColumnSize = 4
+
 // NewUserDic build a user dictionary from a file.
 func NewUserDic(path string) (udic *UserDic, err error) {
-	const (
-		userDicColumnSize = 4
-	)
 	udic = new(UserDic)
 	f, err := os.Open(path)
 	if err != nil {
@@ -66,7 +66,7 @@ func NewUserDic(path string) (udic *UserDic, err error) {
 	var keys []string
 	for _, line := range text {
 		record := strings.Split(line, ",")
-		if len(record) != userDicColumnSize {
+		if len(record) != UserDicColumnSize {
 			err = fmt.Errorf("invalid format: %s", line)
 			return
 		}

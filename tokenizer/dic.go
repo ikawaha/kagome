@@ -21,11 +21,6 @@ type Dic struct {
 	dic *dic.Dic
 }
 
-// UserDic represents a user dictionary.
-type UserDic struct {
-	dic *dic.UserDic
-}
-
 // SysDic returns the system dictionary (IPA dictionary).
 func SysDic() Dic {
 	return Dic{dic.SysDic()}
@@ -45,10 +40,4 @@ func SysDicUni() Dic {
 func NewDic(path string) (Dic, error) {
 	d, err := dic.Load(path)
 	return Dic{d}, err
-}
-
-// NewUserDic build a user dictionary from a file.
-func NewUserDic(path string) (UserDic, error) {
-	d, err := dic.NewUserDic(path)
-	return UserDic{d}, err
 }
