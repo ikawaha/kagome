@@ -19,4 +19,5 @@ type Trie interface {
 	Search(input string) []int32
 	PrefixSearch(input string) (length int, output []int32)
 	CommonPrefixSearch(input string) (lens []int, outputs [][]int32)
+	CommonPrefixSearchCallback(input string, callback func(id, l int))
 }

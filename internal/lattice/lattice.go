@@ -126,29 +126,23 @@ func (la *Lattice) Build(inp string) {
 
 		// (1) USER DIC
 		if la.udic != nil {
-			lens, outputs := la.udic.Index.CommonPrefixSearch(inp[pos:])
-			for i, ids := range outputs {
-				for j := range ids {
-					la.addNode(runePos, ids[j], runePos,
-						USER, inp[pos:pos+lens[i]])
+			la.udic.Index.CommonPrefixSearchCallback(inp[pos:], func(id, l int) {
+				la.addNode(runePos, id, runePos, USER, inp[pos:pos+l])
+				if !anyMatches {
+					anyMatches = true
 				}
-			}
-			anyMatches = (len(lens) > 0)
+			})
 		}
 		if anyMatches {
 			continue
 		}
-
 		// (2) KNOWN DIC
-		if lens, outputs := la.dic.Index.CommonPrefixSearch(inp[pos:]); len(lens) > 0 {
-			anyMatches = true
-			for i, ids := range outputs {
-				for j := range ids {
-					la.addNode(runePos, ids[j], runePos,
-						KNOWN, inp[pos:pos+lens[i]])
-				}
+		la.dic.Index.CommonPrefixSearchCallback(inp[pos:], func(id, l int) {
+			la.addNode(runePos, id, runePos, KNOWN, inp[pos:pos+l])
+			if !anyMatches {
+				anyMatches = true
 			}
-		}
+		})
 		// (3) UNKNOWN DIC
 		class := la.dic.CharacterCategory(ch)
 		if !anyMatches || la.dic.InvokeList[int(class)] {
@@ -174,8 +168,7 @@ func (la *Lattice) Build(inp string) {
 				end := i + w
 				dup, _ := la.dic.UnkIndexDup[int32(class)]
 				for x := 0; x < int(dup)+1; x++ {
-					la.addNode(runePos, int(id)+x, runePos,
-						UNKNOWN, inp[pos:end])
+					la.addNode(runePos, int(id)+x, runePos, UNKNOWN, inp[pos:end])
 				}
 			}
 		}
