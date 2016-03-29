@@ -82,6 +82,44 @@ func TestCommonPrefixSearch(t *testing.T) {
 	}
 }
 
+func TestCommonPrefixSearchCallback(t *testing.T) {
+	sortedKeywords := []string{
+		"す",    //0
+		"すし",   //1
+		"すし",   //2
+		"すし",   //3
+		"すし",   //4
+		"すしめし", //5
+		"すしめし", //6
+	}
+	expected := []struct {
+		id, l int
+	}{
+		{0, 3},
+		{1, 6},
+		{2, 6},
+		{3, 6},
+		{4, 6},
+		{5, 12},
+		{6, 12},
+	}
+	idx, err := BuildIndexTable(sortedKeywords)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+
+	var i int
+	idx.CommonPrefixSearchCallback("すしめしたべた", func(id, l int) {
+		if expected[i].id != id {
+			t.Errorf("common prefix search callback id, got %v, expected %v", id, expected[i].id)
+		}
+		if expected[i].l != l {
+			t.Errorf("common prefix search callback len, got %v, expected %v", l, expected[i].l)
+		}
+		i++
+	})
+}
+
 func TestSearch(t *testing.T) {
 	sortedKeywords := []string{
 		"す",    //0
