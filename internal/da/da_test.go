@@ -135,7 +135,7 @@ func TestDaBuildAndCommonPrefixSearchCallback01(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	d.CommonPrefixSearchCallback("", func(id, l int) {
-		t.Errorf("unexpected callback, id:%v, l:%v")
+		t.Errorf("unexpected callback, id:%v, l:%v", id, l)
 	})
 }
 
@@ -145,7 +145,7 @@ func TestDaBuildAndCommonPrefixSearchCallback02(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	d.CommonPrefixSearchCallback("", func(id, l int) {
-		t.Errorf("unexpected callback, id:%v, l:%v")
+		t.Errorf("unexpected callback, id:%v, l:%v", id, l)
 	})
 }
 
