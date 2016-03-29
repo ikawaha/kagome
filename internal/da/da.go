@@ -112,10 +112,10 @@ func (d DoubleArray) CommonPrefixSearch(input string) (ids, lens []int) {
 
 // CommonPrefixSearchCallback finds keywords sharing common prefix in an input
 // and callback with id and length.
-func (d DoubleArray) CommonPrefixSearchCallback(input string, callback func(id, size int)) {
+func (d DoubleArray) CommonPrefixSearchCallback(input string, callback func(id, l int)) {
 	var p, q int
 	bufLen := len(d)
-	for i, size := 0, len(input); i < size; i++ {
+	for i := 0; i < len(input); i++ {
 		p = q
 		q = int(d[p].Base) + int(input[i])
 		if q >= bufLen || int(d[q].Check) != p {
