@@ -336,6 +336,11 @@ BOS
 EOS
 ```
 
+Contributing
+---
+
+Issues and pull requests are always welcome. Code changes are made to the develop branch. Do not make your changes against the master branch.
+
 License
 ---
 Kagome is licensed under the Apache License v2.0 and uses the MeCab-IPADIC, UniDic dictionary/statistical model. See NOTICE.txt for license details.
