@@ -75,6 +75,18 @@ func (idx IndexTable) CommonPrefixSearch(input string) (lens []int, ids [][]int)
 	return
 }
 
+// CommonPrefixSearchCallback finds keywords sharing common prefix in an input
+// and callback with id and length.
+func (idx IndexTable) CommonPrefixSearchCallback(input string, callback func(id, l int)) {
+	idx.Da.CommonPrefixSearchCallback(input, func(x, y int) {
+		dup := idx.Dup[int32(x)]
+		for i := x; i < x+int(dup)+1; i++ {
+			callback(i, y)
+		}
+	})
+	return
+}
+
 // Search finds the given keyword and returns the id if found.
 func (idx IndexTable) Search(input string) []int {
 	id, ok := idx.Da.Find(input)

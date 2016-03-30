@@ -129,6 +129,62 @@ func TestDaBuildAndCommonPrefixSearch03(t *testing.T) {
 	}
 }
 
+func TestDaBuildAndCommonPrefixSearchCallback01(t *testing.T) {
+	d, err := Build(nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	d.CommonPrefixSearchCallback("", func(id, l int) {
+		t.Errorf("unexpected callback, id:%v, l:%v", id, l)
+	})
+}
+
+func TestDaBuildAndCommonPrefixSearchCallback02(t *testing.T) {
+	d, err := Build([]string{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	d.CommonPrefixSearchCallback("", func(id, l int) {
+		t.Errorf("unexpected callback, id:%v, l:%v", id, l)
+	})
+}
+
+func TestDaBuildAndCommonPrefixSearchCallback03(t *testing.T) {
+	keywords := []string{
+		"電気通信",              //1
+		"電気",                //2
+		"電気通信大学",            //3
+		"電気通信大学院大学",         //4
+		"電気通信大学大学院",         //5
+		"電気通信大学大学院電気通信学研究科", //6
+		"電気通信大学電気通信学部",      //7
+	}
+	d, err := Build(keywords)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	expected := []struct {
+		id, l int
+	}{
+		{2, 3 * 2},  //"電気"
+		{1, 3 * 4},  //"電気通信"
+		{3, 3 * 6},  //"電気通信大学"
+		{5, 3 * 9},  //"電気通信大学大学院"
+		{6, 3 * 17}, //"電気通信大学大学院電気通信学研究科"
+	}
+
+	var i int
+	d.CommonPrefixSearchCallback("電気通信大学大学院電気通信学研究科", func(id, l int) {
+		if expected[i].id != id {
+			t.Errorf("id: got %v, expected %v", id, expected[i].id)
+		}
+		if expected[i].l != l {
+			t.Errorf("len: got %v, expected %v", l, expected[i].l)
+		}
+		i++
+	})
+}
+
 func TestDaBuildWithIDsAndCommonPrefixSearch01(t *testing.T) {
 	d, err := BuildWithIDs(nil, nil)
 	if err != nil {
