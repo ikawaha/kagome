@@ -33,7 +33,7 @@ const (
 	searchModeOtherPenalty   = 1700
 )
 
-// TokenizeMode represents how to tokenize sentencse.
+// TokenizeMode represents how to tokenize sentence.
 type TokenizeMode int
 
 const (

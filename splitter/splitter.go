@@ -30,7 +30,7 @@ type SentenceSplitter struct {
 
 var (
 	// default sentence splitter
-	defaultSpliter = &SentenceSplitter{
+	defaultSplitter = &SentenceSplitter{
 		Delim:               []rune{'。', '．', '！', '!', '？', '?'},
 		Follower:            []rune{'.', '｣', '」', '』', ')', '）', '｝', '}', '〉', '》'},
 		SkipWhiteSpace:      true,
@@ -39,9 +39,9 @@ var (
 	}
 )
 
-// ScanSentences is a split function for a bufio.Scanner that returns each sentece of text.
+// ScanSentences is a split function for a bufio.Scanner that returns each sentence of text.
 func ScanSentences(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	return defaultSpliter.ScanSentences(data, atEOF)
+	return defaultSplitter.ScanSentences(data, atEOF)
 }
 
 func (s SentenceSplitter) isDelim(r rune) bool {
@@ -62,7 +62,7 @@ func (s SentenceSplitter) isFollower(r rune) bool {
 	return false
 }
 
-// ScanSentences is a split function for a Scanner that returns each sentece of text.
+// ScanSentences is a split function for a Scanner that returns each sentence of text.
 func (s SentenceSplitter) ScanSentences(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if atEOF && len(data) == 0 {
 		return 0, nil, nil
