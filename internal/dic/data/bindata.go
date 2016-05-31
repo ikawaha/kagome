@@ -131,18 +131,18 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"dic/ipa/chardef.dic": dicIpaChardefDic,
+	"dic/ipa/chardef.dic":    dicIpaChardefDic,
 	"dic/ipa/connection.dic": dicIpaConnectionDic,
-	"dic/ipa/content.dic": dicIpaContentDic,
-	"dic/ipa/index.dic": dicIpaIndexDic,
-	"dic/ipa/morph.dic": dicIpaMorphDic,
-	"dic/ipa/unk.dic": dicIpaUnkDic,
-	"dic/uni/chardef.dic": dicUniChardefDic,
+	"dic/ipa/content.dic":    dicIpaContentDic,
+	"dic/ipa/index.dic":      dicIpaIndexDic,
+	"dic/ipa/morph.dic":      dicIpaMorphDic,
+	"dic/ipa/unk.dic":        dicIpaUnkDic,
+	"dic/uni/chardef.dic":    dicUniChardefDic,
 	"dic/uni/connection.dic": dicUniConnectionDic,
-	"dic/uni/content.dic": dicUniContentDic,
-	"dic/uni/index.dic": dicUniIndexDic,
-	"dic/uni/morph.dic": dicUniMorphDic,
-	"dic/uni/unk.dic": dicUniUnkDic,
+	"dic/uni/content.dic":    dicUniContentDic,
+	"dic/uni/index.dic":      dicUniIndexDic,
+	"dic/uni/morph.dic":      dicUniMorphDic,
+	"dic/uni/unk.dic":        dicUniUnkDic,
 }
 
 // AssetDir returns the file names below a certain
@@ -184,23 +184,24 @@ type bintree struct {
 	Func     func() (*asset, error)
 	Children map[string]*bintree
 }
+
 var _bintree = &bintree{nil, map[string]*bintree{
-	"dic": &bintree{nil, map[string]*bintree{
-		"ipa": &bintree{nil, map[string]*bintree{
-			"chardef.dic": &bintree{dicIpaChardefDic, map[string]*bintree{}},
-			"connection.dic": &bintree{dicIpaConnectionDic, map[string]*bintree{}},
-			"content.dic": &bintree{dicIpaContentDic, map[string]*bintree{}},
-			"index.dic": &bintree{dicIpaIndexDic, map[string]*bintree{}},
-			"morph.dic": &bintree{dicIpaMorphDic, map[string]*bintree{}},
-			"unk.dic": &bintree{dicIpaUnkDic, map[string]*bintree{}},
+	"dic": {nil, map[string]*bintree{
+		"ipa": {nil, map[string]*bintree{
+			"chardef.dic":    {dicIpaChardefDic, map[string]*bintree{}},
+			"connection.dic": {dicIpaConnectionDic, map[string]*bintree{}},
+			"content.dic":    {dicIpaContentDic, map[string]*bintree{}},
+			"index.dic":      {dicIpaIndexDic, map[string]*bintree{}},
+			"morph.dic":      {dicIpaMorphDic, map[string]*bintree{}},
+			"unk.dic":        {dicIpaUnkDic, map[string]*bintree{}},
 		}},
-		"uni": &bintree{nil, map[string]*bintree{
-			"chardef.dic": &bintree{dicUniChardefDic, map[string]*bintree{}},
-			"connection.dic": &bintree{dicUniConnectionDic, map[string]*bintree{}},
-			"content.dic": &bintree{dicUniContentDic, map[string]*bintree{}},
-			"index.dic": &bintree{dicUniIndexDic, map[string]*bintree{}},
-			"morph.dic": &bintree{dicUniMorphDic, map[string]*bintree{}},
-			"unk.dic": &bintree{dicUniUnkDic, map[string]*bintree{}},
+		"uni": {nil, map[string]*bintree{
+			"chardef.dic":    {dicUniChardefDic, map[string]*bintree{}},
+			"connection.dic": {dicUniConnectionDic, map[string]*bintree{}},
+			"content.dic":    {dicUniContentDic, map[string]*bintree{}},
+			"index.dic":      {dicUniIndexDic, map[string]*bintree{}},
+			"morph.dic":      {dicUniMorphDic, map[string]*bintree{}},
+			"unk.dic":        {dicUniUnkDic, map[string]*bintree{}},
 		}},
 	}},
 }}
@@ -251,4 +252,3 @@ func _filePath(dir, name string) string {
 	cannonicalName := strings.Replace(name, "\\", "/", -1)
 	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
-
