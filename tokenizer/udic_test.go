@@ -40,10 +40,10 @@ func TestNewUserDicIndex01(t *testing.T) {
 		ok  bool
 	}
 	callAndRespose := []tuple{
-		tuple{inp: "日本経済新聞", id: 0, ok: true},
-		tuple{inp: "朝青龍", id: 1, ok: true},
-		tuple{inp: "関西国際空港", id: 2, ok: true},
-		tuple{inp: "成田国際空港", id: 9, ok: false},
+		{inp: "日本経済新聞", id: 0, ok: true},
+		{inp: "朝青龍", id: 1, ok: true},
+		{inp: "関西国際空港", id: 2, ok: true},
+		{inp: "成田国際空港", id: 9, ok: false},
 	}
 	for _, cr := range callAndRespose {
 		if ids := udic.dic.Index.Search(cr.inp); (len(ids) != 0) != cr.ok {
