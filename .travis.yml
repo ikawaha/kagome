@@ -1,7 +1,7 @@
 language: go
 
 go:
-  - 1.6
+  - 1.6.3
 
 sudo: false
 cache: bundler
@@ -20,3 +20,5 @@ script:
   - cd internal/dic; go test -benchmem -bench .; cd ../..
   - /bin/sh ./go-coverall.sh
 
+after_success:
+  - codecov
