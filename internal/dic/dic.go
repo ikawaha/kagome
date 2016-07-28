@@ -131,7 +131,7 @@ func Load(path string) (d *Dic, err error) {
 			if e != nil {
 				return e
 			}
-			rc.Close()
+			defer rc.Close()
 			switch f.Name {
 			case "morph.dic":
 				if e = d.loadMorphDicPart(rc); e != nil {
