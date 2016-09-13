@@ -12,37 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// +build appengine
+
 package dic
 
 import (
-	"fmt"
-	"io"
-	"strings"
+	"bytes"
 )
 
-const (
-	rowDelimiter = "\n"
-	colDelimiter = "\a"
-)
-
-// Contents represents dictionary contents.
-type Contents [][]string
-
-// WriteTo implements the io.WriterTo interface
-func (c Contents) WriteTo(w io.Writer) (n int64, err error) {
-	for i := 0; i < len(c)-1; i++ {
-		x, e := fmt.Fprintf(w, "%s%s", strings.Join(c[i], colDelimiter), rowDelimiter)
-		if e != nil {
-			return
+// NewContents creates dictionary contents from byte slice
+func NewContents(b []byte) [][]string {
+	rows := bytes.Split(b, []byte(rowDelimiter))
+	m := make([][]string, len(rows))
+	for i, r := range rows {
+		cols := bytes.Split(r, []byte(colDelimiter))
+		m[i] = make([]string, len(cols))
+		for j, c := range cols {
+			m[i][j] = string(c)
 		}
-		n += int64(x)
 	}
-	if i := len(c) - 1; i > 0 {
-		x, e := fmt.Fprintf(w, "%s", strings.Join(c[i], colDelimiter))
-		if e != nil {
-			return n, e
-		}
-		n += int64(x)
-	}
-	return
+	return m
 }
