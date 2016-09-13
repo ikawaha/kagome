@@ -18,7 +18,10 @@ install:
 
 script:
   - go test ./...
+  - go test -tags=appengine ./...
   - cd tokenizer; go test -benchmem -bench .; cd ..
+  - cd tokenizer; go test -tags=appengine -benchmem -bench .; cd ..
   - cd internal/dic; go test -benchmem -bench .; cd ../..
+  - cd internal/dic; go test -tags=appengine -benchmem -bench .; cd ../..
   - /bin/sh ./go-coverall.sh
 

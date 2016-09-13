@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"io"
 	"strings"
-	"unsafe"
 )
 
 const (
@@ -50,11 +49,5 @@ func (c Contents) WriteTo(w io.Writer) (n int64, err error) {
 
 // NewContents creates dictionary contents from byte slice
 func NewContents(b []byte) [][]string {
-	str := *(*string)(unsafe.Pointer(&b))
-	rows := strings.Split(str, rowDelimiter)
-	m := make([][]string, len(rows))
-	for i, r := range rows {
-		m[i] = strings.Split(r, colDelimiter)
-	}
-	return m
+	return newContents(b)
 }
