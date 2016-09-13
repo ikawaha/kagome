@@ -21,8 +21,7 @@ import (
 	"unsafe"
 )
 
-// NewContents creates dictionary contents from byte slice
-func NewContents(b []byte) [][]string {
+func newContents(b []byte) [][]string {
 	str := *(*string)(unsafe.Pointer(&b))
 	rows := strings.Split(str, rowDelimiter)
 	m := make([][]string, len(rows))

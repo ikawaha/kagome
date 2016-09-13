@@ -46,3 +46,8 @@ func (c Contents) WriteTo(w io.Writer) (n int64, err error) {
 	}
 	return
 }
+
+// NewContents creates dictionary contents from byte slice
+func NewContents(b []byte) [][]string {
+	return newContents(b)
+}

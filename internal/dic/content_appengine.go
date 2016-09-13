@@ -20,8 +20,7 @@ import (
 	"bytes"
 )
 
-// NewContents creates dictionary contents from byte slice
-func NewContents(b []byte) [][]string {
+func newContents(b []byte) [][]string {
 	rows := bytes.Split(b, []byte(rowDelimiter))
 	m := make([][]string, len(rows))
 	for i, r := range rows {
