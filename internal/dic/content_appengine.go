@@ -17,18 +17,15 @@
 package dic
 
 import (
-	"bytes"
+	"strings"
 )
 
 func newContents(b []byte) [][]string {
-	rows := bytes.Split(b, []byte(rowDelimiter))
+	str := string(b)
+	rows := strings.Split(str, rowDelimiter)
 	m := make([][]string, len(rows))
 	for i, r := range rows {
-		cols := bytes.Split(r, []byte(colDelimiter))
-		m[i] = make([]string, len(cols))
-		for j, c := range cols {
-			m[i][j] = string(c)
-		}
+		m[i] = strings.Split(r, colDelimiter)
 	}
 	return m
 }
