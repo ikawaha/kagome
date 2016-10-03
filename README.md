@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ikawaha/kagome.svg?branch=master)](https://travis-ci.org/ikawaha/kagome) [![Coverage Status](https://coveralls.io/repos/ikawaha/kagome/badge.svg?branch=master&service=github)](https://coveralls.io/github/ikawaha/kagome?branch=master)  [![GoDoc](https://godoc.org/github.com/ikawaha/kagome?status.svg)](https://godoc.org/github.com/ikawaha/kagome)  [![BuildStatus(Windows)](https://ci.appveyor.com/api/projects/status/k4g4bpy1ijqoasbe/branch/master?svg=true)](https://ci.appveyor.com/project/ikawaha/kagome)
+[![Build Status](https://travis-ci.org/ikawaha/kagome.svg?branch=master)](https://travis-ci.org/ikawaha/kagome) [![BuildStatus(Windows)](https://ci.appveyor.com/api/projects/status/k4g4bpy1ijqoasbe/branch/master?svg=true)](https://ci.appveyor.com/project/ikawaha/kagome) [![Coverage Status](https://coveralls.io/repos/ikawaha/kagome/badge.svg?branch=master&service=github)](https://coveralls.io/github/ikawaha/kagome?branch=master)  [![GoDoc](https://godoc.org/github.com/ikawaha/kagome?status.svg)](https://godoc.org/github.com/ikawaha/kagome) [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
 Kagome Japanese Morphological Analyzer
 ===
@@ -335,6 +335,15 @@ BOS
 。      記号,句点,*,*,*,*,。,。,。
 EOS
 ```
+
+Working with Google App Engine
+---
+
+The system dictionary UniDic is too large to upload to Google App Engine.
+For Google App Engine, please use [kagome.ipadic](https://github.com/ikawaha/kagome.ipadic) which is small dictionary version of kagome.
+
+see details: https://github.com/ikawaha/kagome/issues/86
+
 
 Contributing
 ---
