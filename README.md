@@ -340,7 +340,7 @@ Working with Google App Engine
 ---
 
 The system dictionary UniDic is too large to upload to Google App Engine.
-For Google App Engine, please use [kagome.ipadic](https://github.com/ikawaha/kagome.ipadic) which is small dictionary version of kagome.
+For Google App Engine, please use [kagome.ipadic](https://github.com/ikawaha/kagome.ipadic) which is a small dictionary version of kagome.
 
 see details: https://github.com/ikawaha/kagome/issues/86
 
