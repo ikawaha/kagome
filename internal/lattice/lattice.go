@@ -107,7 +107,7 @@ func (la *Lattice) addNode(pos, id, start int, class NodeClass, surface string) 
 }
 
 // Build builds a lattice from the inputs.
-func (la *Lattice) Build(inp string) {
+func (la *Lattice) Build(inp string) error {
 	rc := utf8.RuneCountInString(inp)
 	la.Input = inp
 	if cap(la.list) < rc+2 {
@@ -150,9 +150,12 @@ func (la *Lattice) Build(inp string) {
 			unkWordLen := 1
 			if la.dic.GroupList[int(class)] {
 				for i, w, size := endPos, 1, len(inp); i < size; i += w {
-					var c rune
-					c, w = utf8.DecodeRuneInString(inp[i:])
-					if la.dic.CharacterCategory(c) != class {
+					var r rune
+					r, w = utf8.DecodeRuneInString(inp[i:])
+					if r == utf8.RuneError {
+						return fmt.Errorf("invalid encoding, pos:%d", i)
+					}
+					if la.dic.CharacterCategory(r) != class {
 						break
 					}
 					endPos += w
@@ -164,7 +167,11 @@ func (la *Lattice) Build(inp string) {
 			}
 			id := la.dic.UnkIndex[int32(class)]
 			for i, w := pos, 0; i < endPos; i += w {
-				_, w = utf8.DecodeRuneInString(inp[i:])
+				var r rune
+				r, w = utf8.DecodeRuneInString(inp[i:])
+				if r == utf8.RuneError {
+					return fmt.Errorf("invalid encoding, pos:%d", i)
+				}
 				end := i + w
 				dup, _ := la.dic.UnkIndexDup[int32(class)]
 				for x := 0; x < int(dup)+1; x++ {
@@ -173,7 +180,7 @@ func (la *Lattice) Build(inp string) {
 			}
 		}
 	}
-	return
+	return nil
 }
 
 // String returns a debug string of a lattice.

@@ -145,7 +145,10 @@ func command(opt *option) error {
 	scanner := bufio.NewScanner(fp)
 	for scanner.Scan() {
 		line := scanner.Text()
-		tokens := t.Analyze(line, mode)
+		tokens, err := t.Analyze(line, mode)
+		if err != nil {
+			fmt.Fprintf(ErrorWriter, "%v: %v\n", err, line)
+		}
 		for i, size := 1, len(tokens); i < size; i++ {
 			tok := tokens[i]
 			c := tok.Features()

@@ -151,7 +151,12 @@ func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "Extended":
 		mode = tokenizer.Extended
 	}
-	tokens := h.tokenizer.Analyze(body.Input, mode)
+	tokens, e := h.tokenizer.Analyze(body.Input, mode)
+	if e != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "{\"status\":false,\"error\":\"%v\"}", e)
+		return
+	}
 	var rsp []record
 	for _, tok := range tokens {
 		if tok.ID == tokenizer.BosEosID {
@@ -221,7 +226,6 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	)
 	var (
 		records []record
-		tokens  []tokenizer.Token
 		svg     string
 		cmdErr  string
 	)
@@ -247,7 +251,10 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 			cmdErr = "Error"
 			log.Printf("process done with error = %v", err)
 		}
-		tokens = h.tokenizer.AnalyzeGraph(sen, m, w0)
+		tokens, err := h.tokenizer.AnalyzeGraph(sen, m, w0)
+		if err != nil {
+			cmdErr = fmt.Sprintf("Error: Tokenize error, %v", err)
+		}
 		w0.Close()
 
 		done := make(chan error, 1)

@@ -30,7 +30,9 @@ func TestLatticeBuild01(t *testing.T) {
 	defer la.Free()
 
 	inp := ""
-	la.Build(inp)
+	if err := la.Build(inp); err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	if la.Input != inp {
 		t.Errorf("got %v, expected %v", la.Input, inp)
 	}
@@ -62,7 +64,9 @@ func TestLatticeBuild02(t *testing.T) {
 	defer la.Free()
 
 	inp := "あ"
-	la.Build(inp)
+	if err := la.Build(inp); err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	if la.Input != inp {
 		t.Errorf("got %v, expected %v", la.Input, inp)
 	}
@@ -122,7 +126,9 @@ func TestLatticeBuild03(t *testing.T) {
 	defer la.Free()
 
 	inp := "朝青龍"
-	la.Build(inp)
+	if err := la.Build(inp); err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	if la.Input != inp {
 		t.Errorf("got %v, expected %v", la.Input, inp)
 	}
@@ -150,7 +156,9 @@ func TestLatticeBuild04(t *testing.T) {
 	defer la.Free()
 
 	inp := "ポポピ"
-	la.Build(inp)
+	if err := la.Build(inp); err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	if la.Input != inp {
 		t.Errorf("got %v, expected %v", la.Input, inp)
 	}
@@ -213,7 +221,9 @@ func TestLatticeBuild05(t *testing.T) {
 			t.Fatalf("unexpected error: create the test input, %v", b.String())
 		}
 	}
-	la.Build(b.String())
+	if err := la.Build(b.String()); err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	for i := range la.list {
 		for j := range la.list[i] {
 			l := utf8.RuneCountInString(la.list[i][j].Surface)
@@ -257,7 +267,9 @@ func TestLatticeString(t *testing.T) {
 		t.Errorf("got %v, expected: %v", str, expected)
 	}
 
-	la.Build("わたしまけましたわ")
+	if err := la.Build("わたしまけましたわ"); err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	str = la.String()
 	if str == "" {
 		t.Errorf("got empty string")
@@ -284,7 +296,9 @@ node [shape=box, style=filled, fillcolor="#e8e8f0", fontname=Helvetica]
 		t.Errorf("got %v, expected: %v", b.String(), expected)
 	}
 	b.Reset()
-	la.Build("わたしまけましたわポポピ")
+	if err := la.Build("わたしまけましたわポポピ"); err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	la.Forward(Normal)
 	la.Backward(Normal)
 	la.Dot(&b)
@@ -308,7 +322,9 @@ func TestLatticeNewAndFree(t *testing.T) {
 		if len(la.list) != 0 {
 			t.Fatalf("unexpected error: lattice list initialize error, %+v", la.list)
 		}
-		la.Build("すべては科学する心に宿るのだ")
+		if err := la.Build("すべては科学する心に宿るのだ"); err != nil {
+			t.Fatalf("unexpected error, %v", err)
+		}
 		la.Free()
 
 		// renew
@@ -340,7 +356,10 @@ func TestForward(t *testing.T) {
 	la.Forward(Extended)
 
 	for _, m := range []TokenizeMode{Normal, Search, Extended} {
-		la.Build("わたしまけましたわ．関西国際空港．ポポポポポポポポポポ．\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363")
+		const inp = "わたしまけましたわ．関西国際空港．ポポポポポポポポポポ．\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363\U0001f363"
+		if err := la.Build(inp); err != nil {
+			t.Fatalf("unexpected error, %v", err)
+		}
 		la.Forward(m)
 	}
 }
@@ -357,7 +376,9 @@ func TestBackward01(t *testing.T) {
 	la.Backward(Extended)
 
 	for _, m := range []TokenizeMode{Normal, Search, Extended} {
-		la.Build("わたしまけましたわ．ポポピ")
+		if err := la.Build("わたしまけましたわ．ポポピ"); err != nil {
+			t.Fatalf("unexpected error, %v", err)
+		}
 		la.Forward(m)
 		la.Backward(m)
 	}
