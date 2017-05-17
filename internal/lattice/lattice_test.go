@@ -224,6 +224,30 @@ func TestLatticeBuild05(t *testing.T) {
 	}
 }
 
+func TestLatticeBuildInvalidInput(t *testing.T) {
+
+	la := New(dic.SysDic(), nil)
+	if la == nil {
+		t.Fatal("cannot new a lattice")
+	}
+	defer la.Free()
+
+	inp := "\x96\x7b\x93\xfa" // sjis encoding for '日本'
+	la.Build(inp)
+	if la.Input != inp {
+		t.Errorf("got %v, expected %v", la.Input, inp)
+	}
+	bos := node{ID: -1}
+	eos := node{ID: -1, Start: 4}
+	if len(la.list) != 6 {
+		t.Errorf("lattice initialize error: got %v, expected has 2 eos/bos nodes", la.list)
+	} else if len(la.list[0]) != 1 || *la.list[0][0] != bos {
+		t.Errorf("lattice initialize error: got %v, expected %v", *la.list[0][0], bos)
+	} else if len(la.list[len(la.list)-1]) != 1 || *la.list[len(la.list)-1][0] != eos {
+		t.Errorf("lattice initialize error: got %v, expected %v", *la.list[len(la.list)-1][0], eos)
+	}
+}
+
 func TestKanjiOnly01(t *testing.T) {
 	callAndResponse := []struct {
 		in  string
