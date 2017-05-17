@@ -28,7 +28,10 @@ const (
 
 func TestAnalyze01(t *testing.T) {
 	tnz := New()
-	tokens := tnz.Analyze("", Normal)
+	tokens, err := tnz.Analyze("", Normal)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
 		{ID: -1, Surface: "EOS"},
@@ -50,7 +53,10 @@ func TestAnalyze01(t *testing.T) {
 
 func TestAnalyze02(t *testing.T) {
 	tnz := New()
-	tokens := tnz.Analyze("関西国際空港", Normal)
+	tokens, err := tnz.Analyze("関西国際空港", Normal)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
 		{ID: 372977, Surface: "関西国際空港", Start: 0, End: 6, Class: TokenClass(lattice.KNOWN)},
@@ -78,7 +84,10 @@ func TestAnalyze03(t *testing.T) {
 		t.Fatalf("new user dic: unexpected error")
 	}
 	tnz.SetUserDic(udic)
-	tokens := tnz.Analyze("関西国際空港", Normal)
+	tokens, err := tnz.Analyze("関西国際空港", Normal)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
 		{ID: 2, Surface: "関西国際空港", Start: 0, End: 6, Class: TokenClass(lattice.USER)},
@@ -101,7 +110,10 @@ func TestAnalyze03(t *testing.T) {
 
 func TestAnalyze04(t *testing.T) {
 	tnz := New()
-	tokens := tnz.Analyze("ポポピ", Normal)
+	tokens, err := tnz.Analyze("ポポピ", Normal)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
 		{ID: 34, Surface: "ポポピ", Start: 0, End: 3, Class: TokenClass(lattice.UNKNOWN)},
@@ -122,11 +134,26 @@ func TestAnalyze04(t *testing.T) {
 
 }
 
+func TestTokenizeInvalidInput(t *testing.T) {
+	const inp = "\x96\x7b\x93\xfa" // sjis encoding for '日本'
+	tnz := New()
+	_, err := tnz.Tokenize(inp)
+	if err == nil {
+		t.Errorf("expected invalid input error, input: %s", inp)
+	}
+}
+
 func TestTokenize(t *testing.T) {
 	const input = "すもももももももものうち"
 	tnz := New()
-	x := tnz.Tokenize(input)
-	y := tnz.Analyze(input, Normal)
+	x, err := tnz.Tokenize(input)
+	if err != nil {
+		t.Fatalf("Tokenize(): unexpected error, %v", err)
+	}
+	y, err := tnz.Analyze(input, Normal)
+	if err != nil {
+		t.Fatalf("Analyze(): unexpected error, %v", err)
+	}
 	if !reflect.DeepEqual(x, y) {
 		t.Errorf("got %v, expected %v", x, y)
 	}
@@ -134,7 +161,10 @@ func TestTokenize(t *testing.T) {
 
 func TestSearcModeAnalyze01(t *testing.T) {
 	tnz := New()
-	tokens := tnz.Analyze("", Search)
+	tokens, err := tnz.Analyze("", Search)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
 		{ID: -1, Surface: "EOS"},
@@ -156,7 +186,10 @@ func TestSearcModeAnalyze01(t *testing.T) {
 
 func TestSearchModeAnalyze02(t *testing.T) {
 	tnz := New()
-	tokens := tnz.Analyze("関西国際空港", Search)
+	tokens, err := tnz.Analyze("関西国際空港", Search)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
 		{ID: 372968, Surface: "関西", Start: 0, End: 2, Class: TokenClass(lattice.KNOWN)},
@@ -187,7 +220,10 @@ func TestSearchModeAnalyze03(t *testing.T) {
 		t.Fatalf("new user dic: unexpected error")
 	}
 	tnz.SetUserDic(udic)
-	tokens := tnz.Analyze("関西国際空港", Search)
+	tokens, err := tnz.Analyze("関西国際空港", Search)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
 		{ID: 2, Surface: "関西国際空港", Start: 0, End: 6, Class: TokenClass(lattice.USER)},
@@ -210,7 +246,10 @@ func TestSearchModeAnalyze03(t *testing.T) {
 
 func TestSearchModeAnalyze04(t *testing.T) {
 	tnz := New()
-	tokens := tnz.Analyze("ポポピ", Search)
+	tokens, err := tnz.Analyze("ポポピ", Search)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
 		{ID: 34, Surface: "ポポピ", Start: 0, End: 3, Class: TokenClass(lattice.UNKNOWN)},
@@ -233,7 +272,10 @@ func TestSearchModeAnalyze04(t *testing.T) {
 
 func TestExtendedModeAnalyze01(t *testing.T) {
 	tnz := New()
-	tokens := tnz.Analyze("", Extended)
+	tokens, err := tnz.Analyze("", Extended)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
 		{ID: -1, Surface: "EOS"},
@@ -255,7 +297,10 @@ func TestExtendedModeAnalyze01(t *testing.T) {
 
 func TestExtendedModeAnalyze02(t *testing.T) {
 	tnz := New()
-	tokens := tnz.Analyze("関西国際空港", Extended)
+	tokens, err := tnz.Analyze("関西国際空港", Extended)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
 		{ID: 372968, Surface: "関西", Start: 0, End: 2, Class: TokenClass(lattice.KNOWN)},
@@ -285,7 +330,10 @@ func TestExtendedModeAnalyze03(t *testing.T) {
 		t.Fatalf("new user dic: unexpected error")
 	}
 	tnz.SetUserDic(udic)
-	tokens := tnz.Analyze("関西国際空港", Extended)
+	tokens, err := tnz.Analyze("関西国際空港", Extended)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
 		{ID: 2, Surface: "関西国際空港", Start: 0, End: 6, Class: TokenClass(lattice.USER)},
@@ -308,7 +356,10 @@ func TestExtendedModeAnalyze03(t *testing.T) {
 
 func TestExtendedModeAnalyze04(t *testing.T) {
 	tnz := New()
-	tokens := tnz.Analyze("ポポピ", Extended)
+	tokens, err := tnz.Analyze("ポポピ", Extended)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
 		{ID: 34, Surface: "ポ", Start: 0, End: 1, Class: TokenClass(lattice.DUMMY)},

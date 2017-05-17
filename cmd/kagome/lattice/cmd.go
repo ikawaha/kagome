@@ -121,7 +121,11 @@ func command(opt *option) error {
 		}
 	}
 
-	tokens := t.Dot(opt.input, out)
+	tokens, err := t.Dot(opt.input, out)
+	if err != nil {
+		fmt.Fprintln(ErrorWriter, err)
+		os.Exit(1)
+	}
 	if opt.verbose {
 		for i, size := 1, len(tokens); i < size; i++ {
 			tok := tokens[i]

@@ -63,15 +63,17 @@ func (t *Tokenizer) SetUserDic(d UserDic) {
 }
 
 // Tokenize analyze a sentence in standard tokenize mode.
-func (t Tokenizer) Tokenize(input string) []Token {
+func (t Tokenizer) Tokenize(input string) ([]Token, error) {
 	return t.Analyze(input, Normal)
 }
 
 // Analyze tokenizes a sentence in the specified mode.
-func (t Tokenizer) Analyze(input string, mode TokenizeMode) (tokens []Token) {
+func (t Tokenizer) Analyze(input string, mode TokenizeMode) ([]Token, error) {
 	la := lattice.New(t.dic, t.udic)
 	defer la.Free()
-	la.Build(input)
+	if err := la.Build(input); err != nil {
+		return nil, err
+	}
 	m := lattice.Normal
 	switch mode {
 	case Normal:
@@ -84,7 +86,7 @@ func (t Tokenizer) Analyze(input string, mode TokenizeMode) (tokens []Token) {
 	la.Forward(m)
 	la.Backward(m)
 	size := len(la.Output)
-	tokens = make([]Token, 0, size)
+	tokens := make([]Token, 0, size)
 	for i := range la.Output {
 		n := la.Output[size-1-i]
 		tok := Token{
@@ -105,19 +107,21 @@ func (t Tokenizer) Analyze(input string, mode TokenizeMode) (tokens []Token) {
 		}
 		tokens = append(tokens, tok)
 	}
-	return
+	return tokens, nil
 }
 
 // Dot returns morphs of a sentence and exports a lattice graph to dot format in standard tokenize mode.
-func (t Tokenizer) Dot(input string, w io.Writer) (tokens []Token) {
+func (t Tokenizer) Dot(input string, w io.Writer) ([]Token, error) {
 	return t.AnalyzeGraph(input, Normal, w)
 }
 
 // AnalyzeGraph returns morphs of a sentence and exports a lattice graph to dot format.
-func (t Tokenizer) AnalyzeGraph(input string, mode TokenizeMode, w io.Writer) (tokens []Token) {
+func (t Tokenizer) AnalyzeGraph(input string, mode TokenizeMode, w io.Writer) ([]Token, error) {
 	la := lattice.New(t.dic, t.udic)
 	defer la.Free()
-	la.Build(input)
+	if err := la.Build(input); err != nil {
+		return nil, err
+	}
 	m := lattice.Normal
 	switch mode {
 	case Normal:
@@ -130,7 +134,7 @@ func (t Tokenizer) AnalyzeGraph(input string, mode TokenizeMode, w io.Writer) (t
 	la.Forward(m)
 	la.Backward(m)
 	size := len(la.Output)
-	tokens = make([]Token, 0, size)
+	tokens := make([]Token, 0, size)
 	for i := range la.Output {
 		n := la.Output[size-1-i]
 		tok := Token{
@@ -152,5 +156,5 @@ func (t Tokenizer) AnalyzeGraph(input string, mode TokenizeMode, w io.Writer) (t
 		tokens = append(tokens, tok)
 	}
 	la.Dot(w)
-	return
+	return tokens, nil
 }
