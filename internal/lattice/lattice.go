@@ -146,7 +146,12 @@ func (la *Lattice) Build(inp string) {
 		// (3) UNKNOWN DIC
 		class := la.dic.CharacterCategory(ch)
 		if !anyMatches || la.dic.InvokeList[int(class)] {
-			endPos := pos + utf8.RuneLen(ch)
+			var endPos int
+			if ch != utf8.RuneError {
+				endPos = pos + utf8.RuneLen(ch)
+			} else {
+				endPos = pos + 1
+			}
 			unkWordLen := 1
 			if la.dic.GroupList[int(class)] {
 				for i, w, size := endPos, 1, len(inp); i < size; i += w {
