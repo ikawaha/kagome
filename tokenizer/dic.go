@@ -26,9 +26,19 @@ func SysDic() Dic {
 	return Dic{dic.SysDic()}
 }
 
+// SysDic returns the system dictionary (IPA dictionary w/o contents).
+func SysDicSimple() Dic {
+	return Dic{dic.SysDicSimple()}
+}
+
 // SysDicIPA returns the IPA dictionary as the system dictionary.
 func SysDicIPA() Dic {
 	return Dic{dic.SysDicIPA()}
+}
+
+// SysDicIPASimple returns the simple IPA dictionary as the system dictionary (w/o contents).
+func SysDicIPASimple() Dic {
+	return Dic{dic.SysDicIPASimple()}
 }
 
 // SysDicUni returns the UniDic dictionary as the system dictionary.
@@ -36,8 +46,19 @@ func SysDicUni() Dic {
 	return Dic{dic.SysDicUni()}
 }
 
+// SysDicUniSimple returns the simple UniDic dictionary as the system dictionary (w/o contents).
+func SysDicUniSimple() Dic {
+	return Dic{dic.SysDicUniSimple()}
+}
+
 // NewDic loads a dictionary from a file.
 func NewDic(path string) (Dic, error) {
-	d, err := dic.Load(path)
+	d, err := dic.Load(path, true)
+	return Dic{d}, err
+}
+
+// NewDic loads a dictionary from a file w/o contents.
+func NewDicSimple(path string) (Dic, error) {
+	d, err := dic.Load(path, false)
 	return Dic{d}, err
 }

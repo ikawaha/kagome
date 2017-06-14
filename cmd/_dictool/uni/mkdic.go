@@ -18,6 +18,7 @@ import (
 	"archive/zip"
 	"bufio"
 	"bytes"
+	"compress/flate"
 	"encoding/csv"
 	"encoding/gob"
 	"fmt"
@@ -30,6 +31,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ikawaha/kagome/cmd/_dictool/splitfile"
 	"github.com/ikawaha/kagome/internal/dic"
 )
 
@@ -40,6 +42,7 @@ const (
 
 	uniDicArchiveFileName    = "uni.dic"
 	uniDicMorphFileName      = "morph.dic"
+	uniDicPOSFileName        = "pos.dic"
 	uniDicContentFileName    = "content.dic"
 	uniDicIndexFileName      = "index.dic"
 	uniDicConnectionFileName = "connection.dic"
@@ -51,7 +54,8 @@ const (
 	uniMorphRecordLeftIDIndex             = 1
 	uniMorphRecordRightIDIndex            = 2
 	uniMorphRecordWeightIndex             = 3
-	uniMorphRecordOtherContentsStartIndex = 4
+	uniMorphRecordPOSRecordStartIndex     = 4
+	uniMorphRecordOtherContentsStartIndex = 10
 
 	uniUnkRecordSize                    = 10
 	uniUnkRecordCategoryIndex           = 0
@@ -63,6 +67,7 @@ const (
 
 type UniDic struct {
 	Morphs       []dic.Morph
+	POSTable     dic.POSTable
 	Contents     [][]string
 	Index        dic.IndexTable
 	Connection   dic.ConnectionTable
@@ -85,320 +90,168 @@ type uniDicPath struct {
 	Unk        string
 }
 
-func loadUniDic(path uniDicPath) (d *UniDic, err error) {
-	d = new(UniDic)
-	if err = func() error {
-		f, e := os.Open(path.Morph)
-		if e != nil {
-			return e
-		}
-		dec := gob.NewDecoder(f)
-		if e = dec.Decode(&d.Morphs); e != nil {
-			return e
-		}
-		if e = dec.Decode(&d.Contents); e != nil {
-			return e
-		}
-		return nil
-	}(); err != nil {
-		return
-	}
-	if err = func() error {
-		f, e := os.Open(path.Index)
-		if e != nil {
-			return e
-		}
-		idx, e := dic.ReadIndexTable(f)
-		if e != nil {
-			return e
-		}
-		d.Index = idx
-		return nil
-	}(); err != nil {
-		return
-	}
-	if err = func() error {
-		f, e := os.Open(path.Connection)
-		if e != nil {
-			return e
-		}
-		dec := gob.NewDecoder(f)
-		if e = dec.Decode(&d.Connection); e != nil {
-			return e
-		}
-		return nil
-	}(); err != nil {
-		return
-	}
-
-	if err = func() error {
-		f, e := os.Open(path.CharDef)
-		if e != nil {
-			return e
-		}
-		dec := gob.NewDecoder(f)
-		if e = dec.Decode(&d.CharClass); e != nil {
-			return e
-		}
-		if e = dec.Decode(&d.CharCategory); e != nil {
-			return e
-		}
-		if e = dec.Decode(&d.InvokeList); e != nil {
-			return e
-		}
-		if e = dec.Decode(&d.GroupList); e != nil {
-			return e
-		}
-		return nil
-	}(); err != nil {
-		return
-	}
-
-	if err = func() error {
-		f, e := os.Open(path.Unk)
-		if e != nil {
-			return e
-		}
-		dec := gob.NewDecoder(f)
-		if e = dec.Decode(&d.UnkMorphs); e != nil {
-			return e
-		}
-		if e = dec.Decode(&d.UnkIndex); e != nil {
-			return e
-		}
-		if e = dec.Decode(&d.UnkIndexDup); e != nil {
-			return e
-		}
-		if e = dec.Decode(&d.UnkContents); e != nil {
-			return e
-		}
-		return nil
-	}(); err != nil {
-		return
-	}
-	return
-}
-
 type uniMorphRecordSlice [][]string
 
 func (p uniMorphRecordSlice) Len() int           { return len(p) }
 func (p uniMorphRecordSlice) Less(i, j int) bool { return p[i][0] < p[j][0] }
 func (p uniMorphRecordSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
-func saveUniDic(d *UniDic, base string, archive bool) (err error) {
+func saveUniDic(d *UniDic, base string, archive bool) error {
 	var zw *zip.Writer
+	p := path.Join(base, uniDicArchiveFileName)
 	if archive {
-		p := path.Join(base, uniDicArchiveFileName)
-		f, e := os.Create(p)
-		if e != nil {
-			return e
+		f, err := os.Create(p)
+		if err != nil {
+			return err
 		}
 		defer f.Close()
 		zw = zip.NewWriter(f)
+	} else {
+		f, err := splitfile.Open(p, 20*1024*1024) // 10MB
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		zw = zip.NewWriter(f)
+		zw.RegisterCompressor(zip.Deflate, func(out io.Writer) (io.WriteCloser, error) {
+			return flate.NewWriter(out, flate.NoCompression)
+		})
+		if err != nil {
+			return err
+		}
+
 	}
 
-	if err = func() (e error) {
-		p := path.Join(base, uniDicMorphFileName)
-		var out io.Writer
-		if archive {
-			out, e = zw.Create(p)
-			if e != nil {
-				return
-			}
-		} else {
-			var f *os.File
-			if f, e = os.OpenFile(p, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0666); e != nil {
-				return
-			}
-			defer f.Close()
-			out = f
+	if err := func() error {
+		out, err := zw.Create(uniDicMorphFileName)
+		if err != nil {
+			return err
 		}
-		if _, e = dic.MorphSlice(d.Morphs).WriteTo(out); e != nil {
-			return
-		}
-		return
+		_, err = dic.MorphSlice(d.Morphs).WriteTo(out)
+		return err
 	}(); err != nil {
-		return
+		return err
 	}
 
-	if err = func() (e error) {
-		p := path.Join(base, uniDicContentFileName)
-		var out io.Writer
-		if archive {
-			out, e = zw.Create(p)
-			if e != nil {
-				return
-			}
-		} else {
-			var f *os.File
-			if f, e = os.OpenFile(p, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0666); e != nil {
-				return
-			}
-			defer f.Close()
-			out = f
+	if err := func() (e error) {
+		out, err := zw.Create(uniDicPOSFileName)
+		if err != nil {
+			return err
 		}
-		if _, e = dic.Contents(d.Contents).WriteTo(out); e != nil {
-			return
-		}
-		return
+		_, err = dic.POSTable(d.POSTable).WriteTo(out)
+		return err
 	}(); err != nil {
-		return
+		return err
 	}
 
-	if err = func() (e error) {
-		p := path.Join(base, uniDicIndexFileName)
-		var out io.Writer
-		if archive {
-			if out, e = zw.Create(p); e != nil {
-				return
-			}
-
-		} else {
-			var f *os.File
-			if f, e = os.OpenFile(p, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0666); e != nil {
-				return
-			}
-			defer f.Close()
-			out = f
+	if err := func() error {
+		out, err := zw.Create(uniDicContentFileName)
+		if err != nil {
+			return err
 		}
-		if _, e := d.Index.WriteTo(out); e != nil {
-			return e
-		}
-		return nil
+		_, err = dic.Contents(d.Contents).WriteTo(out)
+		return err
 	}(); err != nil {
-		return
+		return err
 	}
 
-	if err = func() (e error) {
-		p := path.Join(base, uniDicConnectionFileName)
-		var out io.Writer
-		if archive {
-			if out, e = zw.Create(p); e != nil {
-				return
-			}
-
-		} else {
-			var f *os.File
-			if f, e = os.OpenFile(p, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0666); e != nil {
-				return
-			}
-			defer f.Close()
-			out = f
+	if err := func() error {
+		out, err := zw.Create(uniDicIndexFileName)
+		if err != nil {
+			return err
 		}
-		if _, e = d.Connection.WriteTo(out); e != nil {
-			return e
-		}
-		// var buf bytes.Buffer
-		// enc := gob.NewEncoder(&buf)
-		// if e = enc.Encode(d.Connection); e != nil {
-		// 	return e
-		// }
-		// if _, e = buf.WriteTo(out); e != nil {
-		// 	return e
-		// }
-		return e
+		_, err = d.Index.WriteTo(out)
+		return err
 	}(); err != nil {
-		return
+		return err
 	}
 
-	if err = func() (e error) {
-		p := path.Join(base, uniDicCharDefFileName)
-		var out io.Writer
-		if archive {
-			if out, e = zw.Create(p); e != nil {
-				return
-			}
-
-		} else {
-			var f *os.File
-			if f, e = os.OpenFile(p, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0666); e != nil {
-				return
-			}
-			defer f.Close()
-			out = f
+	if err := func() error {
+		out, err := zw.Create(uniDicConnectionFileName)
+		if err != nil {
+			return err
 		}
+		_, err = d.Connection.WriteTo(out)
+		return err
+	}(); err != nil {
+		return err
+	}
+
+	if err := func() error {
+		out, err := zw.Create(uniDicCharDefFileName)
+		if err != nil {
+			return err
+		}
+
 		var buf bytes.Buffer
 		enc := gob.NewEncoder(&buf)
-		if e = enc.Encode(d.CharClass); e != nil {
-			return e
+		if err := enc.Encode(d.CharClass); err != nil {
+			return err
 		}
-		if _, e = buf.WriteTo(out); e != nil {
-			return e
+		if _, err := buf.WriteTo(out); err != nil {
+			return err
 		}
-		if e = enc.Encode(d.CharCategory); e != nil {
-			return e
+		if err := enc.Encode(d.CharCategory); err != nil {
+			return err
 		}
-		if _, e = buf.WriteTo(out); e != nil {
-			return e
+		if _, err := buf.WriteTo(out); err != nil {
+			return err
 		}
-		if e = enc.Encode(d.InvokeList); e != nil {
-			return e
+		if err := enc.Encode(d.InvokeList); err != nil {
+			return err
 		}
-		if _, e = buf.WriteTo(out); e != nil {
-			return e
+		if _, err := buf.WriteTo(out); err != nil {
+			return err
 		}
-		if e = enc.Encode(d.GroupList); e != nil {
-			return e
+		if err := enc.Encode(d.GroupList); err != nil {
+			return err
 		}
-		if _, e = buf.WriteTo(out); e != nil {
-			return e
+		if _, err := buf.WriteTo(out); err != nil {
+			return err
 		}
 		return nil
 	}(); err != nil {
-		return
+		return err
 	}
 
-	if err = func() (e error) {
-		p := path.Join(base, uniDicUnkFileName)
-		var out io.Writer
-		if archive {
-			if out, e = zw.Create(p); e != nil {
-				return
-			}
-
-		} else {
-			var f *os.File
-			if f, e = os.OpenFile(p, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0666); e != nil {
-				return
-			}
-			defer f.Close()
-			out = f
+	if err := func() error {
+		out, err := zw.Create(uniDicUnkFileName)
+		if err != nil {
+			return err
 		}
+
 		var buf bytes.Buffer
 		enc := gob.NewEncoder(&buf)
-		if e = enc.Encode(d.UnkMorphs); e != nil {
-			return e
+		if err := enc.Encode(d.UnkMorphs); err != nil {
+			return err
 		}
-		if _, e = buf.WriteTo(out); e != nil {
-			return e
+		if _, err := buf.WriteTo(out); err != nil {
+			return err
 		}
-		if e = enc.Encode(d.UnkIndex); e != nil {
-			return e
+		if err := enc.Encode(d.UnkIndex); err != nil {
+			return err
 		}
-		if _, e = buf.WriteTo(out); e != nil {
-			return e
+		if _, err := buf.WriteTo(out); err != nil {
+			return err
 		}
-		if err = enc.Encode(d.UnkIndexDup); err != nil {
-			return e
+		if err := enc.Encode(d.UnkIndexDup); err != nil {
+			return err
 		}
-		if _, e = buf.WriteTo(out); e != nil {
-			return e
+		if _, err := buf.WriteTo(out); err != nil {
+			return err
 		}
-		if e = enc.Encode(d.UnkContents); e != nil {
-			return e
+		if err := enc.Encode(d.UnkContents); err != nil {
+			return err
 		}
-		if _, e = buf.WriteTo(out); e != nil {
-			return e
+		if _, err := buf.WriteTo(out); err != nil {
+			return err
 		}
 		return nil
 	}(); err != nil {
-		return
+		return err
 	}
 
-	if archive {
-		err = zw.Close()
-	}
-	return
+	return zw.Close()
 }
 
 func buildUniDic(mecabPath, neologdPath string) (d *UniDic, err error) {
@@ -465,8 +318,14 @@ func buildUniDic(mecabPath, neologdPath string) (d *UniDic, err error) {
 	sort.Sort(records)
 	d = new(UniDic)
 	d.Morphs = make([]dic.Morph, 0, len(records))
+	d.POSTable = dic.POSTable{
+		POSs: make([]dic.POS, 0, len(records)),
+	}
 	d.Contents = make([][]string, 0, len(records))
-	var keywords []string
+	var (
+		keywords []string
+		posMap   = make(dic.POSMap)
+	)
 	for _, rec := range records {
 		keywords = append(keywords, rec[uniMrophRecordSurfaceIndex])
 		var l, r, w int
@@ -481,8 +340,12 @@ func buildUniDic(mecabPath, neologdPath string) (d *UniDic, err error) {
 		}
 		m := dic.Morph{LeftID: int16(l), RightID: int16(r), Weight: int16(w)}
 		d.Morphs = append(d.Morphs, m)
+		d.POSTable.POSs = append(d.POSTable.POSs, posMap.Add(
+			rec[uniMorphRecordPOSRecordStartIndex:uniMorphRecordOtherContentsStartIndex]),
+		)
 		d.Contents = append(d.Contents, rec[uniMorphRecordOtherContentsStartIndex:])
 	}
+	d.POSTable.NameList = posMap.List()
 
 	if d.Index, err = dic.BuildIndexTable(keywords); err != nil {
 		return

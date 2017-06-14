@@ -30,14 +30,14 @@ func TestSystemDic(t *testing.T) {
 }
 
 func TestSystemDicIPAPath01(t *testing.T) {
-	expected := "dic/ipa"
+	expected := "dic/ipa/ipa.dic"
 	if IPADicPath != expected {
 		t.Errorf("got %v, expected %v\n", IPADicPath, expected)
 	}
 }
 
 func TestSystemDicUniPath01(t *testing.T) {
-	expected := "dic/uni"
+	expected := "dic/uni/uni.dic"
 	if UniDicPath != expected {
 		t.Errorf("got %v, expected %v\n", UniDicPath, expected)
 	}
@@ -753,12 +753,24 @@ func TestSystemDicUniGroupList01(t *testing.T) {
 
 func BenchmarkSysDicIPA(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		loadInternalSysDic(IPADicPath)
+		loadInternalSysDic(IPADicPath, true)
+	}
+}
+
+func BenchmarkSysDicIPASimple(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		loadInternalSysDic(IPADicPath, false)
 	}
 }
 
 func BenchmarkSysDicUni(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		loadInternalSysDic(UniDicPath)
+		loadInternalSysDic(UniDicPath, true)
+	}
+}
+
+func BenchmarkSysDicUniSimple(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		loadInternalSysDic(UniDicPath, false)
 	}
 }

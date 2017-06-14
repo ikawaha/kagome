@@ -41,6 +41,83 @@ func TestTokenClassString(t *testing.T) {
 	}
 }
 
+func TestFeatures01(t *testing.T) {
+	tok := Token{
+		ID:      0,
+		Class:   TokenClass(lattice.KNOWN),
+		Start:   0,
+		End:     1,
+		Surface: "",
+	}
+	tok.dic = dic.SysDic()
+
+	f := tok.Features()
+	expected := []string{"名詞", "一般", "*", "*", "*", "*", "Tシャツ", "ティーシャツ", "ティーシャツ"}
+	if !reflect.DeepEqual(f, expected) {
+		t.Errorf("got %v, expected %v", f, expected)
+	}
+}
+
+func TestFeatures02(t *testing.T) {
+	tok := Token{
+		ID:      0,
+		Class:   TokenClass(lattice.UNKNOWN),
+		Start:   0,
+		End:     1,
+		Surface: "",
+	}
+	tok.dic = dic.SysDic()
+
+	f := tok.Features()
+	expected := []string{"名詞", "固有名詞", "地域", "一般", "*", "*", "*"}
+	if !reflect.DeepEqual(f, expected) {
+		t.Errorf("got %v, expected %v", f, expected)
+	}
+}
+
+func TestFeatures03(t *testing.T) {
+	tok := Token{
+		ID:      0,
+		Class:   TokenClass(lattice.USER),
+		Start:   0,
+		End:     1,
+		Surface: "",
+	}
+	tok.dic = dic.SysDic()
+	if udic, e := dic.NewUserDic("../_sample/userdic.txt"); e != nil {
+		t.Fatalf("build user dic error: %v", e)
+	} else {
+		tok.udic = udic
+	}
+
+	f := tok.Features()
+	expected := []string{"カスタム名詞", "日本/経済/新聞", "ニホン/ケイザイ/シンブン"}
+	if !reflect.DeepEqual(f, expected) {
+		t.Errorf("got %v, expected %v", f, expected)
+	}
+}
+
+func TestFeatures04(t *testing.T) {
+	tok := Token{
+		ID:      0,
+		Class:   DUMMY,
+		Start:   0,
+		End:     1,
+		Surface: "",
+	}
+	tok.dic = dic.SysDic()
+	if udic, e := dic.NewUserDic("../_sample/userdic.txt"); e != nil {
+		t.Fatalf("build user dic error: %v", e)
+	} else {
+		tok.udic = udic
+	}
+
+	f := tok.Features()
+	if len(f) != 0 {
+		t.Errorf("got %v, expected empty", f)
+	}
+}
+
 func TestFeaturesAndPos01(t *testing.T) {
 	tok := Token{
 		ID:      0,
@@ -72,7 +149,7 @@ func TestFeaturesAndPos02(t *testing.T) {
 	tok.dic = dic.SysDic()
 
 	f := tok.Features()
-	expected := []string{"名詞", "一般", "*", "*", "*", "*", "*"}
+	expected := []string{"名詞", "固有名詞", "地域", "一般", "*", "*", "*"}
 	if !reflect.DeepEqual(f, expected) {
 		t.Errorf("got %v, expected %v", f, expected)
 	}
