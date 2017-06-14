@@ -78,22 +78,15 @@ func TestLatticeBuild02(t *testing.T) {
 
 	expected := 4
 	if len(la.list[1]) != expected {
-		t.Errorf("lattice initialize error: got %v, expected %v", len(la.list[1]), expected)
-	} else {
-		l := la.list[1]
-		callAndResponse := []struct {
-			in  int
-			out node
-		}{
-			{in: 0, out: node{122, 0, KNOWN, 0, 3, 3, 5549, "あ", nil}},
-			{in: 1, out: node{123, 0, KNOWN, 0, 776, 776, 6690, "あ", nil}},
-			{in: 2, out: node{124, 0, KNOWN, 0, 2, 2, 4262, "あ", nil}},
-			{in: 3, out: node{125, 0, KNOWN, 0, 1118, 1118, 9035, "あ", nil}},
+		t.Fatalf("lattice initialize error: got %v, expected %v", len(la.list[1]), expected)
+	}
+	l := la.list[1]
+	for _, v := range l {
+		if v.Surface != inp {
+			t.Errorf("lattice initialize error: got %+v, expected surface %s", v, inp)
 		}
-		for _, cr := range callAndResponse {
-			if *l[cr.in] != cr.out {
-				t.Errorf("lattice initialize error: got %v, expected %v", l[cr.in], cr.out)
-			}
+		if v.Class != KNOWN {
+			t.Errorf("lattice initialize error: got %+v, expected class KNOWN", v)
 		}
 	}
 	if len(la.Output) != 0 {
@@ -166,26 +159,31 @@ func TestLatticeBuild04(t *testing.T) {
 
 	expected := 7
 	if len(la.list[1]) != expected {
-		t.Errorf("lattice initialize error: got %v, expected %v", len(la.list[1]), expected)
-	} else {
-		l := la.list[1]
-		callAndResponse := []struct {
-			in  int
-			out node
-		}{
-			{in: 0, out: node{98477, 0, KNOWN, 0, 1285, 1285, 4279, "ポ", nil}},
-			{in: 1, out: node{31, 0, UNKNOWN, 0, 1289, 1289, 13581, "ポ", nil}},
-			{in: 2, out: node{32, 0, UNKNOWN, 0, 1285, 1285, 9461, "ポ", nil}},
-			{in: 3, out: node{33, 0, UNKNOWN, 0, 1293, 1293, 13661, "ポ", nil}},
-			{in: 4, out: node{34, 0, UNKNOWN, 0, 1292, 1292, 10922, "ポ", nil}},
-			{in: 5, out: node{35, 0, UNKNOWN, 0, 1288, 1288, 10521, "ポ", nil}},
-			{in: 6, out: node{36, 0, UNKNOWN, 0, 3, 3, 14138, "ポ", nil}},
+		t.Fatalf("lattice initialize error: got %v, expected %v", len(la.list[1]), expected)
+	}
+	l := la.list[1]
+	var known, unknown, undef int
+	for _, v := range l {
+		if v.Surface != string([]rune(inp)[0:1]) {
+			t.Errorf("lattice initialize error: got %+v, expected surface %c", v, []rune(inp)[0])
 		}
-		for _, cr := range callAndResponse {
-			if *l[cr.in] != cr.out {
-				t.Errorf("lattice initialize error: got %v, expected %v", l[cr.in], cr.out)
-			}
+		switch v.Class {
+		case KNOWN:
+			known++
+		case UNKNOWN:
+			unknown++
+		default:
+			undef++
 		}
+	}
+	if known != 1 {
+		t.Errorf("lattice initialize error: got KNOWN %d, expected 1, %+v", known, l)
+	}
+	if unknown != 6 {
+		t.Errorf("lattice initialize error: got UNKNOWN %d, expected 6, %+v", unknown, l)
+	}
+	if undef != 0 {
+		t.Errorf("lattice initialize error: got unexpected class %d, %+v", undef, l)
 	}
 	if len(la.Output) != 0 {
 		t.Errorf("lattice initialize error: got %v, expected empty", la.Output)

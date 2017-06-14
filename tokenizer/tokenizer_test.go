@@ -169,8 +169,7 @@ func TestSearchModeAnalyze02(t *testing.T) {
 		t.Fatalf("got %v, expected %v", tokens, expected)
 	}
 	for i, tok := range tokens {
-		if tok.ID != expected[i].ID ||
-			tok.Class != expected[i].Class ||
+		if tok.Class != expected[i].Class ||
 			tok.Start != expected[i].Start ||
 			tok.End != expected[i].End ||
 			tok.Surface != expected[i].Surface {
@@ -267,8 +266,7 @@ func TestExtendedModeAnalyze02(t *testing.T) {
 		t.Fatalf("got %v, expected %v", tokens, expected)
 	}
 	for i, tok := range tokens {
-		if tok.ID != expected[i].ID ||
-			tok.Class != expected[i].Class ||
+		if tok.Class != expected[i].Class ||
 			tok.Start != expected[i].Start ||
 			tok.End != expected[i].End ||
 			tok.Surface != expected[i].Surface {

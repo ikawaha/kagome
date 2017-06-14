@@ -19,8 +19,8 @@ import (
 	"os"
 	"path"
 
-	"./ipa"
-	"./uni"
+	"github.com/ikawaha/kagome/cmd/_dictool/ipa"
+	"github.com/ikawaha/kagome/cmd/_dictool/uni"
 )
 
 var errorWriter = os.Stderr

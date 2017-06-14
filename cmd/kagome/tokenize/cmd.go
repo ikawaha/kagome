@@ -30,7 +30,7 @@ import (
 const (
 	CommandName  = "tokenize"
 	Description  = `command line tokenize`
-	usageMessage = "%s [-file input_file] [-dic dic_file] [-udic userdic_file] [-sysdic (ipa|uni)] [-mode (normal|search|extended)]\n"
+	usageMessage = "%s [-file input_file] [-dic dic_file] [-udic userdic_file] [-sysdic (ipa|uni)] [-sysdic_simple false] [-mode (normal|search|extended)]\n"
 )
 
 // ErrorWriter writes to stderr
@@ -44,6 +44,7 @@ type option struct {
 	dic     string
 	udic    string
 	sysdic  string
+	simple  bool
 	mode    string
 	flagSet *flag.FlagSet
 }
@@ -61,6 +62,7 @@ func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	o.flagSet.StringVar(&o.dic, "dic", "", "dic")
 	o.flagSet.StringVar(&o.udic, "udic", "", "user dic")
 	o.flagSet.StringVar(&o.sysdic, "sysdic", "ipa", "system dic type (ipa|uni)")
+	o.flagSet.BoolVar(&o.simple, "sysdic_simple", false, "use simple dic")
 	o.flagSet.StringVar(&o.mode, "mode", "normal", "tokenize mode (normal|search|extended)")
 
 	return
@@ -77,7 +79,8 @@ func (o *option) parse(args []string) (err error) {
 	if o.mode != "" && o.mode != "normal" && o.mode != "search" && o.mode != "extended" {
 		return fmt.Errorf("invalid argument: -mode %v\n", o.mode)
 	}
-	if o.sysdic != "" && o.sysdic != "ipa" && o.sysdic != "uni" {
+	if o.sysdic != "" && o.sysdic != "ipa" && o.sysdic != "ipa_simple" &&
+		o.sysdic != "uni" && o.sysdic != "uni_simple" {
 		return fmt.Errorf("invalid argument: -sysdic %v\n", o.sysdic)
 	}
 	return
@@ -97,11 +100,23 @@ func command(opt *option) error {
 	var dic tokenizer.Dic
 	if opt.dic == "" {
 		if opt.sysdic == "ipa" {
-			dic = tokenizer.SysDicIPA()
+			if opt.simple {
+				dic = tokenizer.SysDicIPASimple()
+			} else {
+				dic = tokenizer.SysDicIPA()
+			}
 		} else if opt.sysdic == "uni" {
-			dic = tokenizer.SysDicUni()
+			if opt.simple {
+				dic = tokenizer.SysDicUniSimple()
+			} else {
+				dic = tokenizer.SysDicUni()
+			}
 		} else {
-			dic = tokenizer.SysDic()
+			if opt.simple {
+				dic = tokenizer.SysDicSimple()
+			} else {
+				dic = tokenizer.SysDic()
+			}
 		}
 	} else {
 		var err error
