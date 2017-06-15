@@ -51,3 +51,13 @@ func (c Contents) WriteTo(w io.Writer) (n int64, err error) {
 func NewContents(b []byte) [][]string {
 	return newContents(b)
 }
+
+func newContents(b []byte) [][]string {
+	str := string(b)
+	rows := strings.Split(str, rowDelimiter)
+	m := make([][]string, len(rows))
+	for i, r := range rows {
+		m[i] = strings.Split(r, colDelimiter)
+	}
+	return m
+}
