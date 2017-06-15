@@ -68,7 +68,10 @@ func (t Token) Features() (features []string) {
 	case lattice.DUMMY:
 		return
 	case lattice.KNOWN:
-		features = t.dic.Contents[t.ID]
+		features = t.dic.POSTable.GetPOSName(t.dic.POSTable.POSs[t.ID])
+		if t.dic.Contents != nil {
+			features = append(features, t.dic.Contents[t.ID]...)
+		}
 	case lattice.UNKNOWN:
 		features = t.dic.UnkContents[t.ID]
 	case lattice.USER:

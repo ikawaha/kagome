@@ -29,15 +29,25 @@ func TestSystemDic(t *testing.T) {
 	}
 }
 
+func TestSystemDicSimple(t *testing.T) {
+	d := SysDicSimple()
+
+	const expected = 392126
+	c := len(d.Morphs)
+	if c != expected {
+		t.Errorf("got %v, expected %v\n", c, expected)
+	}
+}
+
 func TestSystemDicIPAPath01(t *testing.T) {
-	expected := "dic/ipa"
+	expected := "dic/ipa/ipa.dic"
 	if IPADicPath != expected {
 		t.Errorf("got %v, expected %v\n", IPADicPath, expected)
 	}
 }
 
 func TestSystemDicUniPath01(t *testing.T) {
-	expected := "dic/uni"
+	expected := "dic/uni/uni.dic"
 	if UniDicPath != expected {
 		t.Errorf("got %v, expected %v\n", UniDicPath, expected)
 	}
@@ -45,6 +55,15 @@ func TestSystemDicUniPath01(t *testing.T) {
 
 func TestSystemDicIPAMorphs01(t *testing.T) {
 	d := SysDicIPA()
+	const expected = 392126
+	c := len(d.Morphs)
+	if c != expected {
+		t.Errorf("got %v, expected %v\n", c, expected)
+	}
+}
+
+func TestSystemDicIPASimpleMorphs01(t *testing.T) {
+	d := SysDicIPASimple()
 	const expected = 392126
 	c := len(d.Morphs)
 	if c != expected {
@@ -61,6 +80,15 @@ func TestSystemDicUniMorphs01(t *testing.T) {
 	}
 }
 
+func TestSystemDicUniSimpleMorphs01(t *testing.T) {
+	d := SysDicUniSimple()
+	const expected = 756463
+	c := len(d.Morphs)
+	if c != expected {
+		t.Errorf("got %v, expected %v\n", c, expected)
+	}
+}
+
 func TestSystemDicIPAContents01(t *testing.T) {
 	d := SysDicIPA()
 	const expected = 392126
@@ -70,9 +98,27 @@ func TestSystemDicIPAContents01(t *testing.T) {
 	}
 }
 
+func TestSystemDicIPASimpleContents01(t *testing.T) {
+	d := SysDicIPASimple()
+	const expected = 0
+	c := len(d.Contents)
+	if c != expected {
+		t.Errorf("got %v, expected %v\n", c, expected)
+	}
+}
+
 func TestSystemDicUniContents01(t *testing.T) {
 	d := SysDicUni()
 	const expected = 756463
+	c := len(d.Contents)
+	if c != expected {
+		t.Errorf("got %v, expected %v\n", c, expected)
+	}
+}
+
+func TestSystemDicUniSimpleContents01(t *testing.T) {
+	d := SysDicUniSimple()
+	const expected = 0
 	c := len(d.Contents)
 	if c != expected {
 		t.Errorf("got %v, expected %v\n", c, expected)
@@ -753,12 +799,24 @@ func TestSystemDicUniGroupList01(t *testing.T) {
 
 func BenchmarkSysDicIPA(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		loadInternalSysDic(IPADicPath)
+		loadInternalSysDic(IPADicPath, true)
+	}
+}
+
+func BenchmarkSysDicIPASimple(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		loadInternalSysDic(IPADicPath, false)
 	}
 }
 
 func BenchmarkSysDicUni(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		loadInternalSysDic(UniDicPath)
+		loadInternalSysDic(UniDicPath, true)
+	}
+}
+
+func BenchmarkSysDicUniSimple(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		loadInternalSysDic(UniDicPath, false)
 	}
 }

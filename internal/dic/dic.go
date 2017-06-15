@@ -25,6 +25,7 @@ import (
 // Dic represents a dictionary of a tokenizer.
 type Dic struct {
 	Morphs       []Morph
+	POSTable     POSTable
 	Contents     [][]string
 	Connection   ConnectionTable
 	Index        IndexTable
@@ -52,6 +53,15 @@ func (d *Dic) loadMorphDicPart(r io.Reader) error {
 		return fmt.Errorf("dic initializer, Morphs: %v", e)
 	}
 	d.Morphs = m
+	return nil
+}
+
+func (d *Dic) loadPOSDicPart(r io.Reader) error {
+	p, e := ReadPOSTable(r)
+	if e != nil {
+		return fmt.Errorf("dic initializer, POSs: %v", e)
+	}
+	d.POSTable = p
 	return nil
 }
 
@@ -117,14 +127,17 @@ func (d *Dic) loadUnkDicPart(r io.Reader) error {
 }
 
 // Load loads a dictionary from a file.
-func Load(path string) (d *Dic, err error) {
-	d = new(Dic)
+func Load(path string, simple bool) (d *Dic, err error) {
 	r, err := zip.OpenReader(path)
 	if err != nil {
 		return d, err
 	}
 	defer r.Close()
+	return load(&r.Reader, simple)
+}
 
+func load(r *zip.Reader, full bool) (d *Dic, err error) {
+	d = new(Dic)
 	for _, f := range r.File {
 		if err = func() error {
 			rc, e := f.Open()
@@ -137,9 +150,15 @@ func Load(path string) (d *Dic, err error) {
 				if e = d.loadMorphDicPart(rc); e != nil {
 					return e
 				}
-			case "content.dic":
-				if e = d.loadContentDicPart(rc); e != nil {
+			case "pos.dic":
+				if e = d.loadPOSDicPart(rc); e != nil {
 					return e
+				}
+			case "content.dic":
+				if full {
+					if e = d.loadContentDicPart(rc); e != nil {
+						return e
+					}
 				}
 			case "index.dic":
 				if e = d.loadIndexDicPart(rc); e != nil {
@@ -157,6 +176,8 @@ func Load(path string) (d *Dic, err error) {
 				if e = d.loadUnkDicPart(rc); e != nil {
 					return e
 				}
+			default:
+				return fmt.Errorf("unknown file, %v", f.Name)
 			}
 			return nil
 		}(); err != nil {

@@ -49,9 +49,25 @@ func TestSysDicIPA(t *testing.T) {
 	}
 }
 
+func TestSysDicIPASimple(t *testing.T) {
+	a := SysDicIPASimple()
+	b := SysDicIPASimple()
+	if a.dic != b.dic {
+		t.Errorf("got %p and %p, expected singleton", a.dic, b.dic)
+	}
+}
+
 func TestSysDicUni(t *testing.T) {
 	a := SysDicUni()
 	b := SysDicUni()
+	if a.dic != b.dic {
+		t.Errorf("got %p and %p, expected singleton", a.dic, b.dic)
+	}
+}
+
+func TestSysDicUniSimple(t *testing.T) {
+	a := SysDicUniSimple()
+	b := SysDicUniSimple()
 	if a.dic != b.dic {
 		t.Errorf("got %p and %p, expected singleton", a.dic, b.dic)
 	}
