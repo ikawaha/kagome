@@ -2,6 +2,8 @@
 // sources:
 // dic/ipa/ipa.dic.000
 // dic/ipa/ipa.dic.001
+// dic/ipa/ipa.dic.002
+// dic/ipa/ipa.dic.003
 // dic/uni/uni.dic.000
 // dic/uni/uni.dic.001
 // dic/uni/uni.dic.002
@@ -11,6 +13,14 @@
 // dic/uni/uni.dic.006
 // dic/uni/uni.dic.007
 // dic/uni/uni.dic.008
+// dic/uni/uni.dic.009
+// dic/uni/uni.dic.00a
+// dic/uni/uni.dic.00b
+// dic/uni/uni.dic.00c
+// dic/uni/uni.dic.00d
+// dic/uni/uni.dic.00e
+// dic/uni/uni.dic.00f
+// dic/uni/uni.dic.010
 // DO NOT EDIT!
 
 package data
@@ -132,6 +142,8 @@ func AssetNames() []string {
 var _bindata = map[string]func() (*asset, error){
 	"dic/ipa/ipa.dic.000": dicIpaIpaDic000,
 	"dic/ipa/ipa.dic.001": dicIpaIpaDic001,
+	"dic/ipa/ipa.dic.002": dicIpaIpaDic002,
+	"dic/ipa/ipa.dic.003": dicIpaIpaDic003,
 	"dic/uni/uni.dic.000": dicUniUniDic000,
 	"dic/uni/uni.dic.001": dicUniUniDic001,
 	"dic/uni/uni.dic.002": dicUniUniDic002,
@@ -141,6 +153,14 @@ var _bindata = map[string]func() (*asset, error){
 	"dic/uni/uni.dic.006": dicUniUniDic006,
 	"dic/uni/uni.dic.007": dicUniUniDic007,
 	"dic/uni/uni.dic.008": dicUniUniDic008,
+	"dic/uni/uni.dic.009": dicUniUniDic009,
+	"dic/uni/uni.dic.00a": dicUniUniDic00a,
+	"dic/uni/uni.dic.00b": dicUniUniDic00b,
+	"dic/uni/uni.dic.00c": dicUniUniDic00c,
+	"dic/uni/uni.dic.00d": dicUniUniDic00d,
+	"dic/uni/uni.dic.00e": dicUniUniDic00e,
+	"dic/uni/uni.dic.00f": dicUniUniDic00f,
+	"dic/uni/uni.dic.010": dicUniUniDic010,
 }
 
 // AssetDir returns the file names below a certain
@@ -187,6 +207,8 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"ipa": &bintree{nil, map[string]*bintree{
 			"ipa.dic.000": &bintree{dicIpaIpaDic000, map[string]*bintree{}},
 			"ipa.dic.001": &bintree{dicIpaIpaDic001, map[string]*bintree{}},
+			"ipa.dic.002": &bintree{dicIpaIpaDic002, map[string]*bintree{}},
+			"ipa.dic.003": &bintree{dicIpaIpaDic003, map[string]*bintree{}},
 		}},
 		"uni": &bintree{nil, map[string]*bintree{
 			"uni.dic.000": &bintree{dicUniUniDic000, map[string]*bintree{}},
@@ -198,6 +220,14 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"uni.dic.006": &bintree{dicUniUniDic006, map[string]*bintree{}},
 			"uni.dic.007": &bintree{dicUniUniDic007, map[string]*bintree{}},
 			"uni.dic.008": &bintree{dicUniUniDic008, map[string]*bintree{}},
+			"uni.dic.009": &bintree{dicUniUniDic009, map[string]*bintree{}},
+			"uni.dic.00a": &bintree{dicUniUniDic00a, map[string]*bintree{}},
+			"uni.dic.00b": &bintree{dicUniUniDic00b, map[string]*bintree{}},
+			"uni.dic.00c": &bintree{dicUniUniDic00c, map[string]*bintree{}},
+			"uni.dic.00d": &bintree{dicUniUniDic00d, map[string]*bintree{}},
+			"uni.dic.00e": &bintree{dicUniUniDic00e, map[string]*bintree{}},
+			"uni.dic.00f": &bintree{dicUniUniDic00f, map[string]*bintree{}},
+			"uni.dic.010": &bintree{dicUniUniDic010, map[string]*bintree{}},
 		}},
 	}},
 }}
