@@ -107,7 +107,7 @@ func saveUniDic(d *UniDic, base string, archive bool) error {
 		defer f.Close()
 		zw = zip.NewWriter(f)
 	} else {
-		f, err := splitfile.Open(p, 20*1024*1024) // 10MB
+		f, err := splitfile.Open(p, 10*1024*1024) // 10MB
 		if err != nil {
 			return err
 		}

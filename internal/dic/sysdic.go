@@ -94,7 +94,9 @@ func loadInternalSysDicSimple(path string) (d *Dic) {
 }
 
 func loadInternalSysDic(path string, full bool) (d *Dic) {
-	var buf []byte
+	buf := make([]byte, 0, 36*1024*1024) // 36MB
+	defer func() { buf = nil }()
+
 	for i := 0; ; i++ {
 		b, err := data.Asset(path + fmt.Sprintf(".%03x", i))
 		if err != nil {
