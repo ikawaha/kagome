@@ -314,7 +314,7 @@ func TestCharCategory02(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	c := dic.CharacterCategory(rune(len(dic.CharCategory) + 1))
+	c := dic.CharacterCategory(rune(len(dic.CharCategory)))
 	expected := dic.CharCategory[0]
 	if c != expected {
 		t.Errorf("got %v, expected %v", c, expected)

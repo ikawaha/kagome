@@ -41,7 +41,7 @@ type Dic struct {
 
 // CharacterCategory returns the category of a rune.
 func (d Dic) CharacterCategory(r rune) byte {
-	if int(r) <= len(d.CharCategory) {
+	if int(r) < len(d.CharCategory) {
 		return d.CharCategory[r]
 	}
 	return d.CharCategory[0] // default
