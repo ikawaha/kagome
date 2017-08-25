@@ -21,6 +21,7 @@ import (
 	"io"
 )
 
+// POSTable represents a table for managing part of speeches.
 type POSTable struct {
 	POSs     []POS
 	NameList []string
@@ -32,7 +33,7 @@ type POSID int16
 // POS represents a vector of part of speech.
 type POS []POSID
 
-// String returns a vector of part of speech name.
+// GetPOSName returns a vector of part of speech name.
 func (p POSTable) GetPOSName(pos POS) []string {
 	ret := make([]string, 0, len(pos))
 	for _, id := range pos {
