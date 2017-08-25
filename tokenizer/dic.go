@@ -26,7 +26,7 @@ func SysDic() Dic {
 	return Dic{dic.SysDic()}
 }
 
-// SysDic returns the system dictionary (IPA dictionary w/o contents).
+// SysDicSimple returns the system dictionary (IPA dictionary w/o contents).
 func SysDicSimple() Dic {
 	return Dic{dic.SysDicSimple()}
 }
@@ -57,7 +57,7 @@ func NewDic(path string) (Dic, error) {
 	return Dic{d}, err
 }
 
-// NewDic loads a dictionary from a file w/o contents.
+// NewDicSimple loads a dictionary from a file w/o contents.
 func NewDicSimple(path string) (Dic, error) {
 	d, err := dic.Load(path, false)
 	return Dic{d}, err

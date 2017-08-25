@@ -65,8 +65,8 @@ func BuildIndexTable(sortedKeywords []string) (IndexTable, error) {
 func (idx IndexTable) CommonPrefixSearch(input string) (lens []int, ids [][]int) {
 	seeds, lens := idx.Da.CommonPrefixSearch(input)
 	for _, id := range seeds {
-		dup, _ := idx.Dup[int32(id)]
-		list := make([]int, 1+dup, 1+dup)
+		dup := idx.Dup[int32(id)]
+		list := make([]int, 1+dup)
 		for i := 0; i < len(list); i++ {
 			list[i] = id + i
 		}
@@ -93,8 +93,8 @@ func (idx IndexTable) Search(input string) []int {
 	if !ok {
 		return nil
 	}
-	dup, _ := idx.Dup[int32(id)]
-	list := make([]int, 1+dup, 1+dup)
+	dup := idx.Dup[int32(id)]
+	list := make([]int, 1+dup)
 	for i := 0; i < len(list); i++ {
 		list[i] = id + i
 	}
@@ -103,7 +103,9 @@ func (idx IndexTable) Search(input string) []int {
 
 // WriteTo saves a index table.
 func (idx IndexTable) WriteTo(w io.Writer) (n int64, err error) {
-	n, err = idx.Da.WriteTo(w)
+	if n, err = idx.Da.WriteTo(w); err != nil {
+		return
+	}
 	var b bytes.Buffer
 	enc := gob.NewEncoder(&b)
 	if err = enc.Encode(idx.Dup); err != nil {

@@ -39,7 +39,7 @@ func Build(keywords []string) (DoubleArray, error) {
 	if s == 0 {
 		return DoubleArray{}, nil
 	}
-	ids := make([]int, s, s)
+	ids := make([]int, s)
 	for i := range ids {
 		ids[i] = i + 1
 	}
@@ -78,11 +78,11 @@ func BuildWithIDs(keywords []string, ids []int) (DoubleArray, error) {
 
 // Find searches TRIE by a given keyword and returns the id if found.
 func (d DoubleArray) Find(input string) (id int, ok bool) {
-	p, q, _, ok := d.search(input)
+	_, q, _, ok := d.search(input)
 	if !ok {
 		return
 	}
-	p = q
+	p := q
 	q = int(d[p].Base) + int(terminator)
 	if q >= len(d) || int(d[q].Check) != p || d[q].Base > 0 {
 		return
@@ -176,7 +176,7 @@ func Read(r io.Reader) (DoubleArray, error) {
 		return DoubleArray{}, e
 	}
 	//fmt.Println("read data len:", sz)
-	d := make(DoubleArray, sz, sz)
+	d := make(DoubleArray, sz)
 	for i := range d {
 		if e := binary.Read(r, binary.LittleEndian, &d[i].Base); e != nil {
 			return d, e

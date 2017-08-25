@@ -171,7 +171,7 @@ func (la *Lattice) Build(inp string) {
 			for i, w := pos, 0; i < endPos; i += w {
 				_, w = utf8.DecodeRuneInString(inp[i:])
 				end := i + w
-				dup, _ := la.dic.UnkIndexDup[int32(class)]
+				dup := la.dic.UnkIndexDup[int32(class)]
 				for x := 0; x < int(dup)+1; x++ {
 					la.addNode(runePos, int(id)+x, runePos, UNKNOWN, inp[pos:end])
 				}
