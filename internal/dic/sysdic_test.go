@@ -16,10 +16,12 @@ package dic
 
 import (
 	"reflect"
+	"sync"
 	"testing"
 )
 
 func TestSystemDic(t *testing.T) {
+	initSysDicIPA = sync.Once{}
 	d := SysDic() // load default ipadic
 
 	const expected = 392126
@@ -30,6 +32,7 @@ func TestSystemDic(t *testing.T) {
 }
 
 func TestSystemDicSimple(t *testing.T) {
+	initSysDicIPA = sync.Once{}
 	d := SysDicSimple()
 
 	const expected = 392126
@@ -54,6 +57,7 @@ func TestSystemDicUniPath01(t *testing.T) {
 }
 
 func TestSystemDicIPAMorphs01(t *testing.T) {
+	initSysDicIPA = sync.Once{}
 	d := SysDicIPA()
 	const expected = 392126
 	c := len(d.Morphs)
@@ -63,6 +67,7 @@ func TestSystemDicIPAMorphs01(t *testing.T) {
 }
 
 func TestSystemDicIPASimpleMorphs01(t *testing.T) {
+	initSysDicIPA = sync.Once{}
 	d := SysDicIPASimple()
 	const expected = 392126
 	c := len(d.Morphs)
@@ -72,6 +77,7 @@ func TestSystemDicIPASimpleMorphs01(t *testing.T) {
 }
 
 func TestSystemDicUniMorphs01(t *testing.T) {
+	initSysDicIPA = sync.Once{}
 	d := SysDicUni()
 	const expected = 756463
 	c := len(d.Morphs)
@@ -81,6 +87,7 @@ func TestSystemDicUniMorphs01(t *testing.T) {
 }
 
 func TestSystemDicUniSimpleMorphs01(t *testing.T) {
+	initSysDicUni = sync.Once{}
 	d := SysDicUniSimple()
 	const expected = 756463
 	c := len(d.Morphs)
@@ -90,6 +97,7 @@ func TestSystemDicUniSimpleMorphs01(t *testing.T) {
 }
 
 func TestSystemDicIPAContents01(t *testing.T) {
+	initSysDicIPA = sync.Once{}
 	d := SysDicIPA()
 	const expected = 392126
 	c := len(d.Contents)
@@ -99,6 +107,7 @@ func TestSystemDicIPAContents01(t *testing.T) {
 }
 
 func TestSystemDicIPASimpleContents01(t *testing.T) {
+	initSysDicIPA = sync.Once{}
 	d := SysDicIPASimple()
 	const expected = 0
 	c := len(d.Contents)
@@ -108,6 +117,7 @@ func TestSystemDicIPASimpleContents01(t *testing.T) {
 }
 
 func TestSystemDicUniContents01(t *testing.T) {
+	initSysDicUni = sync.Once{}
 	d := SysDicUni()
 	const expected = 756463
 	c := len(d.Contents)
@@ -117,6 +127,7 @@ func TestSystemDicUniContents01(t *testing.T) {
 }
 
 func TestSystemDicUniSimpleContents01(t *testing.T) {
+	initSysDicUni = sync.Once{}
 	d := SysDicUniSimple()
 	const expected = 0
 	c := len(d.Contents)
@@ -126,6 +137,7 @@ func TestSystemDicUniSimpleContents01(t *testing.T) {
 }
 
 func TestSystemDicIPAIndex01(t *testing.T) {
+	initSysDicIPA = sync.Once{}
 	d := SysDicIPA()
 	type callAndResponse struct {
 		input string
@@ -143,6 +155,7 @@ func TestSystemDicIPAIndex01(t *testing.T) {
 }
 
 func TestSystemDicUniIndex01(t *testing.T) {
+	initSysDicUni = sync.Once{}
 	d := SysDicUni()
 	type callAndResponse struct {
 		input string
@@ -160,6 +173,7 @@ func TestSystemDicUniIndex01(t *testing.T) {
 }
 
 func TestSystemDicIPAIndex02(t *testing.T) {
+	initSysDicIPA = sync.Once{}
 	d := SysDicIPA()
 	type callAndRespose struct {
 		input string
@@ -201,6 +215,7 @@ func TestSystemDicIPAIndex02(t *testing.T) {
 }
 
 func TestSystemDicUniIndex02(t *testing.T) {
+	initSysDicUni = sync.Once{}
 	d := SysDicUni()
 	type callAndRespose struct {
 		input string
@@ -244,6 +259,7 @@ func TestSystemDicUniIndex02(t *testing.T) {
 }
 
 func TestSystemDicIPACharClass01(t *testing.T) {
+	initSysDicIPA = sync.Once{}
 	d := SysDicIPA()
 	expected := []string{
 		"DEFAULT",      // 0
@@ -264,6 +280,7 @@ func TestSystemDicIPACharClass01(t *testing.T) {
 }
 
 func TestSystemDicUniCharClass01(t *testing.T) {
+	initSysDicUni = sync.Once{}
 	d := SysDicUni()
 	expected := []string{
 		"DEFAULT",      // 0
@@ -297,6 +314,7 @@ func TestSystemDicIPACharCategory01(t *testing.T) {
 		GREEK        = 9
 		CYRILLIC     = 10
 	)
+	initSysDicIPA = sync.Once{}
 	d := SysDicIPA()
 	type callAndRespose struct {
 		input    int
@@ -478,6 +496,7 @@ func TestSystemDicUniCharCategory01(t *testing.T) {
 		GREEK        = 9
 		CYRILLIC     = 10
 	)
+	initSysDicUni = sync.Once{}
 	d := SysDicUni()
 	type callAndRespose struct {
 		input    int
@@ -675,6 +694,7 @@ func TestSystemDicIPAInvokeList01(t *testing.T) {
 		{GREEK, true},
 		{CYRILLIC, true},
 	}
+	initSysDicIPA = sync.Once{}
 	d := SysDicIPA()
 	for _, cr := range crs {
 		if iv := d.InvokeList[cr.class]; iv != cr.invoke {
@@ -713,6 +733,7 @@ func TestSystemDicUniInvokeList01(t *testing.T) {
 		{GREEK, true},
 		{CYRILLIC, true},
 	}
+	initSysDicUni = sync.Once{}
 	d := SysDicUni()
 	for _, cr := range crs {
 		if iv := d.InvokeList[cr.class]; iv != cr.invoke {
@@ -751,6 +772,7 @@ func TestSystemDicIPAGroupList01(t *testing.T) {
 		{GREEK, true},
 		{CYRILLIC, true},
 	}
+	initSysDicIPA = sync.Once{}
 	d := SysDicIPA()
 	for _, cr := range crs {
 		if iv := d.GroupList[cr.class]; iv != cr.invoke {
@@ -789,6 +811,7 @@ func TestSystemDicUniGroupList01(t *testing.T) {
 		{GREEK, true},
 		{CYRILLIC, true},
 	}
+	initSysDicUni = sync.Once{}
 	d := SysDicUni()
 	for _, cr := range crs {
 		if iv := d.GroupList[cr.class]; iv != cr.invoke {

@@ -30,7 +30,7 @@ import (
 const (
 	CommandName  = "tokenize"
 	Description  = `command line tokenize`
-	usageMessage = "%s [-file input_file] [-dic dic_file] [-udic userdic_file] [-sysdic (ipa|uni)] [-sysdic_simple false] [-mode (normal|search|extended)]\n"
+	usageMessage = "%s [-file input_file] [-dic dic_file] [-udic userdic_file] [-sysdic (ipa|uni)] [-simple false] [-mode (normal|search|extended)]\n"
 )
 
 // ErrorWriter writes to stderr
@@ -62,7 +62,7 @@ func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	o.flagSet.StringVar(&o.dic, "dic", "", "dic")
 	o.flagSet.StringVar(&o.udic, "udic", "", "user dic")
 	o.flagSet.StringVar(&o.sysdic, "sysdic", "ipa", "system dic type (ipa|uni)")
-	o.flagSet.BoolVar(&o.simple, "sysdic_simple", false, "use simple dic")
+	o.flagSet.BoolVar(&o.simple, "simple", false, "display abbreviated dictionary contents")
 	o.flagSet.StringVar(&o.mode, "mode", "normal", "tokenize mode (normal|search|extended)")
 
 	return
@@ -79,8 +79,7 @@ func (o *option) parse(args []string) (err error) {
 	if o.mode != "" && o.mode != "normal" && o.mode != "search" && o.mode != "extended" {
 		return fmt.Errorf("invalid argument: -mode %v\n", o.mode)
 	}
-	if o.sysdic != "" && o.sysdic != "ipa" && o.sysdic != "ipa_simple" &&
-		o.sysdic != "uni" && o.sysdic != "uni_simple" {
+	if o.sysdic != "" && o.sysdic != "ipa" && o.sysdic != "uni" {
 		return fmt.Errorf("invalid argument: -sysdic %v\n", o.sysdic)
 	}
 	return
@@ -120,9 +119,16 @@ func command(opt *option) error {
 		}
 	} else {
 		var err error
-		dic, err = tokenizer.NewDic(opt.dic)
-		if err != nil {
-			return err
+		if opt.simple {
+			dic, err = tokenizer.NewDicSimple(opt.dic)
+			if err != nil {
+				return err
+			}
+		} else {
+			dic, err = tokenizer.NewDic(opt.dic)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	var udic tokenizer.UserDic
