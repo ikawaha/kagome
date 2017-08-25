@@ -31,16 +31,11 @@ const (
 )
 
 var (
-	sysDicIPAFull       *Dic
-	initSysDicIPAFull   sync.Once
-	sysDicIPASimple     *Dic
-	initSysDicIPASimple sync.Once
-	initSysDicIPA       sync.Once
+	sysDicIPA     *Dic
+	initSysDicIPA sync.Once
 
-	sysDicUniFull       *Dic
-	initSysDicUniFull   sync.Once
-	sysDicUniSimple     *Dic
-	initSysDicUniSimple sync.Once
+	sysDicUni     *Dic
+	initSysDicUni sync.Once
 )
 
 // SysDic returns the kagome system dictionary.
@@ -55,34 +50,34 @@ func SysDicSimple() *Dic {
 
 // SysDicIPA returns the IPA system dictionary.
 func SysDicIPA() *Dic {
-	initSysDicIPAFull.Do(func() {
-		sysDicIPAFull = loadInternalSysDicFull(IPADicPath)
+	initSysDicIPA.Do(func() {
+		sysDicIPA = loadInternalSysDicFull(IPADicPath)
 	})
-	return sysDicIPAFull
+	return sysDicIPA
 }
 
 // SysDicUni returns the UniDic system dictionary.
 func SysDicUni() *Dic {
-	initSysDicUniFull.Do(func() {
-		sysDicUniFull = loadInternalSysDicFull(UniDicPath)
+	initSysDicUni.Do(func() {
+		sysDicUni = loadInternalSysDicFull(UniDicPath)
 	})
-	return sysDicUniFull
+	return sysDicUni
 }
 
 // SysDicIPASimple returns the IPA system dictionary without contents.
 func SysDicIPASimple() *Dic {
-	initSysDicIPASimple.Do(func() {
-		sysDicIPASimple = loadInternalSysDicSimple(IPADicPath)
+	initSysDicIPA.Do(func() {
+		sysDicIPA = loadInternalSysDicSimple(IPADicPath)
 	})
-	return sysDicIPASimple
+	return sysDicIPA
 }
 
 // SysDicUniSimple returns the IPA system dictionary without contents.
 func SysDicUniSimple() *Dic {
-	initSysDicUniSimple.Do(func() {
-		sysDicUniSimple = loadInternalSysDicSimple(UniDicPath)
+	initSysDicUni.Do(func() {
+		sysDicUni = loadInternalSysDicSimple(UniDicPath)
 	})
-	return sysDicUniSimple
+	return sysDicUni
 }
 
 func loadInternalSysDicFull(path string) (d *Dic) {
