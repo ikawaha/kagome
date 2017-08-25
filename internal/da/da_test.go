@@ -225,7 +225,7 @@ func TestDaBuildWithIDsAndPrefixSearch03(t *testing.T) {
 		h[keywords[i]] = ids[i]
 	}
 
-	d, err := BuildWithIDs(keywords, ids)
+	_, err := BuildWithIDs(keywords, ids)
 	if err == nil {
 		t.Errorf("invalid argument error was expected")
 	}
