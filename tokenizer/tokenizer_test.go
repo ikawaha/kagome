@@ -122,6 +122,16 @@ func TestAnalyze04(t *testing.T) {
 
 }
 
+func TestTokenizeSpecialCase(t *testing.T) {
+	inputs := []string{
+		"\u10000",
+	}
+	tnz := New()
+	for _, s := range inputs {
+		tnz.Tokenize(s)
+	}
+}
+
 func TestTokenize(t *testing.T) {
 	const input = "すもももももももものうち"
 	tnz := New()
