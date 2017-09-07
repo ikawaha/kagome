@@ -39,6 +39,10 @@ func TestSysDic(t *testing.T) {
 	if a.dic != b.dic {
 		t.Errorf("got %p and %p, expected singleton", a.dic, b.dic)
 	}
+	c := SysDicSimple() // do not load, sharing full dict.
+	if a.dic != c.dic {
+		t.Errorf("got %p and %p, expected singleton", a.dic, b.dic)
+	}
 }
 
 func TestSysDicIPA(t *testing.T) {
