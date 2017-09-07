@@ -231,7 +231,7 @@ func TestDaBuildWithIDsAndPrefixSearch03(t *testing.T) {
 	}
 
 	ids = ids[0 : len(ids)-1]
-	d, err = BuildWithIDs(keywords, ids)
+	d, err := BuildWithIDs(keywords, ids)
 	if err != nil {
 		t.Errorf("unexpected error: %v\n", err)
 	}
