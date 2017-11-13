@@ -18,7 +18,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 
 	"github.com/ikawaha/kagome/cmd/kagome/lattice"
 	"github.com/ikawaha/kagome/cmd/kagome/server"
@@ -59,7 +59,7 @@ var (
 //Usage prints to stdout information about the tool
 func Usage() {
 	fmt.Fprintf(errorWriter, "Japanese Morphological Analyzer -- github.com/ikawaha/kagome\n")
-	fmt.Fprintf(errorWriter, "usage: %s <command>\n", path.Base(os.Args[0]))
+	fmt.Fprintf(errorWriter, "usage: %s <command>\n", filepath.Base(os.Args[0]))
 }
 
 // PrintDefaults prints out the default flags

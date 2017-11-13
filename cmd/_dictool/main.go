@@ -17,7 +17,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 
 	"github.com/ikawaha/kagome/cmd/_dictool/ipa"
 	"github.com/ikawaha/kagome/cmd/_dictool/uni"
@@ -36,7 +36,7 @@ var subcommands = []struct {
 }
 
 func Usage() {
-	fmt.Fprintf(errorWriter, "usage: %s <command>\n", path.Base(os.Args[0]))
+	fmt.Fprintf(errorWriter, "usage: %s <command>\n", filepath.Base(os.Args[0]))
 }
 
 func PrintDefaults() {
