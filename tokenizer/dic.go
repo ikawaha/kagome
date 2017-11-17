@@ -53,12 +53,12 @@ func SysDicUniSimple() Dic {
 
 // NewDic loads a dictionary from a file.
 func NewDic(path string) (Dic, error) {
-	d, err := dic.Load(path, true)
+	d, err := dic.Load(path)
 	return Dic{d}, err
 }
 
 // NewDicSimple loads a dictionary from a file w/o contents.
 func NewDicSimple(path string) (Dic, error) {
-	d, err := dic.Load(path, false)
+	d, err := dic.LoadSimple(path)
 	return Dic{d}, err
 }

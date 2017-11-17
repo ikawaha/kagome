@@ -22,7 +22,7 @@ import (
 var testDic = "../../_sample/ipa.dic"
 
 func TestDicLoad(t *testing.T) {
-	dic, err := Load(testDic, true)
+	dic, err := Load(testDic)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -38,8 +38,25 @@ func TestDicLoad(t *testing.T) {
 	}
 }
 
+func TestDicLoadSimple(t *testing.T) {
+	dic, err := LoadSimple(testDic)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	const expected = 392126
+	if c := len(dic.Morphs); c != expected {
+		t.Errorf("morphs got %v, expected %v\n", c, expected)
+	}
+	if c := len(dic.POSTable.POSs); c != expected {
+		t.Errorf("POSs got %v, expected %v\n", c, expected)
+	}
+	if expected, c := 0, len(dic.Contents); c != expected {
+		t.Errorf("contents got %v, expected %v\n", c, expected)
+	}
+}
+
 func TestDicIndex01(t *testing.T) {
-	dic, err := Load(testDic, true)
+	dic, err := Load(testDic)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -59,7 +76,7 @@ func TestDicIndex01(t *testing.T) {
 }
 
 func TestDicIndex02(t *testing.T) {
-	dic, err := Load(testDic, true)
+	dic, err := Load(testDic)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -103,7 +120,7 @@ func TestDicIndex02(t *testing.T) {
 }
 
 func TestDicCharClass01(t *testing.T) {
-	dic, err := Load(testDic, true)
+	dic, err := Load(testDic)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -139,7 +156,7 @@ func TestDicCharCategory01(t *testing.T) {
 		GREEK        = 9
 		CYRILLIC     = 10
 	)
-	dic, err := Load(testDic, true)
+	dic, err := Load(testDic)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -310,7 +327,7 @@ func TestDicCharCategory01(t *testing.T) {
 }
 
 func TestCharCategory02(t *testing.T) {
-	dic, err := Load(testDic, true)
+	dic, err := Load(testDic)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -352,7 +369,7 @@ func TestDicInvokeList01(t *testing.T) {
 		{GREEK, true},
 		{CYRILLIC, true},
 	}
-	dic, err := Load(testDic, true)
+	dic, err := Load(testDic)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -393,7 +410,7 @@ func TestDicGroupList01(t *testing.T) {
 		{GREEK, true},
 		{CYRILLIC, true},
 	}
-	dic, err := Load(testDic, true)
+	dic, err := Load(testDic)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
