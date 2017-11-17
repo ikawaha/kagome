@@ -33,6 +33,19 @@ func TestNewDic(t *testing.T) {
 	}
 }
 
+func TestNewDicSimple(t *testing.T) {
+	d, err := NewDicSimple(testDic)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if expected, c := 392126, len(d.dic.Morphs); c != expected {
+		t.Errorf("got %v, expected %v\n", c, expected)
+	}
+	if expected, c := 0, len(d.dic.Contents); c != expected {
+		t.Errorf("got %v, expected %v\n", c, expected)
+	}
+}
+
 func TestSysDic(t *testing.T) {
 	a := SysDic()
 	b := SysDic()
