@@ -127,13 +127,23 @@ func (d *Dic) loadUnkDicPart(r io.Reader) error {
 }
 
 // Load loads a dictionary from a file.
-func Load(path string, simple bool) (d *Dic, err error) {
+func Load(path string) (d *Dic, err error) {
 	r, err := zip.OpenReader(path)
 	if err != nil {
 		return d, err
 	}
 	defer r.Close()
-	return load(&r.Reader, simple)
+	return load(&r.Reader, true)
+}
+
+// LoadSimple loads a dictionary from a file without contents.
+func LoadSimple(path string) (d *Dic, err error) {
+	r, err := zip.OpenReader(path)
+	if err != nil {
+		return d, err
+	}
+	defer r.Close()
+	return load(&r.Reader, false)
 }
 
 func load(r *zip.Reader, full bool) (d *Dic, err error) {
