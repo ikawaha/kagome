@@ -112,7 +112,6 @@ func (d *Dic) loadCharDefDicPart(r io.Reader) error {
 
 func readMap(r io.Reader) (map[int32]int32, error) {
 	var sz int64
-	fmt.Println("size", sz)
 	if err := binary.Read(r, binary.LittleEndian, &sz); err != nil {
 		return nil, err
 	}
