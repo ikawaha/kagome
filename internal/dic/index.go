@@ -149,8 +149,8 @@ func ReadIndexTable(r io.Reader) (IndexTable, error) {
 			return idx, err
 		}
 		var v int32
-		if e := binary.Read(r, binary.LittleEndian, &v); e != nil {
-			return idx, e
+		if err := binary.Read(r, binary.LittleEndian, &v); err != nil {
+			return idx, err
 		}
 		idx.Dup[k] = v
 	}
