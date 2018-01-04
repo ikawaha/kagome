@@ -16,6 +16,7 @@ package dic
 
 import (
 	"archive/zip"
+	"encoding/binary"
 	"encoding/gob"
 	"fmt"
 	"io"
@@ -109,19 +110,46 @@ func (d *Dic) loadCharDefDicPart(r io.Reader) error {
 	return nil
 }
 
+func readMap(r io.Reader) (map[int32]int32, error) {
+	var sz int64
+	fmt.Println("size", sz)
+	if err := binary.Read(r, binary.LittleEndian, &sz); err != nil {
+		return nil, err
+	}
+	m := make(map[int32]int32, sz)
+	for i := int64(0); i < sz; i++ {
+		var k int32
+		if err := binary.Read(r, binary.LittleEndian, &k); err != nil {
+			return nil, err
+		}
+		var v int32
+		if err := binary.Read(r, binary.LittleEndian, &v); err != nil {
+			return nil, err
+		}
+		m[k] = v
+	}
+	return m, nil
+}
+
 func (d *Dic) loadUnkDicPart(r io.Reader) error {
+
+	ui, err := readMap(r)
+	if err != nil {
+		return fmt.Errorf("dic initializer, UnkIndex: %v", err)
+	}
+	d.UnkIndex = ui
+	ud, err := readMap(r)
+	if err != nil {
+		return fmt.Errorf("dic initializer, UnkIndexDup: %v", err)
+	}
+	d.UnkIndexDup = ud
+
 	dec := gob.NewDecoder(r)
-	if e := dec.Decode(&d.UnkMorphs); e != nil {
-		return fmt.Errorf("dic initializer, UnkMorphs: %v", e)
+	if err := dec.Decode(&d.UnkMorphs); err != nil {
+		return fmt.Errorf("dic initializer, UnkMorphs: %v", err)
 	}
-	if e := dec.Decode(&d.UnkIndex); e != nil {
-		return fmt.Errorf("dic initializer, UnkIndex: %v", e)
-	}
-	if e := dec.Decode(&d.UnkIndexDup); e != nil {
-		return fmt.Errorf("dic initializer, UnkIndexDup: %v", e)
-	}
-	if e := dec.Decode(&d.UnkContents); e != nil {
-		return fmt.Errorf("dic initializer, UnkContents: %v", e)
+	if err := dec.Decode(&d.UnkContents); err != nil {
+		return fmt.Errorf("dic initializer, UnkContents: %v", err)
 	}
 	return nil
 }
