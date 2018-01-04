@@ -1,6 +1,6 @@
 package data
 
-import (
+import(
 	"os"
 	"time"
 )
@@ -20,7 +20,8 @@ func dicUniUniDic001() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "dic/uni/uni.dic.001", size: 10485760, mode: os.FileMode(420), modTime: time.Unix(1515072764, 0)}
+	info := bindataFileInfo{name: "dic/uni/uni.dic.001", size: 10485760, mode: os.FileMode(420), modTime: time.Unix(1515075871, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
+
