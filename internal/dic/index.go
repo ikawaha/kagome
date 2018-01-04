@@ -109,7 +109,9 @@ func (idx IndexTable) WriteTo(w io.Writer) (n int64, err error) {
 	for k := range idx.Dup {
 		keys = append(keys, k)
 	}
-
+	sort.Slice(keys, func(i, j int) bool {
+		return keys[i] < keys[j]
+	})
 	sz := int64(len(keys))
 	if err = binary.Write(w, binary.LittleEndian, sz); err != nil {
 		return

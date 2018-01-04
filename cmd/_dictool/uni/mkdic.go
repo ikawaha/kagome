@@ -102,6 +102,9 @@ func writeMap(w io.Writer, m map[int32]int32) (n int64, err error) {
 	for k := range m {
 		keys = append(keys, k)
 	}
+	sort.Slice(keys, func(i, j int) bool {
+		return keys[i] < keys[j]
+	})
 	sz := int64(len(keys))
 	if err := binary.Write(w, binary.LittleEndian, sz); err != nil {
 		return n, err
