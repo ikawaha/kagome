@@ -19,7 +19,6 @@ import (
 	"bufio"
 	"bytes"
 	"compress/flate"
-	"encoding/binary"
 	"encoding/csv"
 	"encoding/gob"
 	"fmt"
@@ -77,10 +76,7 @@ type UniDic struct {
 	InvokeList   []bool
 	GroupList    []bool
 
-	UnkMorphs   []dic.Morph
-	UnkIndex    map[int32]int32
-	UnkIndexDup map[int32]int32
-	UnkContents [][]string
+	dic.UnkDic
 }
 
 type uniDicPath struct {
@@ -96,33 +92,6 @@ type uniMorphRecordSlice [][]string
 func (p uniMorphRecordSlice) Len() int           { return len(p) }
 func (p uniMorphRecordSlice) Less(i, j int) bool { return p[i][0] < p[j][0] }
 func (p uniMorphRecordSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-
-func writeMap(w io.Writer, m map[int32]int32) (n int64, err error) {
-	keys := make([]int32, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
-	}
-	sort.Slice(keys, func(i, j int) bool {
-		return keys[i] < keys[j]
-	})
-	sz := int64(len(keys))
-	if err := binary.Write(w, binary.LittleEndian, sz); err != nil {
-		return n, err
-	}
-	n += int64(binary.Size(sz))
-	for _, k := range keys {
-		if err := binary.Write(w, binary.LittleEndian, k); err != nil {
-			return n, err
-		}
-		n += int64(binary.Size(k))
-		v := m[k]
-		if err := binary.Write(w, binary.LittleEndian, v); err != nil {
-			return n, err
-		}
-		n += int64(binary.Size(v))
-	}
-	return n, err
-}
 
 func saveUniDic(d *UniDic, base string, archive bool) error {
 	var zw *zip.Writer
@@ -247,25 +216,7 @@ func saveUniDic(d *UniDic, base string, archive bool) error {
 		if err != nil {
 			return err
 		}
-		if _, err := writeMap(out, d.UnkIndex); err != nil {
-			return err
-		}
-		if _, err := writeMap(out, d.UnkIndexDup); err != nil {
-			return err
-		}
-
-		var buf bytes.Buffer
-		enc := gob.NewEncoder(&buf)
-		if err := enc.Encode(d.UnkMorphs); err != nil {
-			return err
-		}
-		if _, err := buf.WriteTo(out); err != nil {
-			return err
-		}
-		if err := enc.Encode(d.UnkContents); err != nil {
-			return err
-		}
-		if _, err := buf.WriteTo(out); err != nil {
+		if _, err := d.UnkDic.WriteTo(out); err != nil {
 			return err
 		}
 		return nil

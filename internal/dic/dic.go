@@ -16,7 +16,6 @@ package dic
 
 import (
 	"archive/zip"
-	"encoding/binary"
 	"encoding/gob"
 	"fmt"
 	"io"
@@ -34,10 +33,8 @@ type Dic struct {
 	CharCategory []byte
 	InvokeList   []bool
 	GroupList    []bool
-	UnkMorphs    []Morph
-	UnkIndex     map[int32]int32
-	UnkIndexDup  map[int32]int32
-	UnkContents  [][]string
+
+	UnkDic
 }
 
 // CharacterCategory returns the category of a rune.
@@ -110,46 +107,13 @@ func (d *Dic) loadCharDefDicPart(r io.Reader) error {
 	return nil
 }
 
-func readMap(r io.Reader) (map[int32]int32, error) {
-	var sz int64
-	if err := binary.Read(r, binary.LittleEndian, &sz); err != nil {
-		return nil, err
-	}
-	m := make(map[int32]int32, sz)
-	for i := int64(0); i < sz; i++ {
-		var k int32
-		if err := binary.Read(r, binary.LittleEndian, &k); err != nil {
-			return nil, err
-		}
-		var v int32
-		if err := binary.Read(r, binary.LittleEndian, &v); err != nil {
-			return nil, err
-		}
-		m[k] = v
-	}
-	return m, nil
-}
-
 func (d *Dic) loadUnkDicPart(r io.Reader) error {
 
-	ui, err := readMap(r)
+	unk, err := ReadUnkDic(r)
 	if err != nil {
-		return fmt.Errorf("dic initializer, UnkIndex: %v", err)
+		return fmt.Errorf("dic initializer, UnkDic: %v, err")
 	}
-	d.UnkIndex = ui
-	ud, err := readMap(r)
-	if err != nil {
-		return fmt.Errorf("dic initializer, UnkIndexDup: %v", err)
-	}
-	d.UnkIndexDup = ud
-
-	dec := gob.NewDecoder(r)
-	if err := dec.Decode(&d.UnkMorphs); err != nil {
-		return fmt.Errorf("dic initializer, UnkMorphs: %v", err)
-	}
-	if err := dec.Decode(&d.UnkContents); err != nil {
-		return fmt.Errorf("dic initializer, UnkContents: %v", err)
-	}
+	d.UnkDic = unk
 	return nil
 }
 
