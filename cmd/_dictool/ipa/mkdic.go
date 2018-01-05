@@ -79,10 +79,7 @@ type IpaDic struct {
 	InvokeList   []bool
 	GroupList    []bool
 
-	UnkMorphs   []dic.Morph
-	UnkIndex    map[int32]int32
-	UnkIndexDup map[int32]int32
-	UnkContents [][]string
+	dic.UnkDic
 }
 
 type ipaDicPath struct {
@@ -223,31 +220,7 @@ func saveIpaDic(d *IpaDic, base string, archive bool) error {
 		if err != nil {
 			return err
 		}
-
-		var buf bytes.Buffer
-		enc := gob.NewEncoder(&buf)
-		if err := enc.Encode(d.UnkMorphs); err != nil {
-			return err
-		}
-		if _, err := buf.WriteTo(out); err != nil {
-			return err
-		}
-		if err := enc.Encode(d.UnkIndex); err != nil {
-			return err
-		}
-		if _, err := buf.WriteTo(out); err != nil {
-			return err
-		}
-		if err := enc.Encode(d.UnkIndexDup); err != nil {
-			return err
-		}
-		if _, err := buf.WriteTo(out); err != nil {
-			return err
-		}
-		if err := enc.Encode(d.UnkContents); err != nil {
-			return err
-		}
-		if _, err := buf.WriteTo(out); err != nil {
+		if _, err := d.UnkDic.WriteTo(out); err != nil {
 			return err
 		}
 		return nil

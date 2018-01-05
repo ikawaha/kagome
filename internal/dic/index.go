@@ -15,8 +15,7 @@
 package dic
 
 import (
-	"bytes"
-	"encoding/gob"
+	"encoding/binary"
 	"fmt"
 	"io"
 	"sort"
@@ -106,16 +105,29 @@ func (idx IndexTable) WriteTo(w io.Writer) (n int64, err error) {
 	if n, err = idx.Da.WriteTo(w); err != nil {
 		return
 	}
-	var b bytes.Buffer
-	enc := gob.NewEncoder(&b)
-	if err = enc.Encode(idx.Dup); err != nil {
+	keys := make([]int32, 0, len(idx.Dup))
+	for k := range idx.Dup {
+		keys = append(keys, k)
+	}
+	sort.Slice(keys, func(i, j int) bool {
+		return keys[i] < keys[j]
+	})
+	sz := int64(len(keys))
+	if err = binary.Write(w, binary.LittleEndian, sz); err != nil {
 		return
 	}
-	x, err := b.WriteTo(w)
-	if err != nil {
-		return
+	n += int64(binary.Size(sz))
+	for _, k := range keys {
+		if err = binary.Write(w, binary.LittleEndian, k); err != nil {
+			return
+		}
+		n += int64(binary.Size(k))
+		v := idx.Dup[k]
+		if err = binary.Write(w, binary.LittleEndian, v); err != nil {
+			return
+		}
+		n += int64(binary.Size(v))
 	}
-	n += x
 	return
 }
 
@@ -128,9 +140,21 @@ func ReadIndexTable(r io.Reader) (IndexTable, error) {
 	}
 	idx.Da = d
 
-	dec := gob.NewDecoder(r)
-	if e := dec.Decode(&idx.Dup); e != nil {
-		return idx, fmt.Errorf("read index dup table error, %v", e)
+	var sz int64
+	if err := binary.Read(r, binary.LittleEndian, &sz); err != nil {
+		return idx, err
+	}
+	idx.Dup = make(map[int32]int32, sz)
+	for i := int64(0); i < sz; i++ {
+		var k int32
+		if err := binary.Read(r, binary.LittleEndian, &k); err != nil {
+			return idx, err
+		}
+		var v int32
+		if err := binary.Read(r, binary.LittleEndian, &v); err != nil {
+			return idx, err
+		}
+		idx.Dup[k] = v
 	}
 
 	return idx, nil
