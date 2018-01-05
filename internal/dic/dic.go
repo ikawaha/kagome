@@ -33,10 +33,8 @@ type Dic struct {
 	CharCategory []byte
 	InvokeList   []bool
 	GroupList    []bool
-	UnkMorphs    []Morph
-	UnkIndex     map[int32]int32
-	UnkIndexDup  map[int32]int32
-	UnkContents  [][]string
+
+	UnkDic
 }
 
 // CharacterCategory returns the category of a rune.
@@ -110,19 +108,11 @@ func (d *Dic) loadCharDefDicPart(r io.Reader) error {
 }
 
 func (d *Dic) loadUnkDicPart(r io.Reader) error {
-	dec := gob.NewDecoder(r)
-	if e := dec.Decode(&d.UnkMorphs); e != nil {
-		return fmt.Errorf("dic initializer, UnkMorphs: %v", e)
+	unk, err := ReadUnkDic(r)
+	if err != nil {
+		return fmt.Errorf("dic initializer, UnkDic: %v", err)
 	}
-	if e := dec.Decode(&d.UnkIndex); e != nil {
-		return fmt.Errorf("dic initializer, UnkIndex: %v", e)
-	}
-	if e := dec.Decode(&d.UnkIndexDup); e != nil {
-		return fmt.Errorf("dic initializer, UnkIndexDup: %v", e)
-	}
-	if e := dec.Decode(&d.UnkContents); e != nil {
-		return fmt.Errorf("dic initializer, UnkContents: %v", e)
-	}
+	d.UnkDic = unk
 	return nil
 }
 
