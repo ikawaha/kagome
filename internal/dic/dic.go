@@ -108,10 +108,9 @@ func (d *Dic) loadCharDefDicPart(r io.Reader) error {
 }
 
 func (d *Dic) loadUnkDicPart(r io.Reader) error {
-
 	unk, err := ReadUnkDic(r)
 	if err != nil {
-		return fmt.Errorf("dic initializer, UnkDic: %v, err")
+		return fmt.Errorf("dic initializer, UnkDic: %v", err)
 	}
 	d.UnkDic = unk
 	return nil
