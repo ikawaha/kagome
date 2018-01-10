@@ -28,7 +28,7 @@ type POSTable struct {
 }
 
 // POSID represents a ID of part of speech.
-type POSID int16
+type POSID int
 
 // POS represents a vector of part of speech.
 type POS []POSID
