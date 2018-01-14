@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package mecab
+package juman
 
 import (
 	"flag"
@@ -22,18 +22,18 @@ import (
 
 // subcommand property
 var (
-	CommandName  = "mecab"
-	Description  = `mecab dic build tool`
-	usageMessage = "%s -mecab mecabdic-path [-z]\n"
+	CommandName  = "juman"
+	Description  = `juman dic build tool`
+	usageMessage = "%s -mecab mecabdic-path [-neologd neologd-path] [-z]\n"
 	errorWriter  = os.Stderr
 )
 
 // options
 type option struct {
-	output   string
-	mecab    string
-	archive  bool
-	encoding string
+	output  string
+	mecab   string
+	neologd string
+	archive bool
 
 	flagSet *flag.FlagSet
 }
@@ -44,9 +44,9 @@ func newOption() (o *option) {
 	}
 	// option settings
 	o.flagSet.BoolVar(&o.archive, "z", true, "build an archived dic")
-	o.flagSet.StringVar(&o.output, "output", "mecab.dic", "set output path")
+	o.flagSet.StringVar(&o.output, "output", ".", "set output path")
 	o.flagSet.StringVar(&o.mecab, "mecab", "", "set mecab src path")
-	o.flagSet.StringVar(&o.encoding, "encoding", "utf8", "set mecab src encoding [utf8|eucjp|sjis|jis]")
+	o.flagSet.StringVar(&o.neologd, "neologd", "", "set neologd src path")
 	return
 }
 
@@ -66,37 +66,36 @@ func (o *option) parse(args []string) (err error) {
 
 // command main
 func command(opt *option) error {
-	d, err := buildMecabDic(opt.mecab, opt.encoding)
+	d, err := buildJumanDic(opt.mecab, opt.neologd)
 	if err != nil {
 		return err
 	}
-	if saveMecabDic(d, opt.output, opt.archive); err != nil {
-		return fmt.Errorf("build error: %v", err)
+	if saveJumanDic(d, opt.output, opt.archive); err != nil {
+		return fmt.Errorf("build error: %v\n", err)
 	}
 	return nil
 }
 
-// Run mecab command
 func Run(args []string) error {
 	if len(args) == 0 {
-		usage()
-		printDefaults()
+		Usage()
+		PrintDefaults()
 		return nil
 	}
 	opt := newOption()
 	if e := opt.parse(args); e != nil {
-		usage()
-		printDefaults()
+		Usage()
+		PrintDefaults()
 		return e
 	}
 	return command(opt)
 }
 
-func usage() {
+func Usage() {
 	fmt.Fprintf(os.Stderr, usageMessage, CommandName)
 }
 
-func printDefaults() {
+func PrintDefaults() {
 	o := newOption()
 	o.flagSet.PrintDefaults()
 }

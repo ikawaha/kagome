@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package mecab
+package juman
 
 import (
 	"archive/zip"
@@ -30,45 +30,41 @@ import (
 	"strconv"
 	"strings"
 
-	"golang.org/x/text/encoding/japanese"
-	"golang.org/x/text/transform"
-
 	"github.com/ikawaha/kagome/cmd/_dictool/splitfile"
 	"github.com/ikawaha/kagome/internal/dic"
 )
 
 const (
-	mecabMatrixDefFileName = "matrix.def"
-	mecabCharDefFileName   = "char.def"
-	mecabUnkDefFileName    = "unk.def"
+	jumanMatrixDefFileName = "matrix.def"
+	jumanCharDefFileName   = "char.def"
+	jumanUnkDefFileName    = "unk.def"
 
-	mecabDicDefaultArchiveFileName = "mecab.dic"
+	jumanDicArchiveFileName    = "juman.dic"
+	jumanDicMorphFileName      = "morph.dic"
+	jumanDicPOSFileName        = "pos.dic"
+	jumanDicContentFileName    = "content.dic"
+	jumanDicIndexFileName      = "index.dic"
+	jumanDicConnectionFileName = "connection.dic"
+	jumanDicCharDefFileName    = "chardef.dic"
+	jumanDicUnkFileName        = "unk.dic"
 
-	mecabDicMorphFileName      = "morph.dic"
-	mecabDicPOSFileName        = "pos.dic"
-	mecabDicContentFileName    = "content.dic"
-	mecabDicIndexFileName      = "index.dic"
-	mecabDicConnectionFileName = "connection.dic"
-	mecabDicCharDefFileName    = "chardef.dic"
-	mecabDicUnkFileName        = "unk.dic"
+	jumanMorphCsvColSize                    = 11
+	jumanMrophRecordSurfaceIndex            = 0
+	jumanMorphRecordLeftIDIndex             = 1
+	jumanMorphRecordRightIDIndex            = 2
+	jumanMorphRecordWeightIndex             = 3
+	jumanMorphRecordPOSRecordStartIndex     = 4
+	jumanMorphRecordOtherContentsStartIndex = 8
 
-	mecabMrophRecordSurfaceIndex            = 0
-	mecabMorphRecordLeftIDIndex             = 1
-	mecabMorphRecordRightIDIndex            = 2
-	mecabMorphRecordWeightIndex             = 3
-	mecabMorphRecordPOSRecordStartIndex     = 4
-	mecabMorphRecordOtherContentsStartIndex = 10
-	mecabMorphCsvColMinSize                 = mecabMorphRecordOtherContentsStartIndex + 1
-
-	mecabUnkRecordCategoryIndex           = 0
-	mecabUnkRecordLeftIDIndex             = 1
-	mecabUnkRecordRightIndex              = 2
-	mecabUnkRecordWeigthIndex             = 3
-	mecabUnkRecordOtherContentsStartIndex = 4
-	mecabUnkRecordMinSize                 = mecabUnkRecordOtherContentsStartIndex + 1
+	jumanUnkRecordSize                    = 11
+	jumanUnkRecordCategoryIndex           = 0
+	jumanUnkRecordLeftIDIndex             = 1
+	jumanUnkRecordRightIndex              = 2
+	jumanUnkRecordWeigthIndex             = 3
+	jumanUnkRecordOtherContentsStartIndex = 4
 )
 
-type mecabDic struct {
+type jumanDic struct {
 	Morphs       []dic.Morph
 	POSTable     dic.POSTable
 	Contents     [][]string
@@ -82,7 +78,7 @@ type mecabDic struct {
 	dic.UnkDic
 }
 
-type mecabDicPath struct {
+type jumanDicPath struct {
 	Morph      string
 	POS        string
 	Index      string
@@ -91,26 +87,24 @@ type mecabDicPath struct {
 	Unk        string
 }
 
-type mecabMorphRecordSlice [][]string
+type jumanMorphRecordSlice [][]string
 
-func (p mecabMorphRecordSlice) Len() int           { return len(p) }
-func (p mecabMorphRecordSlice) Less(i, j int) bool { return p[i][0] < p[j][0] }
-func (p mecabMorphRecordSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+func (p jumanMorphRecordSlice) Len() int           { return len(p) }
+func (p jumanMorphRecordSlice) Less(i, j int) bool { return p[i][0] < p[j][0] }
+func (p jumanMorphRecordSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
-func saveMecabDic(d *mecabDic, output string, archive bool) error {
+func saveJumanDic(d *jumanDic, base string, archive bool) error {
 	var zw *zip.Writer
-	if fi, err := os.Stat(output); err == nil && fi.IsDir() {
-		output = filepath.Join(output, mecabDicDefaultArchiveFileName)
-	}
+	p := filepath.Join(base, jumanDicArchiveFileName)
 	if archive {
-		f, err := os.Create(output)
+		f, err := os.Create(p)
 		if err != nil {
 			return err
 		}
 		defer f.Close()
 		zw = zip.NewWriter(f)
 	} else {
-		f, err := splitfile.Open(output, 10*1024*1024) // 10MB
+		f, err := splitfile.Open(p, 10*1024*1024) // 10MB
 		if err != nil {
 			return err
 		}
@@ -126,7 +120,7 @@ func saveMecabDic(d *mecabDic, output string, archive bool) error {
 	}
 
 	if err := func() error {
-		out, err := zw.Create(mecabDicMorphFileName)
+		out, err := zw.Create(jumanDicMorphFileName)
 		if err != nil {
 			return err
 		}
@@ -137,7 +131,7 @@ func saveMecabDic(d *mecabDic, output string, archive bool) error {
 	}
 
 	if err := func() (e error) {
-		out, err := zw.Create(mecabDicPOSFileName)
+		out, err := zw.Create(jumanDicPOSFileName)
 		if err != nil {
 			return err
 		}
@@ -148,7 +142,7 @@ func saveMecabDic(d *mecabDic, output string, archive bool) error {
 	}
 
 	if err := func() error {
-		out, err := zw.Create(mecabDicContentFileName)
+		out, err := zw.Create(jumanDicContentFileName)
 		if err != nil {
 			return err
 		}
@@ -159,7 +153,7 @@ func saveMecabDic(d *mecabDic, output string, archive bool) error {
 	}
 
 	if err := func() error {
-		out, err := zw.Create(mecabDicIndexFileName)
+		out, err := zw.Create(jumanDicIndexFileName)
 		if err != nil {
 			return err
 		}
@@ -170,7 +164,7 @@ func saveMecabDic(d *mecabDic, output string, archive bool) error {
 	}
 
 	if err := func() error {
-		out, err := zw.Create(mecabDicConnectionFileName)
+		out, err := zw.Create(jumanDicConnectionFileName)
 		if err != nil {
 			return err
 		}
@@ -181,7 +175,7 @@ func saveMecabDic(d *mecabDic, output string, archive bool) error {
 	}
 
 	if err := func() error {
-		out, err := zw.Create(mecabDicCharDefFileName)
+		out, err := zw.Create(jumanDicCharDefFileName)
 		if err != nil {
 			return err
 		}
@@ -218,7 +212,7 @@ func saveMecabDic(d *mecabDic, output string, archive bool) error {
 	}
 
 	if err := func() error {
-		out, err := zw.Create(mecabDicUnkFileName)
+		out, err := zw.Create(jumanDicUnkFileName)
 		if err != nil {
 			return err
 		}
@@ -233,14 +227,14 @@ func saveMecabDic(d *mecabDic, output string, archive bool) error {
 	return zw.Close()
 }
 
-func buildMecabDic(mecabPath string, encoding string) (d *mecabDic, err error) {
+func buildJumanDic(mecabPath, neologdPath string) (d *jumanDic, err error) {
 	// Morphs, Contents, Index
 	var files []string
 	files, err = filepath.Glob(mecabPath + "/*.csv")
 	if err != nil {
 		return
 	}
-	var records mecabMorphRecordSlice
+	var records jumanMorphRecordSlice
 	for _, file := range files {
 		if err = func() error {
 			f, e := os.Open(file)
@@ -248,28 +242,15 @@ func buildMecabDic(mecabPath string, encoding string) (d *mecabDic, err error) {
 				return e
 			}
 			defer f.Close()
-
-			var _r io.Reader
-			switch encoding {
-			case "sjis":
-				_r = transform.NewReader(f, japanese.ShiftJIS.NewDecoder())
-			case "eucjp":
-				_r = transform.NewReader(f, japanese.EUCJP.NewDecoder())
-			case "jis":
-				_r = transform.NewReader(f, japanese.ISO2022JP.NewDecoder())
-			default:
-				_r = f
-			}
-			r := csv.NewReader(_r)
+			r := csv.NewReader(f)
 			r.Comma = ','
-			r.LazyQuotes = true
 			for {
 				rec, e := r.Read()
 				if e == io.EOF {
 					break
 				} else if e != nil {
 					return e
-				} else if len(rec) < mecabMorphCsvColMinSize {
+				} else if len(rec) != jumanMorphCsvColSize {
 					return fmt.Errorf("invalid format csv: %v, %v", file, rec)
 				}
 				records = append(records, rec)
@@ -279,9 +260,36 @@ func buildMecabDic(mecabPath string, encoding string) (d *mecabDic, err error) {
 			return
 		}
 	}
+	if err = func() error {
+		if neologdPath == "" {
+			return nil
+		}
+		f, e := os.Open(neologdPath)
+		if e != nil {
+			return e
+		}
+		defer f.Close()
+		r := csv.NewReader(f)
+		r.Comma = ','
+		r.LazyQuotes = true
+		for {
+			rec, e := r.Read()
+			if e == io.EOF {
+				break
+			} else if e != nil {
+				return e
+			} else if len(rec) != jumanMorphCsvColSize {
+				return fmt.Errorf("invalid format csv: %v, %v", neologdPath, rec)
+			}
+			records = append(records, rec)
+		}
+		return nil
+	}(); err != nil {
+		return
+	}
 
 	sort.Sort(records)
-	d = new(mecabDic)
+	d = new(jumanDic)
 	d.Morphs = make([]dic.Morph, 0, len(records))
 	d.POSTable = dic.POSTable{
 		POSs: make([]dic.POS, 0, len(records)),
@@ -292,23 +300,23 @@ func buildMecabDic(mecabPath string, encoding string) (d *mecabDic, err error) {
 		posMap   = make(dic.POSMap)
 	)
 	for _, rec := range records {
-		keywords = append(keywords, rec[mecabMrophRecordSurfaceIndex])
+		keywords = append(keywords, rec[jumanMrophRecordSurfaceIndex])
 		var l, r, w int
-		if l, err = strconv.Atoi(rec[mecabMorphRecordLeftIDIndex]); err != nil {
+		if l, err = strconv.Atoi(rec[jumanMorphRecordLeftIDIndex]); err != nil {
 			return
 		}
-		if r, err = strconv.Atoi(rec[mecabMorphRecordRightIDIndex]); err != nil {
+		if r, err = strconv.Atoi(rec[jumanMorphRecordRightIDIndex]); err != nil {
 			return
 		}
-		if w, err = strconv.Atoi(rec[mecabMorphRecordWeightIndex]); err != nil {
+		if w, err = strconv.Atoi(rec[jumanMorphRecordWeightIndex]); err != nil {
 			return
 		}
 		m := dic.Morph{LeftID: int16(l), RightID: int16(r), Weight: int16(w)}
 		d.Morphs = append(d.Morphs, m)
 		d.POSTable.POSs = append(d.POSTable.POSs, posMap.Add(
-			rec[mecabMorphRecordPOSRecordStartIndex:mecabMorphRecordOtherContentsStartIndex]),
+			rec[jumanMorphRecordPOSRecordStartIndex:jumanMorphRecordOtherContentsStartIndex]),
 		)
-		d.Contents = append(d.Contents, rec[mecabMorphRecordOtherContentsStartIndex:])
+		d.Contents = append(d.Contents, rec[jumanMorphRecordOtherContentsStartIndex:])
 	}
 	d.POSTable.NameList = posMap.List()
 
@@ -317,79 +325,77 @@ func buildMecabDic(mecabPath string, encoding string) (d *mecabDic, err error) {
 	}
 
 	// ConnectionTable
-	r, c, v, e := loadMecabMatrixDefFile(mecabPath + "/" + mecabMatrixDefFileName)
-	if e != nil {
+	if r, c, v, e := loadJumanMatrixDefFile(mecabPath + "/" + jumanMatrixDefFileName); e != nil {
 		err = e
 		return
+	} else {
+		d.Connection.Row = r
+		d.Connection.Col = c
+		d.Connection.Vec = v
 	}
-
-	d.Connection.Row = r
-	d.Connection.Col = c
-	d.Connection.Vec = v
 
 	// CharDef
-	cc, cm, inv, grp, e := loadMecabCharClassDefFile(mecabPath + "/" + mecabCharDefFileName)
-	if e != nil {
+	if cc, cm, inv, grp, e := loadJumanCharClassDefFile(mecabPath + "/" + jumanCharDefFileName); e != nil {
 		err = e
 		return
+	} else {
+		d.CharClass = cc
+		d.CharCategory = cm
+		d.InvokeList = inv
+		d.GroupList = grp
 	}
-
-	d.CharClass = cc
-	d.CharCategory = cm
-	d.InvokeList = inv
-	d.GroupList = grp
 
 	// Unk
-	unks, e := loadMecabUnkFile(mecabPath + "/" + mecabUnkDefFileName)
-	if e != nil {
+	if records, e := loadJumanUnkFile(mecabPath + "/" + jumanUnkDefFileName); e != nil {
 		err = e
 		return
-	}
-	d.UnkIndex = make(map[int32]int32)
-	d.UnkIndexDup = make(map[int32]int32)
-	sort.Sort(mecabMorphRecordSlice(unks))
-	for _, rec := range unks {
-		catid := int32(-1)
-		for id, cat := range d.CharClass {
-			if cat == rec[mecabUnkRecordCategoryIndex] {
-				catid = int32(id)
-				break
+	} else {
+		d.UnkIndex = make(map[int32]int32)
+		d.UnkIndexDup = make(map[int32]int32)
+		sort.Sort(jumanMorphRecordSlice(records))
+		for _, rec := range records {
+			catid := int32(-1)
+			for id, cat := range d.CharClass {
+				if cat == rec[jumanUnkRecordCategoryIndex] {
+					catid = int32(id)
+					break
+				}
 			}
+			if catid < 0 {
+				err = fmt.Errorf("unknown unk category: %v", rec[jumanUnkRecordCategoryIndex])
+				return
+			}
+			if _, ok := d.UnkIndex[catid]; !ok {
+				d.UnkIndex[catid] = int32(len(d.UnkContents))
+			} else {
+				d.UnkIndexDup[catid]++
+			}
+			var l, r, w int
+			if l, err = strconv.Atoi(rec[jumanUnkRecordLeftIDIndex]); err != nil {
+				return
+			}
+			if r, err = strconv.Atoi(rec[jumanUnkRecordRightIndex]); err != nil {
+				return
+			}
+			if w, err = strconv.Atoi(rec[jumanUnkRecordWeigthIndex]); err != nil {
+				return
+			}
+			m := dic.Morph{LeftID: int16(l), RightID: int16(r), Weight: int16(w)}
+			d.UnkMorphs = append(d.UnkMorphs, m)
+			d.UnkContents = append(d.UnkContents, rec[jumanUnkRecordOtherContentsStartIndex:])
 		}
-		if catid < 0 {
-			err = fmt.Errorf("unknown unk category: %v", rec[mecabUnkRecordCategoryIndex])
-			return
-		}
-		if _, ok := d.UnkIndex[catid]; !ok {
-			d.UnkIndex[catid] = int32(len(d.UnkContents))
-		} else {
-			d.UnkIndexDup[catid]++
-		}
-		var l, r, w int
-		if l, err = strconv.Atoi(rec[mecabUnkRecordLeftIDIndex]); err != nil {
-			return
-		}
-		if r, err = strconv.Atoi(rec[mecabUnkRecordRightIndex]); err != nil {
-			return
-		}
-		if w, err = strconv.Atoi(rec[mecabUnkRecordWeigthIndex]); err != nil {
-			return
-		}
-		m := dic.Morph{LeftID: int16(l), RightID: int16(r), Weight: int16(w)}
-		d.UnkMorphs = append(d.UnkMorphs, m)
-		d.UnkContents = append(d.UnkContents, rec[mecabUnkRecordOtherContentsStartIndex:])
 	}
 	return
 }
 
-func loadMecabMorphFile(path string) (records [][]string, err error) {
+func loadJumanMorphFile(path string) (records [][]string, err error) {
 	var f *os.File
 	f, err = os.Open(path)
 	if err != nil {
 		return
 	}
 	defer f.Close()
-	r := csv.NewReader(transform.NewReader(f, japanese.EUCJP.NewDecoder()))
+	r := csv.NewReader(f)
 	r.Comma = ','
 	for {
 		record, e := r.Read()
@@ -404,7 +410,7 @@ func loadMecabMorphFile(path string) (records [][]string, err error) {
 	return
 }
 
-func loadMecabMatrixDefFile(path string) (rowSize, colSize int64, vec []int16, err error) {
+func loadJumanMatrixDefFile(path string) (rowSize, colSize int64, vec []int16, err error) {
 	var file *os.File
 	file, err = os.Open(path)
 	if err != nil {
@@ -461,7 +467,7 @@ func loadMecabMatrixDefFile(path string) (rowSize, colSize int64, vec []int16, e
 	return
 }
 
-func loadMecabCharClassDefFile(path string) (charClass []string, charCategory []byte, invokeMap, groupMap []bool, err error) {
+func loadJumanCharClassDefFile(path string) (charClass []string, charCategory []byte, invokeMap, groupMap []bool, err error) {
 	var file *os.File
 	file, err = os.Open(path)
 	if err != nil {
@@ -510,13 +516,13 @@ func loadMecabCharClassDefFile(path string) (charClass []string, charCategory []
 	return
 }
 
-func loadMecabUnkFile(path string) (records [][]string, err error) {
+func loadJumanUnkFile(path string) (records [][]string, err error) {
 	var file *os.File
 	file, err = os.Open(path)
 	if err != nil {
 		return
 	}
-	r := csv.NewReader(transform.NewReader(file, japanese.EUCJP.NewDecoder()))
+	r := csv.NewReader(file)
 	r.Comma = ','
 	for {
 		rec, e := r.Read()
@@ -525,7 +531,7 @@ func loadMecabUnkFile(path string) (records [][]string, err error) {
 		} else if e != nil {
 			err = e
 			return
-		} else if len(rec) < mecabUnkRecordMinSize {
+		} else if len(rec) != jumanUnkRecordSize {
 			err = fmt.Errorf("invalid format csv: %v, %v", file, rec)
 			return
 		}

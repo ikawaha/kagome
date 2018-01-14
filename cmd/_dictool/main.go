@@ -20,7 +20,7 @@ import (
 	"path/filepath"
 
 	"github.com/ikawaha/kagome/cmd/_dictool/ipa"
-	"github.com/ikawaha/kagome/cmd/_dictool/mecab"
+	"github.com/ikawaha/kagome/cmd/_dictool/juman"
 	"github.com/ikawaha/kagome/cmd/_dictool/uni"
 )
 
@@ -34,7 +34,7 @@ var subcommands = []struct {
 	// subcommands
 	{ipa.CommandName, ipa.Description, ipa.Run},
 	{uni.CommandName, uni.Description, uni.Run},
-	{mecab.CommandName, mecab.Description, mecab.Run},
+	{juman.CommandName, juman.Description, juman.Run},
 }
 
 func Usage() {
