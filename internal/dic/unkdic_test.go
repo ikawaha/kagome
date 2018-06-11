@@ -1,18 +1,18 @@
 package dic
 
 import (
-	"testing"
 	"bytes"
 	"reflect"
+	"testing"
 )
 
 func TestWriteMap(t *testing.T) {
 	var b0, b1 bytes.Buffer
 
-	m:=map[int32]int32{
-		1:1,
-		2:4,
-		3:9,
+	m := map[int32]int32{
+		1: 1,
+		2: 4,
+		3: 9,
 	}
 
 	sz0, err := writeMap(&b0, m)
@@ -33,21 +33,21 @@ func TestWriteMap(t *testing.T) {
 
 func TestUnkDic_WriteAndRead(t *testing.T) {
 	d := UnkDic{
-		UnkMorphs:    []Morph{
-			{LeftID:1, RightID:2, Weight:3},
-			{LeftID:11, RightID:22, Weight:33},
+		UnkMorphs: []Morph{
+			{LeftID: 1, RightID: 2, Weight: 3},
+			{LeftID: 11, RightID: 22, Weight: 33},
 		},
-		UnkIndex:     map[int32]int32{
-			1:1,
-			2:4,
-			3:9,
+		UnkIndex: map[int32]int32{
+			1: 1,
+			2: 4,
+			3: 9,
 		},
-		UnkIndexDup:  map[int32]int32{
-			1:7,
-			2:8,
-			3:9,
+		UnkIndexDup: map[int32]int32{
+			1: 7,
+			2: 8,
+			3: 9,
 		},
-		UnkContents:  [][]string{
+		UnkContents: [][]string{
 			{"hello", "goodbye"},
 			{"こんにちは", "さようなら"},
 		},
@@ -59,7 +59,7 @@ func TestUnkDic_WriteAndRead(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected write error, %v", err)
 	}
-	if expected :=int64(231); sz != expected {
+	if expected := int64(231); sz != expected {
 		t.Fatalf("silialization size, got %v, expected %v", sz, expected)
 	}
 
