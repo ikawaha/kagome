@@ -23,7 +23,7 @@ var testFile = "../../_sample/userdic.txt"
 
 func TestNewUserDic01(t *testing.T) {
 	if _, e := NewUserDic(""); e == nil {
-		t.Error("expected error, but no occured\n")
+		t.Error("expected error, but no occurred\n")
 	}
 }
 
