@@ -11,23 +11,24 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 package dic
 
 import (
-	"encoding/binary"
-	"io"
 	"bytes"
+	"encoding/binary"
 	"encoding/gob"
-	"sort"
 	"fmt"
+	"io"
+	"sort"
 )
 
 // UnkDic represents an unknown word dictionary part.
 type UnkDic struct {
-	UnkMorphs    []Morph
-	UnkIndex     map[int32]int32
-	UnkIndexDup  map[int32]int32
-	UnkContents  [][]string
+	UnkMorphs   []Morph
+	UnkIndex    map[int32]int32
+	UnkIndexDup map[int32]int32
+	UnkContents [][]string
 }
 
 func writeMap(w io.Writer, m map[int32]int32) (n int64, err error) {
@@ -79,7 +80,7 @@ func (u UnkDic) WriteTo(w io.Writer) (n int64, err error) {
 	if err != nil {
 		return n, err
 	}
-	n +=size
+	n += size
 	if err := enc.Encode(u.UnkContents); err != nil {
 		return n, err
 	}
@@ -87,7 +88,7 @@ func (u UnkDic) WriteTo(w io.Writer) (n int64, err error) {
 	if err != nil {
 		return n, err
 	}
-	n +=size
+	n += size
 
 	return n, nil
 }
