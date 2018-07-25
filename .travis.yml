@@ -17,7 +17,6 @@ install:
 
 script:
   - go test ./...
-  - go build -tags=appengine ./cmd/kagome/...
   - cd tokenizer; go test -benchmem -bench .; cd ..
   - cd internal/dic; go test -benchmem -bench .; cd ../..
   - /bin/sh ./go-coverall.sh
