@@ -52,6 +52,7 @@ func NewWithDic(d Dic) (t Tokenizer) {
 	return Tokenizer{dic: d.dic}
 }
 
+// NewWithDicPath create a tokenizer with a dictionary that loads from path.
 func NewWithDicPath(p string) (Tokenizer, error) {
 	d, err := dic.Load(p)
 	if err != nil {
