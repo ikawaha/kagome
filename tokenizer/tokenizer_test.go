@@ -26,6 +26,8 @@ const (
 	testUserDicPath = "../_sample/userdic.txt"
 )
 
+// testing
+
 func TestAnalyze01(t *testing.T) {
 	tnz := New()
 	tokens := tnz.Analyze("", Normal)
