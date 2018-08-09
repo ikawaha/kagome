@@ -140,7 +140,6 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	/*
 	"dic/ipa/ipa.dic.000": dicIpaIpaDic000,
 	"dic/ipa/ipa.dic.001": dicIpaIpaDic001,
 	"dic/ipa/ipa.dic.002": dicIpaIpaDic002,
@@ -162,7 +161,6 @@ var _bindata = map[string]func() (*asset, error){
 	"dic/uni/uni.dic.00e": dicUniUniDic00e,
 	"dic/uni/uni.dic.00f": dicUniUniDic00f,
 	"dic/uni/uni.dic.010": dicUniUniDic010,
-	*/
 }
 
 // AssetDir returns the file names below a certain
@@ -208,15 +206,12 @@ type bintree struct {
 var _bintree = &bintree{nil, map[string]*bintree{
 	"dic": &bintree{nil, map[string]*bintree{
 		"ipa": &bintree{nil, map[string]*bintree{
-			/*
 			"ipa.dic.000": &bintree{dicIpaIpaDic000, map[string]*bintree{}},
 			"ipa.dic.001": &bintree{dicIpaIpaDic001, map[string]*bintree{}},
 			"ipa.dic.002": &bintree{dicIpaIpaDic002, map[string]*bintree{}},
 			"ipa.dic.003": &bintree{dicIpaIpaDic003, map[string]*bintree{}},
-			*/
 		}},
 		"uni": &bintree{nil, map[string]*bintree{
-			/*
 			"uni.dic.000": &bintree{dicUniUniDic000, map[string]*bintree{}},
 			"uni.dic.001": &bintree{dicUniUniDic001, map[string]*bintree{}},
 			"uni.dic.002": &bintree{dicUniUniDic002, map[string]*bintree{}},
@@ -234,7 +229,6 @@ var _bintree = &bintree{nil, map[string]*bintree{
 			"uni.dic.00e": &bintree{dicUniUniDic00e, map[string]*bintree{}},
 			"uni.dic.00f": &bintree{dicUniUniDic00f, map[string]*bintree{}},
 			"uni.dic.010": &bintree{dicUniUniDic010, map[string]*bintree{}},
-			*/
 		}},
 	}},
 }}
