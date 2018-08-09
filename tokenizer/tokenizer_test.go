@@ -349,6 +349,29 @@ func TestTokenizerSetDic(t *testing.T) {
 	}
 }
 
+func TestNewWithDicPath(t *testing.T) {
+	result, err := NewWithDicPath("../_sample/bindata.zip")
+
+	if err != nil {
+		t.Errorf("got err %v loading dictionary", err)
+	}
+	exp := []string{"BOS", "こんにちは", "、", "元気", "です", "か", "？", "EOS"}
+	tokens := result.Tokenize("こんにちは、元気ですか？")
+	for i, token := range tokens {
+		if token.Surface != exp[i] {
+			t.Errorf("expected %v, got %v", exp[i], token)
+		}
+	}
+}
+
+func TestNewWithInvalidPath(t *testing.T) {
+	_, err := NewWithDicPath("invalid.zip")
+
+	if err == nil {
+		t.Errorf("no dictionary should have been loaded")
+	}
+}
+
 func TestTokenizerDot(t *testing.T) {
 	tnz := New()
 
