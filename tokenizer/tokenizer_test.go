@@ -366,7 +366,6 @@ func TestNewWithDicPath(t *testing.T) {
 
 func TestNewWithInvalidPath(t *testing.T) {
 	_, err := NewWithDicPath("invalid.zip")
-
 	if err == nil {
 		t.Errorf("no dictionary should have been loaded")
 	}
