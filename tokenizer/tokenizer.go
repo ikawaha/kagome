@@ -56,7 +56,7 @@ func NewWithDic(d Dic) (t Tokenizer) {
 func NewWithDicPath(p string) (Tokenizer, error) {
 	d, err := dic.Load(p)
 	if err != nil {
-		return Tokenizer{}, err
+		return Tokenizer{dic: dic.SysDic()}, err
 	}
 	return NewWithDic(Dic{d}), nil
 }
