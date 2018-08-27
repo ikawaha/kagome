@@ -19,28 +19,10 @@ before_install:
 
 install:
 
-jobs:
-  include:
-  - go: "1.9.x"
-    script:
-      - go test ./...
-      - cd tokenizer; go test -benchmem -bench .; cd ..
-      - cd internal/dic; go test -benchmem -bench .; cd ../..
-  - go: "1.10.x"
-    script:
-      - go test ./...
-      - cd tokenizer; go test -benchmem -bench .; cd ..
-      - cd internal/dic; go test -benchmem -bench .; cd ../..
-  - go: "1.11.x"
-    script:
-      - go test ./...
-      - cd tokenizer; go test -benchmem -bench .; cd ..
-      - cd internal/dic; go test -benchmem -bench .; cd ../..
-  - go: "tip"
-    script:
-      - go test ./...
-      - cd tokenizer; go test -benchmem -bench .; cd ..
-      - cd internal/dic; go test -benchmem -bench .; cd ../..
+script:
+  - go test ./...
+  - cd tokenizer; go test -benchmem -bench .; cd ..
+  - cd internal/dic; go test -benchmem -bench .; cd ../..
 
 after_success:
   include:
