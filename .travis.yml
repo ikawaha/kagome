@@ -4,7 +4,7 @@ go:
   - "1.9.x"
   - "1.10.x"
   - "1.11.x"
-
+  - tip
 sudo: false
 cache: bundler
 
@@ -19,11 +19,6 @@ install:
 matrix:
   include:
   - go: "1.9.x"
-  script:
-    - go test ./...
-    - cd tokenizer; go test -benchmem -bench .; cd ..
-    - cd internal/dic; go test -benchmem -bench .; cd ../..
-    - /bin/sh ./go-coverall.sh  
   - go: "1.10.x"
   script:
     - go test ./...
@@ -32,6 +27,7 @@ matrix:
     - /bin/sh ./go-coverall.sh
   include:
   - go: "1.11.x"
+  - tip
   script:
     - go test ./...
     - cd tokenizer; go test -benchmem -bench .; cd ..
