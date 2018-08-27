@@ -8,6 +8,9 @@ go:
 sudo: false
 cache: bundler
 
+git:
+  depth: 1
+
 before_install:
   - pip install --user codecov
   - go get github.com/axw/gocov/gocov
@@ -16,7 +19,7 @@ before_install:
 
 install:
 
-matrix:
+jobs:
   include:
   - go: "1.9.x"
     script:
