@@ -16,32 +16,31 @@ before_install:
 
 install:
 
-jobs:
+matrix:
   include:
-    - go: "1.9.x"
-      script:
-        - go test ./...
-        - cd tokenizer; go test -benchmem -bench .; cd ..
-        - cd internal/dic; go test -benchmem -bench .; cd ../..
-        - /bin/sh ./go-coverall.sh  
-    - go: "1.10.x"
-      script:
-        - go test ./...
-        - cd tokenizer; go test -benchmem -bench .; cd ..
-        - cd internal/dic; go test -benchmem -bench .; cd ../..
-        - /bin/sh ./go-coverall.sh
-    - go: "1.11.x"
-      script:
-        - go test ./...
-        - cd tokenizer; go test -benchmem -bench .; cd ..
-        - cd internal/dic; go test -benchmem -bench .; cd ../..
-        - go test -covermode=count -coverprofile=coverage.txt ./...
-        - $GOPATH/bin/goverall -coverprofile=coverage.txt service=travis-ci
-    - tip
-      script:
-        - go test ./...
-        - cd tokenizer; go test -benchmem -bench .; cd ..
-        - cd internal/dic; go test -benchmem -bench .; cd ../..
-        - go test -covermode=count -coverprofile=coverage.txt ./...
-        - $GOPATH/bin/goverall -coverprofile=coverage.txt service=travis-ci
+  - go: "1.9.x"
+    script:
+      - go test ./...
+      - cd tokenizer; go test -benchmem -bench .; cd ..
+      - cd internal/dic; go test -benchmem -bench .; cd ../..
+  - go: "1.10.x"
+    script:
+      - go test ./...
+      - cd tokenizer; go test -benchmem -bench .; cd ..
+      - cd internal/dic; go test -benchmem -bench .; cd ../..
+  - go: "1.11.x"
+    script:
+      - go test ./...
+      - cd tokenizer; go test -benchmem -bench .; cd ..
+      - cd internal/dic; go test -benchmem -bench .; cd ../..
+  - tip
+    script:
+      - go test ./...
+      - cd tokenizer; go test -benchmem -bench .; cd ..
+      - cd internal/dic; go test -benchmem -bench .; cd ../..
 
+after_success:
+  include:
+  - go: "1.11.x"
+      - go test -covermode=count -coverprofile=coverage.txt ./...
+      - $GOPATH/bin/goverall -coverprofile=coverage.txt service=travis-ci
