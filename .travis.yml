@@ -25,8 +25,6 @@ script:
   - cd internal/dic; go test -benchmem -bench .; cd ../..
 
 after_success:
-  include:
-  - go: "1.11.x"
-  script:
-      - go test -covermode=count -coverprofile=coverage.txt ./...
-      - $GOPATH/bin/goveralls -coverprofile=coverage.txt service=travis-ci
+  - go test -covermode=count -coverprofile=coverage.txt ./...
+  - $GOPATH/bin/goveralls -coverprofile=coverage.txt service=travis-ci
+on: condition: $TRAVIS_GO_VERSION =~ ^1\.11\.[0-9]+$
