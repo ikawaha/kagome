@@ -29,4 +29,4 @@ after_success:
   - go: "1.11.x"
   script:
       - go test -covermode=count -coverprofile=coverage.txt ./...
-      - $GOPATH/bin/goverall -coverprofile=coverage.txt service=travis-ci
+      - $GOPATH/bin/goveralls -coverprofile=coverage.txt service=travis-ci
