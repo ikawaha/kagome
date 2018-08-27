@@ -33,7 +33,7 @@ matrix:
       - go test ./...
       - cd tokenizer; go test -benchmem -bench .; cd ..
       - cd internal/dic; go test -benchmem -bench .; cd ../..
-  - tip
+  - go: "tip"
     script:
       - go test ./...
       - cd tokenizer; go test -benchmem -bench .; cd ..
@@ -42,5 +42,6 @@ matrix:
 after_success:
   include:
   - go: "1.11.x"
+  script:
       - go test -covermode=count -coverprofile=coverage.txt ./...
       - $GOPATH/bin/goverall -coverprofile=coverage.txt service=travis-ci
