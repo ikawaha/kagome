@@ -25,6 +25,5 @@ script:
   - cd internal/dic; go test -benchmem -bench .; cd ../..
 
 after_success:
-  - go test -covermode=count -coverprofile=coverage.txt ./...
-  - $GOPATH/bin/goveralls -coverprofile=coverage.txt service=travis-ci
-on: condition: $TRAVIS_GO_VERSION =~ ^1\.11\.[0-9]+$
+  - if [ "$TRAVIS_GO_VERSION" = 1.11.* ]; then go test -covermode=count -coverprofile=coverage.txt ./...
+  - if [ "$TRAVIS_GO_VERSION" = 1.11.* ]; $GOPATH/bin/goveralls -coverprofile=coverage.txt service=travis-ci
