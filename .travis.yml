@@ -1,8 +1,9 @@
 language: go
 
 go:
-  - 1.9.7
-  - "1.10.3"
+  - "1.9.x"
+  - "1.10.x"
+  - "1.11.x"
 
 sudo: false
 cache: bundler
@@ -15,9 +16,26 @@ before_install:
 
 install:
 
-script:
-  - go test ./...
-  - cd tokenizer; go test -benchmem -bench .; cd ..
-  - cd internal/dic; go test -benchmem -bench .; cd ../..
-  - /bin/sh ./go-coverall.sh
+matrix:
+  include:
+  - go: "1.9.x"
+  script:
+    - go test ./...
+    - cd tokenizer; go test -benchmem -bench .; cd ..
+    - cd internal/dic; go test -benchmem -bench .; cd ../..
+    - /bin/sh ./go-coverall.sh  
+  - go: "1.10.x"
+  script:
+    - go test ./...
+    - cd tokenizer; go test -benchmem -bench .; cd ..
+    - cd internal/dic; go test -benchmem -bench .; cd ../..
+    - /bin/sh ./go-coverall.sh
+  include:
+  - go: "1.11.x"
+  script:
+    - go test ./...
+    - cd tokenizer; go test -benchmem -bench .; cd ..
+    - cd internal/dic; go test -benchmem -bench .; cd ../..
+    - go test -covermode=count -coverprofile=coverage.txt ./...
+    - $GOPATH/bin/goverall -coverprofile=coverage.txt service=travis-ci
 
