@@ -26,10 +26,10 @@ script:
 
 after_success:
   - |
-    if [[ ${TRAVIS_GO_VERSION} =~ ^1\.11\.[0-9]+ ]]
+    if [[ ${TRAVIS_GO_VERSION} =~ ^1\.11\..+ ]]
     then
       go test -covermode=count -coverprofile=coverage.txt ./...
       $GOPATH/bin/goveralls -coverprofile=coverage.txt service=travis-ci
     else
-      echo $TRAVIS_GO_VERSION
+      echo skip coverage test, $TRAVIS_GO_VERSION
     fi
