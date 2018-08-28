@@ -1,11 +1,15 @@
 language: go
 
 go:
-  - 1.9.7
-  - "1.10.3"
-
+  - "1.9.x"
+  - "1.10.x"
+  - "1.11.x"
+  - tip
 sudo: false
 cache: bundler
+
+git:
+  depth: 1
 
 before_install:
   - pip install --user codecov
@@ -19,5 +23,13 @@ script:
   - go test ./...
   - cd tokenizer; go test -benchmem -bench .; cd ..
   - cd internal/dic; go test -benchmem -bench .; cd ../..
-  - /bin/sh ./go-coverall.sh
 
+after_success:
+  - |
+    if [[ $TRAVIS_GO_VERSION = 1.11.x ]]
+    then
+      go test -covermode=count -coverprofile=coverage.txt ./...
+      $GOPATH/bin/goveralls -coverprofile=coverage.txt -service=travis-ci
+    else
+      echo skip coverage test, $TRAVIS_GO_VERSION
+    fi
