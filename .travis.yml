@@ -1,5 +1,10 @@
 language: go
 
+os:
+  - linux
+  - osx
+  - windows
+
 go:
   - "1.9.x"
   - "1.10.x"
@@ -26,7 +31,7 @@ script:
 
 after_success:
   - |
-    if [[ $TRAVIS_GO_VERSION = 1.11.x ]]
+    if [[ $TRAVIS_GO_VERSION = 1.11.x ]] && [[ $TRAVIS_OS_NAME = linux ]]
     then
       go test -covermode=count -coverprofile=coverage.txt ./...
       $GOPATH/bin/goveralls -coverprofile=coverage.txt -service=travis-ci
