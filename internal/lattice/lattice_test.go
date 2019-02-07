@@ -384,3 +384,33 @@ func TestBackward01(t *testing.T) {
 		la.Backward(m)
 	}
 }
+
+func TestRemoveNullBytes(t *testing.T) {
+	tests := []struct {
+		text     string
+		expected string
+	}{
+		// with null byte
+		{"\x00", ""},
+		{"\x00\x00\x00", ""},
+		{"\x00 \x00", " "},
+		{"あ\x00", "あ"},
+		{"\x00あ", "あ"},
+		{"\x00あ\x00", "あ"},
+		{"あいうえお\x00かきくけこ\x00\n\x00さしすせそ\x00\x00たちつてと\x00", "あいうえおかきくけこ\nさしすせそたちつてと"},
+		// without null byte
+		{"\x01\x02", "\x01\x02"},
+		{"", ""},
+		{" ", " "},
+		{"あ", "あ"},
+		{"\x01あ\x02", "\x01あ\x02"},
+		{"あいうえお\nかきくけこ", "あいうえお\nかきくけこ"},
+	}
+
+	for _, tt := range tests {
+		result := removeNullBytes(tt.text)
+		if result != tt.expected {
+			t.Errorf("empty bytes should be removed. got [%x], expected [%x]", result, tt.expected)
+		}
+	}
+}

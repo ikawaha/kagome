@@ -17,6 +17,7 @@ package lattice
 import (
 	"fmt"
 	"io"
+	"strings"
 	"sync"
 	"unicode"
 	"unicode/utf8"
@@ -108,6 +109,7 @@ func (la *Lattice) addNode(pos, id, start int, class NodeClass, surface string) 
 
 // Build builds a lattice from the inputs.
 func (la *Lattice) Build(inp string) {
+	inp = removeNullBytes(inp)
 	rc := utf8.RuneCountInString(inp)
 	la.Input = inp
 	if cap(la.list) < rc+2 {
@@ -358,4 +360,9 @@ func (la *Lattice) Dot(w io.Writer) {
 	}
 
 	fmt.Fprintln(w, "}")
+}
+
+// removeNullBytes deletes null bytes from the given text.
+func removeNullBytes(text string) string {
+	return strings.Replace(text, "\x00", "", -1)
 }
