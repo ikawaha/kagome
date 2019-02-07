@@ -63,6 +63,11 @@ func TestDaBuildAndSearch03(t *testing.T) {
 			t.Errorf("does not detected: %v\n", k)
 		}
 	}
+
+	// do not panic if input string contains terminator symbol \x00
+	if _, ok := d.Find("12\x00345"); ok {
+		t.Error("unexpected detection")
+	}
 }
 
 func TestDaBuildAndCommonPrefixSearch01(t *testing.T) {
@@ -127,6 +132,11 @@ func TestDaBuildAndCommonPrefixSearch03(t *testing.T) {
 			t.Fatalf("len: got %v, expected %v\n", lens, expectedLens)
 		}
 	}
+
+	// do not panic if input string contains terminator symbol \x00
+	if ids, lens := d.CommonPrefixSearch("\x00電気"); len(ids)+len(lens) > 0 {
+		t.Errorf("unexpected detection, %+v, %+v", ids, lens)
+	}
 }
 
 func TestDaBuildAndCommonPrefixSearchCallback01(t *testing.T) {
@@ -182,6 +192,11 @@ func TestDaBuildAndCommonPrefixSearchCallback03(t *testing.T) {
 			t.Errorf("len: got %v, expected %v", l, expected[i].l)
 		}
 		i++
+	})
+
+	// do not panic if input string contains terminator symbol \x00
+	d.CommonPrefixSearchCallback("\x00電気", func(id, l int) {
+		t.Errorf("unexpected detection, %v, %v", id, l)
 	})
 }
 
