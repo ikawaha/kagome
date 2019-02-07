@@ -87,11 +87,11 @@ func TestDaBuildAndCommonPrefixSearch02(t *testing.T) {
 
 func TestDaBuildAndCommonPrefixSearch03(t *testing.T) {
 	keywords := []string{
-		"電気通信",              //1
-		"電気",                //2
-		"電気通信大学",            //3
-		"電気通信大学院大学",         //4
-		"電気通信大学大学院",         //5
+		"電気通信",      //1
+		"電気",        //2
+		"電気通信大学",    //3
+		"電気通信大学院大学", //4
+		"電気通信大学大学院", //5
 		"電気通信大学大学院電気通信学研究科", //6
 		"電気通信大学電気通信学部",      //7
 	}
@@ -151,11 +151,11 @@ func TestDaBuildAndCommonPrefixSearchCallback02(t *testing.T) {
 
 func TestDaBuildAndCommonPrefixSearchCallback03(t *testing.T) {
 	keywords := []string{
-		"電気通信",              //1
-		"電気",                //2
-		"電気通信大学",            //3
-		"電気通信大学院大学",         //4
-		"電気通信大学大学院",         //5
+		"電気通信",      //1
+		"電気",        //2
+		"電気通信大学",    //3
+		"電気通信大学院大学", //4
+		"電気通信大学大学院", //5
 		"電気通信大学大学院電気通信学研究科", //6
 		"電気通信大学電気通信学部",      //7
 	}
@@ -264,12 +264,12 @@ func TestDaBuildAndPrefixSearch02(t *testing.T) {
 
 func TestDaBuildAndPrefixSearch03(t *testing.T) {
 	keywords := []string{
-		"電気",                //1
-		"電気通信",              //2
-		"電気通信大学",            //3
-		"電気通信大学院大学",         //4
-		"電気通信大学大学院",         //5
-		"電気通信大学電気通信学部",      //6
+		"電気",           //1
+		"電気通信",         //2
+		"電気通信大学",       //3
+		"電気通信大学院大学",    //4
+		"電気通信大学大学院",    //5
+		"電気通信大学電気通信学部", //6
 		"電気通信大学大学院電気通信学研究科", //7
 	}
 
@@ -346,12 +346,12 @@ func TestDaTorture(t *testing.T) {
 
 func TestReadAndWrite(t *testing.T) {
 	keywords := []string{
-		"電気",                //1
-		"電気通信",              //2
-		"電気通信大学",            //3
-		"電気通信大学院大学",         //4
-		"電気通信大学大学院",         //5
-		"電気通信大学電気通信学部",      //6
+		"電気",           //1
+		"電気通信",         //2
+		"電気通信大学",       //3
+		"電気通信大学院大学",    //4
+		"電気通信大学大学院",    //5
+		"電気通信大学電気通信学部", //6
 		"電気通信大学大学院電気通信学研究科", //7
 	}
 
