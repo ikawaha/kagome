@@ -69,7 +69,7 @@ func TestFeatures02(t *testing.T) {
 	tok.dic = dic.SysDic()
 
 	f := tok.Features()
-	expected := []string{"名詞", "固有名詞", "地域", "一般", "*", "*", "*"}
+	expected := []string{"名詞", "固有名詞", "地域", "一般", "*", "*", "*", "", "", ""}
 	if !reflect.DeepEqual(f, expected) {
 		t.Errorf("got %v, expected %v", f, expected)
 	}
@@ -149,7 +149,7 @@ func TestFeaturesAndPos02(t *testing.T) {
 	tok.dic = dic.SysDic()
 
 	f := tok.Features()
-	expected := []string{"名詞", "固有名詞", "地域", "一般", "*", "*", "*"}
+	expected := []string{"名詞", "固有名詞", "地域", "一般", "*", "*", "*", "", "", ""}
 	if !reflect.DeepEqual(f, expected) {
 		t.Errorf("got %v, expected %v", f, expected)
 	}
