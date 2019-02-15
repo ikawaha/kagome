@@ -53,11 +53,14 @@ func TestPOSString(t *testing.T) {
 	table := POSTable{
 		NameList: m.List(),
 	}
-	for i, d := range data {
-		pos := m.Add(d)
-		p := table.GetPOSName(pos)
-		if !reflect.DeepEqual(p, d) {
-			t.Errorf("%d, input %v, got %+v, expected %+v\n", i, d, p, d)
+	for i, want := range data {
+		pos := m.Add(want)
+		got := make([]string, 0, len(pos))
+		for _, id := range pos {
+			got = append(got, table.NameList[id])
+		}
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("%d, input %v, got %+v, expected %+v\n", i, want, got, want)
 		}
 	}
 }
