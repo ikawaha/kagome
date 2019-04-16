@@ -53,7 +53,7 @@ func TestAnalyze02(t *testing.T) {
 	tokens := tnz.Analyze("関西国際空港", Normal)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
-		{ID: 372977, Surface: "関西国際空港", Start: 0, End: 6, Class: TokenClass(lattice.KNOWN)},
+		{ID: 372978, Surface: "関西国際空港", Start: 0, End: 6, Class: TokenClass(lattice.KNOWN)},
 		{ID: -1, Surface: "EOS", Start: 6, End: 6},
 	}
 	if len(tokens) != len(expected) {
