@@ -17,6 +17,7 @@ package lattice
 import (
 	"fmt"
 	"io"
+	"strings"
 	"sync"
 	"unicode"
 	"unicode/utf8"
@@ -281,6 +282,38 @@ func (la *Lattice) Backward(m TokenizeMode) {
 	}
 }
 
+func features(dic *dic.Dic, udic *dic.UserDic, n *node) []string {
+	switch n.Class {
+	case DUMMY:
+		return nil
+	case KNOWN:
+		var c int
+		if dic.Contents != nil {
+			c = len(dic.Contents[n.ID])
+		}
+		features := make([]string, 0, len(dic.POSTable.POSs[n.ID])+c)
+		for _, id := range dic.POSTable.POSs[n.ID] {
+			features = append(features, dic.POSTable.NameList[id])
+		}
+		if dic.Contents != nil {
+			features = append(features, dic.Contents[n.ID]...)
+		}
+		return features
+	case UNKNOWN:
+		features := make([]string, len(dic.UnkContents[n.ID]))
+		for i := range dic.UnkContents[n.ID] {
+			features[i] = dic.UnkContents[n.ID][i]
+		}
+		return features
+	case USER:
+		pos := udic.Contents[n.ID].Pos
+		tokens := strings.Join(udic.Contents[n.ID].Tokens, "/")
+		yomi := strings.Join(udic.Contents[n.ID].Yomi, "/")
+		return []string{pos, tokens, yomi}
+	}
+	return nil
+}
+
 // Dot outputs the lattice in the graphviz dot format.
 func (la *Lattice) Dot(w io.Writer) {
 	bests := make(map[*node]struct{})
@@ -334,10 +367,15 @@ func (la *Lattice) Dot(w io.Writer) {
 					surf = "EOS"
 				}
 			}
+			features := features(la.dic, la.udic, n)
+			pos := "---"
+			if len(features) > 1 {
+				pos = features[0]
+			}
 			if _, ok := bests[n]; ok {
-				fmt.Fprintf(w, "\t\"%p\" [label=\"%s\\n%d\",shape=ellipse, peripheries=2];\n", n, surf, n.Weight)
+				fmt.Fprintf(w, "\t\"%p\" [label=\"%s\\n%s\\n%d\",shape=ellipse, peripheries=2];\n", n, surf, pos, n.Weight)
 			} else if n.Class != UNKNOWN {
-				fmt.Fprintf(w, "\t\"%p\" [label=\"%s\\n%d\"];\n", n, surf, n.Weight)
+				fmt.Fprintf(w, "\t\"%p\" [label=\"%s\\n%s\\n%d\"];\n", n, surf, pos, n.Weight)
 			}
 		}
 	}
