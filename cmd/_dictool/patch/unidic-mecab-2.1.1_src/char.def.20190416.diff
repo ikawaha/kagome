@@ -1,0 +1,11 @@
+--- unidic-mecab-2.1.2_src_org/char.def	2013-03-06 17:54:00.000000000 +0900
++++ unidic-mecab-2.1.2_src/char.def	2016-01-04 22:54:58.000000000 +0900
+@@ -34,7 +34,7 @@ CYRILLIC        1 1 0
+ 
+ # SPACE
+ 0x0020 SPACE  # DO NOT REMOVE THIS LINE, 0x0020 is reserved for SPACE
+-0x00D0 SPACE
++0x000D SPACE
+ 0x0009 SPACE
+ 0x000B SPACE
+ 0x000A SPACE
