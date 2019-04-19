@@ -26,7 +26,7 @@ func TestDicLoad(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	const expected = 392126
+	const expected = IPADICEntrySize
 	if c := len(dic.Morphs); c != expected {
 		t.Errorf("morphs got %v, expected %v\n", c, expected)
 	}
@@ -43,7 +43,7 @@ func TestDicLoadSimple(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	const expected = 392126
+	const expected = IPADICEntrySize
 	if c := len(dic.Morphs); c != expected {
 		t.Errorf("morphs got %v, expected %v\n", c, expected)
 	}

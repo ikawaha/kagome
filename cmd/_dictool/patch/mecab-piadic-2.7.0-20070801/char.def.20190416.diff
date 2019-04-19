@@ -1,0 +1,11 @@
+--- ../../../../taku910/mecab/mecab-ipadic/char.def	2019-04-16 12:19:40.000000000 +0900
++++ mecab-ipadic-2.7.0-20070801/char.def	2015-04-16 00:22:39.000000000 +0900
+@@ -34,7 +34,7 @@ CYRILLIC       1 1 0
+ 
+ # SPACE
+ 0x0020 SPACE  # DO NOT REMOVE THIS LINE, 0x0020 is reserved for SPACE
+-0x00D0 SPACE
++0x000D SPACE
+ 0x0009 SPACE
+ 0x000B SPACE
+ 0x000A SPACE
