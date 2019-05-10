@@ -4,5 +4,5 @@
     "env": {
 	"BUILDPACK_URL": "https://github.com/heroku/heroku-buildpack-multi.git"
     },
-    "stack": "heroku-16"
+    "stack": "heroku-18"
 }
