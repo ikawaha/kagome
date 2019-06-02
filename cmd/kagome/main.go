@@ -28,6 +28,8 @@ import (
 var (
 	errorWriter = os.Stderr
 
+	versionKagome string
+
 	subcommands = []struct {
 		Name          string
 		Description   string
@@ -72,6 +74,17 @@ func PrintDefaults() {
 			fmt.Fprintf(errorWriter, "   %s - %s\n", c.Name, c.Description)
 		}
 	}
+	fmt.Fprintf(errorWriter, "   %s - %s\n", "version", "show version")
+}
+
+// PrintVersion prints out the app version.
+// This must be specified by "-X" option during the go build. Such like:
+//   $ go build --ldflags "-X 'main.versionKagome=${version_app}'"
+func PrintVersion() {
+	if versionKagome == "" {
+		versionKagome = "(version not defined)"
+	}
+	fmt.Printf("%s %s\n", filepath.Base(os.Args[0]), versionKagome)
 }
 
 func main() {
@@ -89,6 +102,10 @@ func main() {
 	}
 	if cmd == nil {
 		options = os.Args[1:]
+		if options[0] == "version" || options[0] == "-v" || options[0] == "--version" {
+			PrintVersion()
+			os.Exit(0)
+		}
 		if e := defaultSubcommand.OptionCheck(options); e != nil {
 			Usage()
 			PrintDefaults()
