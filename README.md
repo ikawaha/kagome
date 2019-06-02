@@ -357,6 +357,46 @@ Docker image
 
 [![Docker](https://dockeri.co/image/ikawaha/kagome)](https://hub.docker.com/r/ikawaha/kagome)
 
+[![](https://images.microbadger.com/badges/image/ikawaha/kagome.svg)](https://microbadger.com/images/ikawaha/kagome "View image info on microbadger.com")
+```bash
+docker pull ikawaha/kagome:latest
+```
+
+**Examples**
+
+```shellsession
+$ # Show kagome's help
+$ docker run --rm ikawaha/kagome -h
+```
+```shellsession
+$ # Show tokenize command's help
+$ docker run --rm ikawaha/kagome tokenize -h
+```
+```shellsession
+$ # Interactive mode of kagome
+$ docker run --rm -it ikawaha/kagome
+すもももももももものうち
+すもも	名詞,一般,*,*,*,*,すもも,スモモ,スモモ
+も	助詞,係助詞,*,*,*,*,も,モ,モ
+もも	名詞,一般,*,*,*,*,もも,モモ,モモ
+も	助詞,係助詞,*,*,*,*,も,モ,モ
+もも	名詞,一般,*,*,*,*,もも,モモ,モモ
+の	助詞,連体化,*,*,*,*,の,ノ,ノ
+うち	名詞,非自立,副詞可能,*,*,*,うち,ウチ,ウチ
+EOS
+^C
+$
+```
+```shellsession
+$ # Server mode of kagome as Web API (Detached to run on background with 8888 port)
+$ docker run --rm -d -p 8888:80 ikawaha/kagome server -http=":80"
+...
+$ # cURL the API from the client (For the results see the Web API section above)
+$ curl -s -XPUT localhost:8888/a -d'{"sentence":"すもももももももものうち", "mode":"normal"}'|jq .
+...
+```
+
+
 Contributing
 ---
 
