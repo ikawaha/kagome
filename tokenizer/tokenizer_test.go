@@ -53,7 +53,7 @@ func TestAnalyze02(t *testing.T) {
 	tokens := tnz.Analyze("関西国際空港", Normal)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
-		{ID: 372977, Surface: "関西国際空港", Start: 0, End: 6, Class: TokenClass(lattice.KNOWN)},
+		{ID: 372978, Surface: "関西国際空港", Start: 0, End: 6, Class: TokenClass(lattice.KNOWN)},
 		{ID: -1, Surface: "EOS", Start: 6, End: 6},
 	}
 	if len(tokens) != len(expected) {
@@ -346,6 +346,28 @@ func TestTokenizerSetDic(t *testing.T) {
 	tnz.SetDic(d)
 	if tnz.dic != d.dic {
 		t.Errorf("got %v, expected %v", tnz.dic, d)
+	}
+}
+
+func TestNewWithDicPath(t *testing.T) {
+	result, err := NewWithDicPath("../_sample/ipa.dic")
+
+	if err != nil {
+		t.Errorf("got err %v loading dictionary", err)
+	}
+	exp := []string{"BOS", "こんにちは", "、", "元気", "です", "か", "？", "EOS"}
+	tokens := result.Tokenize("こんにちは、元気ですか？")
+	for i, token := range tokens {
+		if token.Surface != exp[i] {
+			t.Errorf("expected %v, got %v", exp[i], token)
+		}
+	}
+}
+
+func TestNewWithInvalidPath(t *testing.T) {
+	_, err := NewWithDicPath("invalid.zip")
+	if err == nil {
+		t.Errorf("no dictionary should have been loaded")
 	}
 }
 

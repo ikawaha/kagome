@@ -20,11 +20,16 @@ import (
 	"testing"
 )
 
+const (
+	IPADICEntrySize = 392126 + 1
+	UniDICEntrySize = 756463 + 3
+)
+
 func TestSystemDic(t *testing.T) {
 	initSysDicIPA = sync.Once{}
 	d := SysDic() // load default ipadic
 
-	const expected = 392126
+	const expected = IPADICEntrySize
 	c := len(d.Morphs)
 	if c != expected {
 		t.Errorf("got %v, expected %v\n", c, expected)
@@ -35,7 +40,7 @@ func TestSystemDicSimple(t *testing.T) {
 	initSysDicIPA = sync.Once{}
 	d := SysDicSimple()
 
-	const expected = 392126
+	const expected = IPADICEntrySize
 	c := len(d.Morphs)
 	if c != expected {
 		t.Errorf("got %v, expected %v\n", c, expected)
@@ -59,7 +64,7 @@ func TestSystemDicUniPath01(t *testing.T) {
 func TestSystemDicIPAMorphs01(t *testing.T) {
 	initSysDicIPA = sync.Once{}
 	d := SysDicIPA()
-	const expected = 392126
+	const expected = IPADICEntrySize
 	c := len(d.Morphs)
 	if c != expected {
 		t.Errorf("got %v, expected %v\n", c, expected)
@@ -69,7 +74,7 @@ func TestSystemDicIPAMorphs01(t *testing.T) {
 func TestSystemDicIPASimpleMorphs01(t *testing.T) {
 	initSysDicIPA = sync.Once{}
 	d := SysDicIPASimple()
-	const expected = 392126
+	const expected = IPADICEntrySize
 	c := len(d.Morphs)
 	if c != expected {
 		t.Errorf("got %v, expected %v\n", c, expected)
@@ -79,7 +84,7 @@ func TestSystemDicIPASimpleMorphs01(t *testing.T) {
 func TestSystemDicUniMorphs01(t *testing.T) {
 	initSysDicIPA = sync.Once{}
 	d := SysDicUni()
-	const expected = 756463
+	const expected = UniDICEntrySize
 	c := len(d.Morphs)
 	if c != expected {
 		t.Errorf("got %v, expected %v\n", c, expected)
@@ -89,7 +94,7 @@ func TestSystemDicUniMorphs01(t *testing.T) {
 func TestSystemDicUniSimpleMorphs01(t *testing.T) {
 	initSysDicUni = sync.Once{}
 	d := SysDicUniSimple()
-	const expected = 756463
+	const expected = UniDICEntrySize
 	c := len(d.Morphs)
 	if c != expected {
 		t.Errorf("got %v, expected %v\n", c, expected)
@@ -99,7 +104,7 @@ func TestSystemDicUniSimpleMorphs01(t *testing.T) {
 func TestSystemDicIPAContents01(t *testing.T) {
 	initSysDicIPA = sync.Once{}
 	d := SysDicIPA()
-	const expected = 392126
+	const expected = IPADICEntrySize
 	c := len(d.Contents)
 	if c != expected {
 		t.Errorf("got %v, expected %v\n", c, expected)
@@ -119,7 +124,7 @@ func TestSystemDicIPASimpleContents01(t *testing.T) {
 func TestSystemDicUniContents01(t *testing.T) {
 	initSysDicUni = sync.Once{}
 	d := SysDicUni()
-	const expected = 756463
+	const expected = UniDICEntrySize
 	c := len(d.Contents)
 	if c != expected {
 		t.Errorf("got %v, expected %v\n", c, expected)
@@ -321,9 +326,8 @@ func TestSystemDicIPACharCategory01(t *testing.T) {
 		category byte
 	}
 	testSet := []callAndRespose{
-		{input: 0x0020, category: SPACE}, // 0x0020 SPACE  # DO NOT REMOVE THIS LINE, 0x0020 is reserved for SPACE
-		//{input: 0x00D0, category: SPACE},    // 0x00D0 SPACE
-		{input: 0x000d, category: SPACE},    // 0x00D0 SPACE
+		{input: 0x0020, category: SPACE},    // 0x0020 SPACE  # DO NOT REMOVE THIS LINE, 0x0020 is reserved for SPACE
+		{input: 0x000D, category: SPACE},    // 0x00D0 SPACE
 		{input: 0x0009, category: SPACE},    // 0x0009 SPACE
 		{input: 0x000B, category: SPACE},    // 0x000B SPACE
 		{input: 0x000A, category: SPACE},    // 0x000A SPACE
@@ -503,9 +507,8 @@ func TestSystemDicUniCharCategory01(t *testing.T) {
 		category byte
 	}
 	testSet := []callAndRespose{
-		{input: 0x0020, category: SPACE}, // 0x0020 SPACE  # DO NOT REMOVE THIS LINE, 0x0020 is reserved for SPACE
-		//{input: 0x00D0, category: SPACE},    // 0x00D0 SPACE
-		{input: 0x000d, category: SPACE},    // 0x00D0 SPACE
+		{input: 0x0020, category: SPACE},    // 0x0020 SPACE  # DO NOT REMOVE THIS LINE, 0x0020 is reserved for SPACE
+		{input: 0x000D, category: SPACE},    // 0x00D0 SPACE
 		{input: 0x0009, category: SPACE},    // 0x0009 SPACE
 		{input: 0x000B, category: SPACE},    // 0x000B SPACE
 		{input: 0x000A, category: SPACE},    // 0x000A SPACE

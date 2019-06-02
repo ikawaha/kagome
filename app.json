@@ -3,5 +3,6 @@
     "description": "Kagome Japanese Morphological Analyzer",    
     "env": {
 	"BUILDPACK_URL": "https://github.com/heroku/heroku-buildpack-multi.git"
-    }
+    },
+    "stack": "heroku-18"
 }
