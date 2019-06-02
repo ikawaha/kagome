@@ -29,8 +29,6 @@ RUN apk add git gcc g++ && \
       -o /go/bin/kagome \
       ./kagome && \
     echo '- Running tests ...' && \
-    /go/bin/kagome -v && \
-    /go/bin/kagome --version && \
     /go/bin/kagome version
 
 # 2nd stage: Copy only the built binary to shrink the image size.
