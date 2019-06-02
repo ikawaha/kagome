@@ -1,4 +1,10 @@
-[![Build Status](https://travis-ci.org/ikawaha/kagome.svg?branch=master)](https://travis-ci.org/ikawaha/kagome) [![BuildStatus(Windows)](https://ci.appveyor.com/api/projects/status/k4g4bpy1ijqoasbe/branch/master?svg=true)](https://ci.appveyor.com/project/ikawaha/kagome) [![Coverage Status](https://coveralls.io/repos/ikawaha/kagome/badge.svg?branch=master&service=github)](https://coveralls.io/github/ikawaha/kagome?branch=master)  [![GoDoc](https://godoc.org/github.com/ikawaha/kagome?status.svg)](https://godoc.org/github.com/ikawaha/kagome) [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+[![Build Status](https://travis-ci.org/ikawaha/kagome.svg?branch=master)](https://travis-ci.org/ikawaha/kagome)
+[![BuildStatus(Windows)](https://ci.appveyor.com/api/projects/status/k4g4bpy1ijqoasbe/branch/master?svg=true)](https://ci.appveyor.com/project/ikawaha/kagome)
+[![Coverage Status](https://coveralls.io/repos/ikawaha/kagome/badge.svg?branch=master&service=github)](https://coveralls.io/github/ikawaha/kagome?branch=master) 
+[![GoDoc](https://godoc.org/github.com/ikawaha/kagome?status.svg)](https://godoc.org/github.com/ikawaha/kagome)
+[![Docker Pulls](https://img.shields.io/docker/pulls/ikawaha/kagome.svg?style)](https://hub.docker.com/r/ikawaha/kagome/)
+[![Docker Automated build](https://img.shields.io/docker/automated/ikawaha/kagome.svg)](https://hub.docker.com/r/ikawaha/kagome/)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 Kagome Japanese Morphological Analyzer
 ===
@@ -6,6 +12,7 @@ Kagome Japanese Morphological Analyzer
 Kagome is an open source Japanese morphological analyzer written in pure golang.
 The [MeCab-IPADIC](http://taku910.github.io/mecab/) and [UniDic (unidic-mecab)](http://pj.ninjal.ac.jp/corpus_center/unidic/) dictionary/statiscal models are packaged in Kagome binary.
 
+You could  try it in the [demo](https://kagome.herokuapp.com/_demo).
 ```
 % kagome
 すもももももももものうち
@@ -259,7 +266,7 @@ Launch a server and access `http://localhost:8888`.
 $ kagome -http=":8888" &
 ```
 
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 ![Demo](https://raw.githubusercontent.com/wiki/ikawaha/kagome/images/demoapp.gif)
 
@@ -344,6 +351,11 @@ For Google App Engine, please use [kagome.ipadic](https://github.com/ikawaha/kag
 
 see details: https://github.com/ikawaha/kagome/issues/86
 
+
+Docker image
+---
+
+[![Docker](https://dockeri.co/image/ikawaha/kagome)](https://hub.docker.com/r/ikawaha/kagome)
 
 Contributing
 ---
