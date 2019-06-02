@@ -22,12 +22,12 @@ WORKDIR /go/src/github.com/ikawaha/kagome
 RUN apk add git gcc g++ && \
     version_app=$(git describe --tag) && \
     echo "- Current git tag: ${version_app}" && \
-    cd /go/src/github.com/ikawaha/kagome/cmd && \
+    cd /go/src/github.com/ikawaha/kagome && \
     go build \
       -a \
-      --ldflags "-w -extldflags \"-static\" -X 'main.versionKagome=${version_app}'" \
+      --ldflags "-w -extldflags \"-static\" -X 'main.version=${version_app}'" \
       -o /go/bin/kagome \
-      ./kagome && \
+      ./cmd/kagome && \
     echo '- Running tests ...' && \
     /go/bin/kagome version
 
