@@ -1,0 +1,11 @@
+# This is a test of Dockerfile using docker-compose.
+# - USAGE:
+#   $ docker-compose -f docker-compose.test.yml up
+#   ...
+#   $ # Echo result status. (0 = success)
+#   $ echo $?
+#   ...
+
+sut:
+  build: .
+  command: version
