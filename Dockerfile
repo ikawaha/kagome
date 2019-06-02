@@ -25,7 +25,7 @@ RUN apk add git gcc g++ && \
     cd /go/src/github.com/ikawaha/kagome/cmd && \
     go build \
       -a \
-      --ldflags "-w -extldflags \"-static\" -X 'main.version_kagome=${version_app}'" \
+      --ldflags "-w -extldflags \"-static\" -X 'main.versionKagome=${version_app}'" \
       -o /go/bin/kagome \
       ./kagome && \
     echo '- Running tests ...' && \

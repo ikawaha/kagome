@@ -28,7 +28,7 @@ import (
 var (
 	errorWriter = os.Stderr
 
-	version_kagome string
+	versionKagome string
 
 	subcommands = []struct {
 		Name          string
@@ -79,12 +79,12 @@ func PrintDefaults() {
 
 // PrintVersion prints out the app version.
 // This must be specified by "-X" option during the go build. Such like:
-//   $ go build --ldflags "-X 'main.version_kagome=${version_app}'"
+//   $ go build --ldflags "-X 'main.versionKagome=${version_app}'"
 func PrintVersion() {
-	if version_kagome == "" {
-		version_kagome = "(version not defined)"
+	if versionKagome == "" {
+		versionKagome = "(version not defined)"
 	}
-	fmt.Printf("%s %s\n", filepath.Base(os.Args[0]), version_kagome)
+	fmt.Printf("%s %s\n", filepath.Base(os.Args[0]), versionKagome)
 }
 
 func main() {
