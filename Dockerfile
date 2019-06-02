@@ -4,7 +4,7 @@
 # work as a single 'kagome' binary.
 # - USAGE:
 #   - To build the image, run:
-#     $ docker build --tag kagome:latest ./Dockerfile && docker prune -f
+#     $ docker build --tag kagome:latest ./Dockerfile && docker image prune -f
 #   - To run the container, run:
 #     $ # This is equivalent to "kagome version"
 #     $ docker run --rm kagome:latest version
