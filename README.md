@@ -1,4 +1,10 @@
-[![Build Status](https://travis-ci.org/ikawaha/kagome.svg?branch=master)](https://travis-ci.org/ikawaha/kagome) [![BuildStatus(Windows)](https://ci.appveyor.com/api/projects/status/k4g4bpy1ijqoasbe/branch/master?svg=true)](https://ci.appveyor.com/project/ikawaha/kagome) [![Coverage Status](https://coveralls.io/repos/ikawaha/kagome/badge.svg?branch=master&service=github)](https://coveralls.io/github/ikawaha/kagome?branch=master)  [![GoDoc](https://godoc.org/github.com/ikawaha/kagome?status.svg)](https://godoc.org/github.com/ikawaha/kagome) [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+[![Build Status](https://travis-ci.org/ikawaha/kagome.svg?branch=master)](https://travis-ci.org/ikawaha/kagome)
+[![BuildStatus(Windows)](https://ci.appveyor.com/api/projects/status/k4g4bpy1ijqoasbe/branch/master?svg=true)](https://ci.appveyor.com/project/ikawaha/kagome)
+[![Coverage Status](https://coveralls.io/repos/ikawaha/kagome/badge.svg?branch=master&service=github)](https://coveralls.io/github/ikawaha/kagome?branch=master) 
+[![GoDoc](https://godoc.org/github.com/ikawaha/kagome?status.svg)](https://godoc.org/github.com/ikawaha/kagome)
+[![Docker Pulls](https://img.shields.io/docker/pulls/ikawaha/kagome.svg?style)](https://hub.docker.com/r/ikawaha/kagome/)
+[![Docker Automated build](https://img.shields.io/docker/automated/ikawaha/kagome.svg)](https://hub.docker.com/r/ikawaha/kagome/)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 Kagome Japanese Morphological Analyzer
 ===
@@ -6,6 +12,7 @@ Kagome Japanese Morphological Analyzer
 Kagome is an open source Japanese morphological analyzer written in pure golang.
 The [MeCab-IPADIC](http://taku910.github.io/mecab/) and [UniDic (unidic-mecab)](http://pj.ninjal.ac.jp/corpus_center/unidic/) dictionary/statiscal models are packaged in Kagome binary.
 
+You could  try it in the [demo](https://kagome.herokuapp.com/_demo).
 ```
 % kagome
 すもももももももものうち
@@ -259,7 +266,7 @@ Launch a server and access `http://localhost:8888`.
 $ kagome -http=":8888" &
 ```
 
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 ![Demo](https://raw.githubusercontent.com/wiki/ikawaha/kagome/images/demoapp.gif)
 
@@ -344,6 +351,57 @@ For Google App Engine, please use [kagome.ipadic](https://github.com/ikawaha/kag
 
 see details: https://github.com/ikawaha/kagome/issues/86
 
+
+Docker image
+---
+
+[![Docker](https://dockeri.co/image/ikawaha/kagome)](https://hub.docker.com/r/ikawaha/kagome)
+
+[![](https://images.microbadger.com/badges/image/ikawaha/kagome.svg)](https://microbadger.com/images/ikawaha/kagome "View image info on microbadger.com")
+```bash
+docker pull ikawaha/kagome:latest
+```
+
+**Examples**
+
+#### Show help
+```shellsession
+$ docker run --rm ikawaha/kagome -h
+```
+
+#### Show tokenize command's help
+
+```shellsession
+$ docker run --rm ikawaha/kagome tokenize -h
+```
+
+#### Interactive mode
+```shellsession
+$ docker run --rm -it ikawaha/kagome
+すもももももももものうち
+すもも	名詞,一般,*,*,*,*,すもも,スモモ,スモモ
+も	助詞,係助詞,*,*,*,*,も,モ,モ
+もも	名詞,一般,*,*,*,*,もも,モモ,モモ
+も	助詞,係助詞,*,*,*,*,も,モ,モ
+もも	名詞,一般,*,*,*,*,もも,モモ,モモ
+の	助詞,連体化,*,*,*,*,の,ノ,ノ
+うち	名詞,非自立,副詞可能,*,*,*,うち,ウチ,ウチ
+EOS
+^C
+$
+```
+
+#### Server mode as Web API
+
+* Detached to run on background with 8888 port.
+```shellsession
+$ docker run --rm -d -p 8888:80 ikawaha/kagome server -http=":80"
+```
+
+* Access to the API from the client.
+```shellsession
+$ curl -s -XPUT localhost:8888/a -d'{"sentence":"すもももももももものうち", "mode":"normal"}'| jq .
+```
 
 Contributing
 ---

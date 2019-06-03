@@ -1,4 +1,4 @@
-// Copyright 2015 ikawaha
+// Copyright 2019 ikawaha
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,34 +25,60 @@ import (
 	"github.com/ikawaha/kagome/cmd/kagome/tokenize"
 )
 
+type subcommand struct {
+	Name          string
+	Description   string
+	Run           func([]string) error
+	Usage         func()
+	OptionCheck   func([]string) error
+	PrintDefaults func(flag.ErrorHandling)
+}
+
+var subcommands = []subcommand{
+	{
+		Name:          tokenize.CommandName,
+		Description:   tokenize.Description,
+		Run:           tokenize.Run,
+		Usage:         tokenize.Usage,
+		OptionCheck:   tokenize.OptionCheck,
+		PrintDefaults: tokenize.PrintDefaults,
+	},
+	{
+		Name:          server.CommandName,
+		Description:   server.Description,
+		Run:           server.Run,
+		Usage:         server.Usage,
+		OptionCheck:   server.OptionCheck,
+		PrintDefaults: server.PrintDefaults,
+	},
+	{
+		Name:          lattice.CommandName,
+		Description:   lattice.Description,
+		Run:           lattice.Run,
+		Usage:         lattice.Usage,
+		OptionCheck:   lattice.OptionCheck,
+		PrintDefaults: lattice.PrintDefaults,
+	},
+	{
+		Name:        "version",
+		Description: "show version",
+		Run: func([]string) error {
+			fmt.Fprintf(os.Stderr, "%s\n", version)
+			return nil
+		},
+		Usage:         func() {},
+		OptionCheck:   func([]string) error { return nil },
+		PrintDefaults: func(flag.ErrorHandling) {},
+	},
+}
+
 var (
-	errorWriter = os.Stderr
+	// version is the app version.
+	version = `!!version undefined!!
+This must be specified by -X option during the go build. Such like:
+	$ go build --ldflags "-X 'main.version=$(git describe --tag)'"`
 
-	subcommands = []struct {
-		Name          string
-		Description   string
-		Run           func([]string) error
-		Usage         func()
-		OptionCheck   func([]string) error
-		PrintDefaults func(flag.ErrorHandling)
-	}{
-		{
-			tokenize.CommandName, tokenize.Description,
-			tokenize.Run,
-			tokenize.Usage, tokenize.OptionCheck, tokenize.PrintDefaults,
-		},
-		{
-			server.CommandName, server.Description,
-			server.Run,
-			server.Usage, server.OptionCheck, server.PrintDefaults,
-		},
-		{
-			lattice.CommandName, lattice.Description,
-			lattice.Run,
-			lattice.Usage, lattice.OptionCheck, lattice.PrintDefaults,
-		},
-	}
-
+	errorWriter       = os.Stderr
 	defaultSubcommand = subcommands[0]
 )
 
@@ -89,7 +115,7 @@ func main() {
 	}
 	if cmd == nil {
 		options = os.Args[1:]
-		if e := defaultSubcommand.OptionCheck(options); e != nil {
+		if err := defaultSubcommand.OptionCheck(options); err != nil {
 			Usage()
 			PrintDefaults()
 			fmt.Fprintln(errorWriter)
@@ -99,8 +125,8 @@ func main() {
 		}
 		cmd = defaultSubcommand.Run
 	}
-	if e := cmd(options); e != nil {
-		fmt.Fprintf(errorWriter, "%v\n", e)
+	if err := cmd(options); err != nil {
+		fmt.Fprintf(errorWriter, "%v\n", err)
 		os.Exit(1)
 	}
 }
