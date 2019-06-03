@@ -15,17 +15,16 @@ FROM golang:alpine AS build-app
 
 # Copy the current dir including .git dir for versioning.
 COPY . /go/src/github.com/ikawaha/kagome
-
 WORKDIR /go/src/github.com/ikawaha/kagome
 
 # Shell script to build the image (with the tag as version).
-RUN apk add git gcc g++ && \
+RUN apk --no-cache add git && \
     version_app=$(git describe --tag) && \
     echo "- Current git tag: ${version_app}" && \
-    cd /go/src/github.com/ikawaha/kagome && \
-    go build \
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
       -a \
-      --ldflags "-w -extldflags \"-static\" -X 'main.version=${version_app}'" \
+      -installsuffix cgo \
+      --ldflags "-w -s -extldflags \"-static\" -X 'main.version=${version_app}'" \
       -o /go/bin/kagome \
       ./cmd/kagome && \
     echo '- Running tests ...' && \
