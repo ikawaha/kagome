@@ -364,16 +364,19 @@ docker pull ikawaha/kagome:latest
 
 **Examples**
 
+#### Show help
 ```shellsession
-$ # Show kagome's help
 $ docker run --rm ikawaha/kagome -h
 ```
+
+#### Show tokenize command's help
+
 ```shellsession
-$ # Show tokenize command's help
 $ docker run --rm ikawaha/kagome tokenize -h
 ```
+
+#### Interactive mode
 ```shellsession
-$ # Interactive mode of kagome
 $ docker run --rm -it ikawaha/kagome
 すもももももももものうち
 すもも	名詞,一般,*,*,*,*,すもも,スモモ,スモモ
@@ -387,15 +390,18 @@ EOS
 ^C
 $
 ```
+
+#### Server mode as Web API
+
+* Detached to run on background with 8888 port.
 ```shellsession
-$ # Server mode of kagome as Web API (Detached to run on background with 8888 port)
 $ docker run --rm -d -p 8888:80 ikawaha/kagome server -http=":80"
-...
-$ # cURL the API from the client (For the results see the Web API section above)
-$ curl -s -XPUT localhost:8888/a -d'{"sentence":"すもももももももものうち", "mode":"normal"}'|jq .
-...
 ```
 
+* Access to the API from the client.
+```shellsession
+$ curl -s -XPUT localhost:8888/a -d'{"sentence":"すもももももももものうち", "mode":"normal"}'| jq .
+```
 
 Contributing
 ---
