@@ -21,6 +21,7 @@ WORKDIR /go/src/github.com/ikawaha/kagome
 RUN apk --no-cache add git && \
     version_app=$(git describe --tag) && \
     echo "- Current git tag: ${version_app}" && \
+    go version && \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
       -a \
       -installsuffix cgo \
