@@ -10,9 +10,9 @@ Kagome Japanese Morphological Analyzer
 ===
 
 Kagome is an open source Japanese morphological analyzer written in pure golang.
-The [MeCab-IPADIC](http://taku910.github.io/mecab/) and [UniDic (unidic-mecab)](http://pj.ninjal.ac.jp/corpus_center/unidic/) dictionary/statiscal models are packaged in Kagome binary.
+The [MeCab-IPADIC](http://taku910.github.io/mecab/) and [UniDic (unidic-mecab)](http://pj.ninjal.ac.jp/corpus_center/unidic/) dictionary/statiscal models are packaged in Kagome binary. 
 
-You could  try it in the [demo](https://kagome.herokuapp.com/_demo).
+[![demo](https://img.shields.io/badge/demo-heroku_deployed-blue.svg)](https://kagome.herokuapp.com/_demo).
 ```
 % kagome
 すもももももももものうち
