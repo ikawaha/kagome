@@ -32,36 +32,37 @@ func (t *ConnectionTable) At(row, col int) int16 {
 
 // WriteTo implements the io.WriterTo interface
 func (t ConnectionTable) WriteTo(w io.Writer) (n int64, err error) {
-	if err = binary.Write(w, binary.LittleEndian, t.Row); err != nil {
-		return
+	if err := binary.Write(w, binary.LittleEndian, t.Row); err != nil {
+		return n, err
 	}
 	n += int64(binary.Size(t.Row))
-	if err = binary.Write(w, binary.LittleEndian, t.Col); err != nil {
-		return
+	if err := binary.Write(w, binary.LittleEndian, t.Col); err != nil {
+		return n, err
 	}
 	n += int64(binary.Size(t.Col))
 	for i := range t.Vec {
-		if err = binary.Write(w, binary.LittleEndian, t.Vec[i]); err != nil {
+		if err := binary.Write(w, binary.LittleEndian, t.Vec[i]); err != nil {
 			return n, err
 		}
 		n += int64(binary.Size(t.Vec[i]))
 	}
-	return
+	return n, nil
 }
 
 // LoadConnectionTable loads ConnectionTable from io.Reader.
-func LoadConnectionTable(r io.Reader) (t ConnectionTable, err error) {
-	if err = binary.Read(r, binary.LittleEndian, &t.Row); err != nil {
-		return
+func LoadConnectionTable(r io.Reader) (ConnectionTable, error) {
+	var ret ConnectionTable
+	if err := binary.Read(r, binary.LittleEndian, &ret.Row); err != nil {
+		return ret, err
 	}
-	if err = binary.Read(r, binary.LittleEndian, &t.Col); err != nil {
-		return
+	if err := binary.Read(r, binary.LittleEndian, &ret.Col); err != nil {
+		return ret, err
 	}
-	t.Vec = make([]int16, t.Row*t.Col)
-	for i := range t.Vec {
-		if err = binary.Read(r, binary.LittleEndian, &t.Vec[i]); err != nil {
-			return
+	ret.Vec = make([]int16, ret.Row*ret.Col)
+	for i := range ret.Vec {
+		if err := binary.Read(r, binary.LittleEndian, &ret.Vec[i]); err != nil {
+			return ret, err
 		}
 	}
-	return
+	return ret, nil
 }

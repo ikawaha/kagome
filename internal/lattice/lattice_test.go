@@ -104,9 +104,9 @@ func TestLatticeBuild03(t *testing.T) {
 
 	const udicPath = "../../_sample/userdic.txt"
 
-	udic, e := dic.NewUserDic(udicPath)
-	if e != nil {
-		t.Fatalf("unexpected error: cannot load user dic, %v", e)
+	udic, err := dic.NewUserDic(udicPath)
+	if err != nil {
+		t.Fatalf("unexpected error: cannot load user dic, %v", err)
 	}
 	la := New(dic.SysDic(), udic)
 	if la == nil {
@@ -207,7 +207,7 @@ func TestLatticeBuild05(t *testing.T) {
 	inp := "ポポピポンポコナーノ"
 	var b bytes.Buffer
 	for i, step := 0, utf8.RuneCountInString(inp); i < maximumUnknownWordLength; i = i + step {
-		if _, e := b.WriteString(inp); e != nil {
+		if _, err := b.WriteString(inp); err != nil {
 			t.Fatalf("unexpected error: create the test input, %v", b.String())
 		}
 	}

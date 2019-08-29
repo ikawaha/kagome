@@ -73,8 +73,8 @@ func TestAnalyze02(t *testing.T) {
 
 func TestAnalyze03(t *testing.T) {
 	tnz := New()
-	udic, e := NewUserDic(testUserDicPath)
-	if e != nil {
+	udic, err := NewUserDic(testUserDicPath)
+	if err != nil {
 		t.Fatalf("new user dic: unexpected error")
 	}
 	tnz.SetUserDic(udic)
@@ -191,8 +191,8 @@ func TestSearchModeAnalyze02(t *testing.T) {
 
 func TestSearchModeAnalyze03(t *testing.T) {
 	tnz := New()
-	udic, e := NewUserDic(testUserDicPath)
-	if e != nil {
+	udic, err := NewUserDic(testUserDicPath)
+	if err != nil {
 		t.Fatalf("new user dic: unexpected error")
 	}
 	tnz.SetUserDic(udic)
@@ -288,8 +288,8 @@ func TestExtendedModeAnalyze02(t *testing.T) {
 
 func TestExtendedModeAnalyze03(t *testing.T) {
 	tnz := New()
-	udic, e := NewUserDic(testUserDicPath)
-	if e != nil {
+	udic, err := NewUserDic(testUserDicPath)
+	if err != nil {
 		t.Fatalf("new user dic: unexpected error")
 	}
 	tnz.SetUserDic(udic)

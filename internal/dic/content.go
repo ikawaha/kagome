@@ -31,20 +31,20 @@ type Contents [][]string
 // WriteTo implements the io.WriterTo interface
 func (c Contents) WriteTo(w io.Writer) (n int64, err error) {
 	for i := 0; i < len(c)-1; i++ {
-		x, e := fmt.Fprintf(w, "%s%s", strings.Join(c[i], colDelimiter), rowDelimiter)
-		if e != nil {
-			return
+		x, err := fmt.Fprintf(w, "%s%s", strings.Join(c[i], colDelimiter), rowDelimiter)
+		if err != nil {
+			return n, err
 		}
 		n += int64(x)
 	}
 	if i := len(c) - 1; i > 0 {
-		x, e := fmt.Fprintf(w, "%s", strings.Join(c[i], colDelimiter))
-		if e != nil {
-			return n, e
+		x, err := fmt.Fprintf(w, "%s", strings.Join(c[i], colDelimiter))
+		if err != nil {
+			return n, err
 		}
 		n += int64(x)
 	}
-	return
+	return n, nil
 }
 
 // NewContents creates dictionary contents from byte slice

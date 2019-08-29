@@ -50,9 +50,9 @@ func newOption() (o *option) {
 	return
 }
 
-func (o *option) parse(args []string) (err error) {
-	if err = o.flagSet.Parse(args); err != nil {
-		return
+func (o *option) parse(args []string) error {
+	if err := o.flagSet.Parse(args); err != nil {
+		return err
 	}
 	// validations
 	if nonFlag := o.flagSet.Args(); len(nonFlag) != 0 {
@@ -61,7 +61,7 @@ func (o *option) parse(args []string) (err error) {
 	if o.mecab == "" {
 		return fmt.Errorf("invalid argument: -mecab")
 	}
-	return
+	return nil
 }
 
 // command main
@@ -83,10 +83,10 @@ func Run(args []string) error {
 		return nil
 	}
 	opt := newOption()
-	if e := opt.parse(args); e != nil {
+	if err := opt.parse(args); err != nil {
 		Usage()
 		PrintDefaults()
-		return e
+		return err
 	}
 	return command(opt)
 }

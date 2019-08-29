@@ -46,18 +46,18 @@ func (d Dic) CharacterCategory(r rune) byte {
 }
 
 func (d *Dic) loadMorphDicPart(r io.Reader) error {
-	m, e := LoadMorphSlice(r)
-	if e != nil {
-		return fmt.Errorf("dic initializer, Morphs: %v", e)
+	m, err := LoadMorphSlice(r)
+	if err != nil {
+		return fmt.Errorf("dic initializer, Morphs: %v", err)
 	}
 	d.Morphs = m
 	return nil
 }
 
 func (d *Dic) loadPOSDicPart(r io.Reader) error {
-	p, e := ReadPOSTable(r)
-	if e != nil {
-		return fmt.Errorf("dic initializer, POSs: %v", e)
+	p, err := ReadPOSTable(r)
+	if err != nil {
+		return fmt.Errorf("dic initializer, POSs: %v", err)
 	}
 	d.POSTable = p
 	return nil
@@ -73,18 +73,18 @@ func (d *Dic) loadContentDicPart(r io.Reader) error {
 }
 
 func (d *Dic) loadIndexDicPart(r io.Reader) error {
-	idx, e := ReadIndexTable(r)
-	if e != nil {
-		return fmt.Errorf("dic initializer, Index: %v", e)
+	idx, err := ReadIndexTable(r)
+	if err != nil {
+		return fmt.Errorf("dic initializer, Index: %v", err)
 	}
 	d.Index = idx
 	return nil
 }
 
 func (d *Dic) loadConnectionDicPart(r io.Reader) error {
-	t, e := LoadConnectionTable(r)
-	if e != nil {
-		return fmt.Errorf("dic initializer, Connection: %v", e)
+	t, err := LoadConnectionTable(r)
+	if err != nil {
+		return fmt.Errorf("dic initializer, Connection: %v", err)
 	}
 	d.Connection = t
 	return nil
@@ -92,17 +92,17 @@ func (d *Dic) loadConnectionDicPart(r io.Reader) error {
 
 func (d *Dic) loadCharDefDicPart(r io.Reader) error {
 	dec := gob.NewDecoder(r)
-	if e := dec.Decode(&d.CharClass); e != nil {
-		return fmt.Errorf("dic initializer, CharClass: %v", e)
+	if err := dec.Decode(&d.CharClass); err != nil {
+		return fmt.Errorf("dic initializer, CharClass: %v", err)
 	}
-	if e := dec.Decode(&d.CharCategory); e != nil {
-		return fmt.Errorf("dic initializer, CharCategory: %v", e)
+	if err := dec.Decode(&d.CharCategory); err != nil {
+		return fmt.Errorf("dic initializer, CharCategory: %v", err)
 	}
-	if e := dec.Decode(&d.InvokeList); e != nil {
-		return fmt.Errorf("dic initializer, InvokeList: %v", e)
+	if err := dec.Decode(&d.InvokeList); err != nil {
+		return fmt.Errorf("dic initializer, InvokeList: %v", err)
 	}
-	if e := dec.Decode(&d.GroupList); e != nil {
-		return fmt.Errorf("dic initializer, GroupList: %v", e)
+	if err := dec.Decode(&d.GroupList); err != nil {
+		return fmt.Errorf("dic initializer, GroupList: %v", err)
 	}
 	return nil
 }
@@ -136,53 +136,53 @@ func LoadSimple(path string) (d *Dic, err error) {
 	return load(&r.Reader, false)
 }
 
-func load(r *zip.Reader, full bool) (d *Dic, err error) {
-	d = new(Dic)
+func load(r *zip.Reader, full bool) (*Dic, error) {
+	var d Dic
 	for _, f := range r.File {
-		if err = func() error {
-			rc, e := f.Open()
-			if e != nil {
-				return e
+		if err := func() error {
+			rc, err := f.Open()
+			if err != nil {
+				return err
 			}
 			defer rc.Close()
 			switch f.Name {
 			case "morph.dic":
-				if e = d.loadMorphDicPart(rc); e != nil {
-					return e
+				if err := d.loadMorphDicPart(rc); err != nil {
+					return err
 				}
 			case "pos.dic":
-				if e = d.loadPOSDicPart(rc); e != nil {
-					return e
+				if err := d.loadPOSDicPart(rc); err != nil {
+					return err
 				}
 			case "content.dic":
 				if full {
-					if e = d.loadContentDicPart(rc); e != nil {
-						return e
+					if err := d.loadContentDicPart(rc); err != nil {
+						return err
 					}
 				}
 			case "index.dic":
-				if e = d.loadIndexDicPart(rc); e != nil {
-					return e
+				if err := d.loadIndexDicPart(rc); err != nil {
+					return err
 				}
 			case "connection.dic":
-				if e = d.loadConnectionDicPart(rc); e != nil {
-					return e
+				if err := d.loadConnectionDicPart(rc); err != nil {
+					return err
 				}
 			case "chardef.dic":
-				if e = d.loadCharDefDicPart(rc); e != nil {
-					return e
+				if err := d.loadCharDefDicPart(rc); err != nil {
+					return err
 				}
 			case "unk.dic":
-				if e = d.loadUnkDicPart(rc); e != nil {
-					return e
+				if err := d.loadUnkDicPart(rc); err != nil {
+					return err
 				}
 			default:
 				return fmt.Errorf("unknown file, %v", f.Name)
 			}
 			return nil
 		}(); err != nil {
-			return
+			return nil, err
 		}
 	}
-	return
+	return &d, nil
 }
