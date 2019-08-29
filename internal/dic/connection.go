@@ -52,10 +52,10 @@ func (t ConnectionTable) WriteTo(w io.Writer) (n int64, err error) {
 // LoadConnectionTable loads ConnectionTable from io.Reader.
 func LoadConnectionTable(r io.Reader) (ConnectionTable, error) {
 	var ret ConnectionTable
-	if err := binary.Read(r, binary.LittleEndian, &t.Row); err != nil {
+	if err := binary.Read(r, binary.LittleEndian, &ret.Row); err != nil {
 		return ret, err
 	}
-	if err := binary.Read(r, binary.LittleEndian, &t.Col); err != nil {
+	if err := binary.Read(r, binary.LittleEndian, &ret.Col); err != nil {
 		return ret, err
 	}
 	ret.Vec = make([]int16, ret.Row*ret.Col)
