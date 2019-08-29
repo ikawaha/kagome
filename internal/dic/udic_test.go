@@ -22,15 +22,15 @@ import (
 var testFile = "../../_sample/userdic.txt"
 
 func TestNewUserDic01(t *testing.T) {
-	if _, e := NewUserDic(""); e == nil {
+	if _, err := NewUserDic(""); err == nil {
 		t.Error("expected error, but no occurred\n")
 	}
 }
 
 func TestNewUserDicIndex01(t *testing.T) {
-	udic, e := NewUserDic(testFile)
-	if e != nil {
-		t.Fatalf("unexpected error: %v\n", e)
+	udic, err := NewUserDic(testFile)
+	if err != nil {
+		t.Fatalf("unexpected error: %v\n", err)
 	}
 	type tuple struct {
 		inp string
@@ -51,9 +51,9 @@ func TestNewUserDicIndex01(t *testing.T) {
 }
 
 func TestNewUserDicContents01(t *testing.T) {
-	udic, e := NewUserDic(testFile)
-	if e != nil {
-		t.Fatalf("unexpected error: %v\n", e)
+	udic, err := NewUserDic(testFile)
+	if err != nil {
+		t.Fatalf("unexpected error: %v\n", err)
 	}
 	expectedLen := 3
 	if len(udic.Contents) != expectedLen {

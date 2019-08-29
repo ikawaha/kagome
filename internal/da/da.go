@@ -161,37 +161,37 @@ func (d DoubleArray) PrefixSearch(input string) (id int, ok bool) {
 func (d DoubleArray) WriteTo(w io.Writer) (n int64, err error) {
 	sz := int64(len(d))
 	//fmt.Println("write data len:", sz)
-	if err = binary.Write(w, binary.LittleEndian, sz); err != nil {
-		return
+	if err := binary.Write(w, binary.LittleEndian, sz); err != nil {
+		return n, err
 	}
 	n += int64(binary.Size(sz))
 	for _, v := range d {
-		if err = binary.Write(w, binary.LittleEndian, v.Base); err != nil {
-			return
+		if err := binary.Write(w, binary.LittleEndian, v.Base); err != nil {
+			return n, err
 		}
 		n += int64(binary.Size(v.Base))
-		if err = binary.Write(w, binary.LittleEndian, v.Check); err != nil {
-			return
+		if err := binary.Write(w, binary.LittleEndian, v.Check); err != nil {
+			return n, err
 		}
 		n += int64(binary.Size(v.Check))
 	}
-	return
+	return n, nil
 }
 
 // Read loads a double array.
 func Read(r io.Reader) (DoubleArray, error) {
 	var sz int64
-	if e := binary.Read(r, binary.LittleEndian, &sz); e != nil {
-		return DoubleArray{}, e
+	if err := binary.Read(r, binary.LittleEndian, &sz); err != nil {
+		return DoubleArray{}, err
 	}
 	//fmt.Println("read data len:", sz)
 	d := make(DoubleArray, sz)
 	for i := range d {
-		if e := binary.Read(r, binary.LittleEndian, &d[i].Base); e != nil {
-			return d, e
+		if err := binary.Read(r, binary.LittleEndian, &d[i].Base); err != nil {
+			return d, err
 		}
-		if e := binary.Read(r, binary.LittleEndian, &d[i].Check); e != nil {
-			return d, e
+		if err := binary.Read(r, binary.LittleEndian, &d[i].Check); err != nil {
+			return d, err
 		}
 	}
 	return d, nil

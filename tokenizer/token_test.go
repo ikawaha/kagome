@@ -84,8 +84,8 @@ func TestFeatures03(t *testing.T) {
 		Surface: "",
 	}
 	tok.dic = dic.SysDic()
-	if udic, e := dic.NewUserDic("../_sample/userdic.txt"); e != nil {
-		t.Fatalf("build user dic error: %v", e)
+	if udic, err := dic.NewUserDic("../_sample/userdic.txt"); err != nil {
+		t.Fatalf("build user dic error: %v", err)
 	} else {
 		tok.udic = udic
 	}
@@ -106,8 +106,8 @@ func TestFeatures04(t *testing.T) {
 		Surface: "",
 	}
 	tok.dic = dic.SysDic()
-	if udic, e := dic.NewUserDic("../_sample/userdic.txt"); e != nil {
-		t.Fatalf("build user dic error: %v", e)
+	if udic, err := dic.NewUserDic("../_sample/userdic.txt"); err != nil {
+		t.Fatalf("build user dic error: %v", err)
 	} else {
 		tok.udic = udic
 	}
@@ -167,8 +167,8 @@ func TestFeaturesAndPos03(t *testing.T) {
 		Surface: "",
 	}
 	tok.dic = dic.SysDic()
-	if udic, e := dic.NewUserDic("../_sample/userdic.txt"); e != nil {
-		t.Fatalf("build user dic error: %v", e)
+	if udic, err := dic.NewUserDic("../_sample/userdic.txt"); err != nil {
+		t.Fatalf("build user dic error: %v", err)
 	} else {
 		tok.udic = udic
 	}
@@ -192,8 +192,8 @@ func TestFeaturesAndPos04(t *testing.T) {
 		Surface: "",
 	}
 	tok.dic = dic.SysDic()
-	if udic, e := dic.NewUserDic("../_sample/userdic.txt"); e != nil {
-		t.Fatalf("build user dic error: %v", e)
+	if udic, err := dic.NewUserDic("../_sample/userdic.txt"); err != nil {
+		t.Fatalf("build user dic error: %v", err)
 	} else {
 		tok.udic = udic
 	}

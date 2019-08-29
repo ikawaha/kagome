@@ -63,9 +63,9 @@ func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	return
 }
 
-func (o *option) parse(args []string) (err error) {
-	if err = o.flagSet.Parse(args); err != nil {
-		return
+func (o *option) parse(args []string) error {
+	if err := o.flagSet.Parse(args); err != nil {
+		return err
 	}
 	// validations
 	if nonFlag := o.flagSet.Args(); len(nonFlag) != 0 {
@@ -74,14 +74,14 @@ func (o *option) parse(args []string) (err error) {
 	if o.sysdic != "" && o.sysdic != "ipa" && o.sysdic != "uni" {
 		return fmt.Errorf("invalid argument: -sysdic %v", o.sysdic)
 	}
-	return
+	return nil
 }
 
 //OptionCheck receives a slice of args and returns an error if it was not successfully parsed
-func OptionCheck(args []string) (err error) {
+func OptionCheck(args []string) error {
 	opt := newOption(ioutil.Discard, flag.ContinueOnError)
-	if e := opt.parse(args); e != nil {
-		return fmt.Errorf("%v, %v", CommandName, e)
+	if err := opt.parse(args); err != nil {
+		return fmt.Errorf("%v, %v", CommandName, err)
 	}
 	return nil
 }
@@ -134,10 +134,9 @@ func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Input string `json:"sentence"`
 		Mode  string `json:"mode,omitempty"`
 	}
-	e := json.NewDecoder(r.Body).Decode(&body)
-	if e != nil {
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "{\"status\":false,\"error\":\"%v\"}\n", e)
+		fmt.Fprintf(w, "{\"status\":false,\"error\":\"%v\"}\n", err)
 		return
 	}
 	if body.Input == "" {
@@ -168,20 +167,20 @@ func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		rsp = append(rsp, m)
 	}
-	j, e := json.Marshal(struct {
+	j, err := json.Marshal(struct {
 		Status bool     `json:"status"`
 		Tokens []record `json:"tokens"`
 	}{
 		Status: true,
 		Tokens: rsp,
 	})
-	if e != nil {
+	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "{\"status\":false,\"error\":\"%v\"}", e)
+		fmt.Fprintf(w, "{\"status\":false,\"error\":\"%v\"}", err)
 		return
 	}
-	if _, e := w.Write(j); e != nil {
-		log.Printf("write response json error, %v, %+v", e, body.Input)
+	if _, err := w.Write(j); err != nil {
+		log.Printf("write response json error, %v, %+v", err, body.Input)
 		return
 	}
 }
@@ -209,8 +208,8 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 			RadioOpt string
 		}{Sentence: sen, RadioOpt: mode}
 		t := template.Must(template.New("top").Parse(demoHTML))
-		if e := t.Execute(w, d); e != nil {
-			http.Error(w, e.Error(), http.StatusInternalServerError)
+		if err := t.Execute(w, d); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
 	}
@@ -233,7 +232,7 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	case "Extended":
 		// use Normal mode
 	}
-	if _, e := exec.LookPath(graphvizCmd); e != nil {
+	if _, err := exec.LookPath(graphvizCmd); err != nil {
 		cmdErr = "Error: circo/graphviz is not installed in your $PATH"
 		log.Print("Error: circo/graphviz is not installed in your $PATH\n")
 	} else {
@@ -316,18 +315,18 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		Mode     string
 	}{Sentence: sen, Tokens: records, CmdErr: cmdErr, GraphSvg: template.HTML(svg), Mode: mode}
 	t := template.Must(template.New("top").Parse(graphHTML))
-	if e := t.Execute(w, d); e != nil {
-		http.Error(w, e.Error(), http.StatusInternalServerError)
+	if err := t.Execute(w, d); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 // Run receives the slice of args and executes the server
 func Run(args []string) error {
 	opt := newOption(ErrorWriter, flag.ExitOnError)
-	if e := opt.parse(args); e != nil {
+	if err := opt.parse(args); err != nil {
 		Usage()
 		PrintDefaults(flag.ExitOnError)
-		return fmt.Errorf("%v, %v", CommandName, e)
+		return fmt.Errorf("%v, %v", CommandName, err)
 	}
 	return command(opt)
 }

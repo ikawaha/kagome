@@ -61,9 +61,9 @@ func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	return
 }
 
-func (o *option) parse(args []string) (err error) {
-	if err = o.flagSet.Parse(args); err != nil {
-		return
+func (o *option) parse(args []string) error {
+	if err := o.flagSet.Parse(args); err != nil {
+		return err
 	}
 	// validations
 	if o.flagSet.NArg() == 0 {
@@ -76,14 +76,14 @@ func (o *option) parse(args []string) (err error) {
 		return fmt.Errorf("invalid argument: -mode %v", o.mode)
 	}
 	o.input = strings.Join(o.flagSet.Args(), " ")
-	return
+	return nil
 }
 
 //OptionCheck receives a slice of args and returns an error if it was not successfully parsed
-func OptionCheck(args []string) (err error) {
+func OptionCheck(args []string) error {
 	opt := newOption(ioutil.Discard, flag.ContinueOnError)
-	if e := opt.parse(args); e != nil {
-		return fmt.Errorf("%v, %v", CommandName, e)
+	if err := opt.parse(args); err != nil {
+		return fmt.Errorf("%v, %v", CommandName, err)
 	}
 	return nil
 }
@@ -154,10 +154,10 @@ func command(opt *option) error {
 // Run receives the slice of args and executes the lattice tool
 func Run(args []string) error {
 	opt := newOption(ErrorWriter, flag.ExitOnError)
-	if e := opt.parse(args); e != nil {
+	if err := opt.parse(args); err != nil {
 		Usage()
 		PrintDefaults(flag.ExitOnError)
-		return fmt.Errorf("%v, %v", CommandName, e)
+		return fmt.Errorf("%v, %v", CommandName, err)
 	}
 	return command(opt)
 }

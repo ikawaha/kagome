@@ -227,29 +227,28 @@ func saveJumanDic(d *jumanDic, base string, archive bool) error {
 	return zw.Close()
 }
 
-func buildJumanDic(mecabPath, neologdPath string) (d *jumanDic, err error) {
+func buildJumanDic(mecabPath, neologdPath string) (*jumanDic, error) {
 	// Morphs, Contents, Index
-	var files []string
-	files, err = filepath.Glob(mecabPath + "/*.csv")
+	files, err := filepath.Glob(mecabPath + "/*.csv")
 	if err != nil {
-		return
+		return nil, err
 	}
 	var records jumanMorphRecordSlice
 	for _, file := range files {
-		if err = func() error {
-			f, e := os.Open(file)
-			if e != nil {
-				return e
+		if err := func() error {
+			f, err := os.Open(file)
+			if err != nil {
+				return err
 			}
 			defer f.Close()
 			r := csv.NewReader(f)
 			r.Comma = ','
 			for {
-				rec, e := r.Read()
-				if e == io.EOF {
+				rec, err := r.Read()
+				if err == io.EOF {
 					break
-				} else if e != nil {
-					return e
+				} else if err != nil {
+					return err
 				} else if len(rec) != jumanMorphCsvColSize {
 					return fmt.Errorf("invalid format csv: %v, %v", file, rec)
 				}
@@ -257,27 +256,27 @@ func buildJumanDic(mecabPath, neologdPath string) (d *jumanDic, err error) {
 			}
 			return nil
 		}(); err != nil {
-			return
+			return nil, err
 		}
 	}
-	if err = func() error {
+	if err := func() error {
 		if neologdPath == "" {
 			return nil
 		}
-		f, e := os.Open(neologdPath)
-		if e != nil {
-			return e
+		f, err := os.Open(neologdPath)
+		if err != nil {
+			return err
 		}
 		defer f.Close()
 		r := csv.NewReader(f)
 		r.Comma = ','
 		r.LazyQuotes = true
 		for {
-			rec, e := r.Read()
-			if e == io.EOF {
+			rec, err := r.Read()
+			if err == io.EOF {
 				break
-			} else if e != nil {
-				return e
+			} else if err != nil {
+				return err
 			} else if len(rec) != jumanMorphCsvColSize {
 				return fmt.Errorf("invalid format csv: %v, %v", neologdPath, rec)
 			}
@@ -285,11 +284,11 @@ func buildJumanDic(mecabPath, neologdPath string) (d *jumanDic, err error) {
 		}
 		return nil
 	}(); err != nil {
-		return
+		return nil, err
 	}
 
 	sort.Sort(records)
-	d = new(jumanDic)
+	var d jumanDic
 	d.Morphs = make([]dic.Morph, 0, len(records))
 	d.POSTable = dic.POSTable{
 		POSs: make([]dic.POS, 0, len(records)),
@@ -301,15 +300,17 @@ func buildJumanDic(mecabPath, neologdPath string) (d *jumanDic, err error) {
 	)
 	for _, rec := range records {
 		keywords = append(keywords, rec[jumanMrophRecordSurfaceIndex])
-		var l, r, w int
-		if l, err = strconv.Atoi(rec[jumanMorphRecordLeftIDIndex]); err != nil {
-			return
+		l, err := strconv.Atoi(rec[jumanMorphRecordLeftIDIndex])
+		if err != nil {
+			return nil, err
 		}
-		if r, err = strconv.Atoi(rec[jumanMorphRecordRightIDIndex]); err != nil {
-			return
+		r, err := strconv.Atoi(rec[jumanMorphRecordRightIDIndex])
+		if err != nil {
+			return nil, err
 		}
-		if w, err = strconv.Atoi(rec[jumanMorphRecordWeightIndex]); err != nil {
-			return
+		w, err := strconv.Atoi(rec[jumanMorphRecordWeightIndex])
+		if err != nil {
+			return nil, err
 		}
 		m := dic.Morph{LeftID: int16(l), RightID: int16(r), Weight: int16(w)}
 		d.Morphs = append(d.Morphs, m)
@@ -321,13 +322,12 @@ func buildJumanDic(mecabPath, neologdPath string) (d *jumanDic, err error) {
 	d.POSTable.NameList = posMap.List()
 
 	if d.Index, err = dic.BuildIndexTable(keywords); err != nil {
-		return
+		return nil, err
 	}
 
 	// ConnectionTable
-	if r, c, v, e := loadJumanMatrixDefFile(mecabPath + "/" + jumanMatrixDefFileName); e != nil {
-		err = e
-		return
+	if r, c, v, err := loadJumanMatrixDefFile(mecabPath + "/" + jumanMatrixDefFileName); err != nil {
+		return nil, err
 	} else {
 		d.Connection.Row = r
 		d.Connection.Col = c
@@ -335,9 +335,8 @@ func buildJumanDic(mecabPath, neologdPath string) (d *jumanDic, err error) {
 	}
 
 	// CharDef
-	if cc, cm, inv, grp, e := loadJumanCharClassDefFile(mecabPath + "/" + jumanCharDefFileName); e != nil {
-		err = e
-		return
+	if cc, cm, inv, grp, err := loadJumanCharClassDefFile(mecabPath + "/" + jumanCharDefFileName); err != nil {
+		return nil, err
 	} else {
 		d.CharClass = cc
 		d.CharCategory = cm
@@ -346,9 +345,8 @@ func buildJumanDic(mecabPath, neologdPath string) (d *jumanDic, err error) {
 	}
 
 	// Unk
-	if records, e := loadJumanUnkFile(mecabPath + "/" + jumanUnkDefFileName); e != nil {
-		err = e
-		return
+	if records, err := loadJumanUnkFile(mecabPath + "/" + jumanUnkDefFileName); err != nil {
+		return nil, err
 	} else {
 		d.UnkIndex = make(map[int32]int32)
 		d.UnkIndexDup = make(map[int32]int32)
@@ -362,52 +360,52 @@ func buildJumanDic(mecabPath, neologdPath string) (d *jumanDic, err error) {
 				}
 			}
 			if catid < 0 {
-				err = fmt.Errorf("unknown unk category: %v", rec[jumanUnkRecordCategoryIndex])
-				return
+				return nil, fmt.Errorf("unknown unk category: %v", rec[jumanUnkRecordCategoryIndex])
 			}
 			if _, ok := d.UnkIndex[catid]; !ok {
 				d.UnkIndex[catid] = int32(len(d.UnkContents))
 			} else {
 				d.UnkIndexDup[catid]++
 			}
-			var l, r, w int
-			if l, err = strconv.Atoi(rec[jumanUnkRecordLeftIDIndex]); err != nil {
-				return
+			l, err := strconv.Atoi(rec[jumanUnkRecordLeftIDIndex])
+			if err != nil {
+				return nil, err
 			}
-			if r, err = strconv.Atoi(rec[jumanUnkRecordRightIndex]); err != nil {
-				return
+			r, err := strconv.Atoi(rec[jumanUnkRecordRightIndex])
+			if err != nil {
+				return nil, err
 			}
-			if w, err = strconv.Atoi(rec[jumanUnkRecordWeigthIndex]); err != nil {
-				return
+			w, err := strconv.Atoi(rec[jumanUnkRecordWeigthIndex])
+			if err != nil {
+				return nil, err
 			}
 			m := dic.Morph{LeftID: int16(l), RightID: int16(r), Weight: int16(w)}
 			d.UnkMorphs = append(d.UnkMorphs, m)
 			d.UnkContents = append(d.UnkContents, rec[jumanUnkRecordOtherContentsStartIndex:])
 		}
 	}
-	return
+	return &d, nil
 }
 
-func loadJumanMorphFile(path string) (records [][]string, err error) {
-	var f *os.File
-	f, err = os.Open(path)
+func loadJumanMorphFile(path string) ([][]string, error) {
+	f, err := os.Open(path)
 	if err != nil {
-		return
+		return nil, err
 	}
 	defer f.Close()
 	r := csv.NewReader(f)
 	r.Comma = ','
+	var records [][]string
 	for {
-		record, e := r.Read()
-		if e == io.EOF {
+		record, err := r.Read()
+		if err == io.EOF {
 			break
-		} else if e != nil {
-			err = e
-			return
+		} else if err != nil {
+			return nil, err
 		}
 		records = append(records, record)
 	}
-	return
+	return records, nil
 }
 
 func loadJumanMatrixDefFile(path string) (rowSize, colSize int64, vec []int16, err error) {
@@ -422,49 +420,41 @@ func loadJumanMatrixDefFile(path string) (rowSize, colSize int64, vec []int16, e
 	line := scanner.Text()
 	dim := strings.Split(line, " ")
 	if len(dim) != 2 {
-		err = fmt.Errorf("invalid format: %s", line)
-		return
+		return rowSize, colSize, vec, fmt.Errorf("invalid format: %s", line)
 	}
 	rowSize, err = strconv.ParseInt(dim[0], 10, 0)
 	if err != nil {
-		err = fmt.Errorf("invalid format: %s, %s", err, line)
-		return
+		return rowSize, colSize, vec, fmt.Errorf("invalid format: %s, %s", err, line)
 	}
 	colSize, err = strconv.ParseInt(dim[1], 10, 0)
 	if err != nil {
-		err = fmt.Errorf("invalid format: %s, %s", err, line)
-		return
+		return rowSize, colSize, vec, fmt.Errorf("invalid format: %s, %s", err, line)
 	}
 	vec = make([]int16, rowSize*colSize)
 	for scanner.Scan() {
 		line := scanner.Text()
 		ary := strings.Split(line, " ")
 		if len(ary) != 3 {
-			err = fmt.Errorf("invalid format: %s", line)
-			return
+			return rowSize, colSize, vec, fmt.Errorf("invalid format: %s", line)
 		}
-		row, e := strconv.ParseInt(ary[0], 10, 0)
-		if e != nil {
-			err = fmt.Errorf("invalid format: %s, %s", e, line)
-			return
+		row, err := strconv.ParseInt(ary[0], 10, 0)
+		if err != nil {
+			return rowSize, colSize, vec, fmt.Errorf("invalid format: %s, %s", err, line)
 		}
-		col, e := strconv.ParseInt(ary[1], 10, 0)
-		if e != nil {
-			err = fmt.Errorf("invalid format: %s, %s", e, line)
-			return
+		col, err := strconv.ParseInt(ary[1], 10, 0)
+		if err != nil {
+			return rowSize, colSize, vec, fmt.Errorf("invalid format: %s, %s", err, line)
 		}
-		val, e := strconv.Atoi(ary[2])
-		if e != nil {
-			err = fmt.Errorf("invalid format: %s, %s", e, line)
-			return
+		val, err := strconv.Atoi(ary[2])
+		if err != nil {
+			return rowSize, colSize, vec, fmt.Errorf("invalid format: %s, %s", err, line)
 		}
 		vec[row*colSize+col] = int16(val)
 	}
-	if err = scanner.Err(); err != nil {
-		err = fmt.Errorf("invalid format: %s, %s", err, line)
-		return
+	if err := scanner.Err(); err != nil {
+		return rowSize, colSize, vec, fmt.Errorf("invalid format: %s, %s", err, line)
 	}
-	return
+	return rowSize, colSize, vec, nil
 }
 
 func loadJumanCharClassDefFile(path string) (charClass []string, charCategory []byte, invokeMap, groupMap []bool, err error) {
@@ -516,26 +506,24 @@ func loadJumanCharClassDefFile(path string) (charClass []string, charCategory []
 	return
 }
 
-func loadJumanUnkFile(path string) (records [][]string, err error) {
-	var file *os.File
-	file, err = os.Open(path)
+func loadJumanUnkFile(path string) ([][]string, error) {
+	file, err := os.Open(path)
 	if err != nil {
-		return
+		return nil, err
 	}
 	r := csv.NewReader(file)
 	r.Comma = ','
+	var records [][]string
 	for {
-		rec, e := r.Read()
-		if e == io.EOF {
+		rec, err := r.Read()
+		if err == io.EOF {
 			break
-		} else if e != nil {
-			err = e
-			return
+		} else if err != nil {
+			return nil, err
 		} else if len(rec) != jumanUnkRecordSize {
-			err = fmt.Errorf("invalid format csv: %v, %v", file, rec)
-			return
+			return nil, fmt.Errorf("invalid format csv: %v, %v", file, rec)
 		}
 		records = append(records, rec)
 	}
-	return
+	return records, nil
 }

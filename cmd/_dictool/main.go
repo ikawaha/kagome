@@ -65,8 +65,8 @@ func main() {
 		PrintDefaults()
 		return
 	}
-	if e := cmd(os.Args[2:]); e != nil {
-		fmt.Fprintf(errorWriter, "%v\n", e)
+	if err := cmd(os.Args[2:]); err != nil {
+		fmt.Fprintf(errorWriter, "%v\n", err)
 		os.Exit(1)
 	}
 }
