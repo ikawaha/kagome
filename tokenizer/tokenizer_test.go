@@ -376,14 +376,14 @@ func TestTokenizerDot(t *testing.T) {
 
 	// test empty case
 	var b bytes.Buffer
-	tnz.Dot("", &b)
+	tnz.Dot(&b, "")
 	if b.String() == "" {
 		t.Errorf("got empty string")
 	}
 
 	// only idling
 	b.Reset()
-	tnz.Dot("わたしまけましたわ", &b)
+	tnz.Dot(&b, "わたしまけましたわ")
 	if b.String() == "" {
 		t.Errorf("got empty string")
 	}
@@ -395,14 +395,14 @@ func TestTokenizerAnalyzeGraph(t *testing.T) {
 	// test empty case
 	for _, mode := range []TokenizeMode{Normal, Search, Extended} {
 		var b bytes.Buffer
-		tnz.AnalyzeGraph("", mode, &b)
+		tnz.AnalyzeGraph(&b, "", mode)
 		if b.String() == "" {
 			t.Errorf("got empty string")
 		}
 
 		// only idling
 		b.Reset()
-		tnz.Dot("わたしまけましたわ", &b)
+		tnz.Dot(&b, "わたしまけましたわ")
 		if b.String() == "" {
 			t.Errorf("got empty string")
 		}
