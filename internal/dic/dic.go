@@ -138,6 +138,17 @@ func LoadSimple(path string) (d *Dic, err error) {
 
 func load(r *zip.Reader, full bool) (*Dic, error) {
 	var d Dic
+	type dictionaryPartLoader func(io.Reader) error
+	loaders := map[string]dictionaryPartLoader{
+		"morph.dic":      d.loadMorphDicPart,
+		"pos.dic":        d.loadPOSDicPart,
+		"content.dic":    d.loadContentDicPart,
+		"index.dic":      d.loadIndexDicPart,
+		"connection.dic": d.loadConnectionDicPart,
+		"chardef.dic":    d.loadCharDefDicPart,
+		"unk.dic":        d.loadUnkDicPart,
+	}
+
 	for _, f := range r.File {
 		if err := func() error {
 			rc, err := f.Open()
@@ -145,41 +156,14 @@ func load(r *zip.Reader, full bool) (*Dic, error) {
 				return err
 			}
 			defer rc.Close()
-			switch f.Name {
-			case "morph.dic":
-				if err := d.loadMorphDicPart(rc); err != nil {
-					return err
-				}
-			case "pos.dic":
-				if err := d.loadPOSDicPart(rc); err != nil {
-					return err
-				}
-			case "content.dic":
-				if full {
-					if err := d.loadContentDicPart(rc); err != nil {
-						return err
-					}
-				}
-			case "index.dic":
-				if err := d.loadIndexDicPart(rc); err != nil {
-					return err
-				}
-			case "connection.dic":
-				if err := d.loadConnectionDicPart(rc); err != nil {
-					return err
-				}
-			case "chardef.dic":
-				if err := d.loadCharDefDicPart(rc); err != nil {
-					return err
-				}
-			case "unk.dic":
-				if err := d.loadUnkDicPart(rc); err != nil {
-					return err
-				}
-			default:
+			if !full && f.Name == "content.dic" {
+				return nil
+			}
+			loader, ok := loaders[f.Name]
+			if !ok {
 				return fmt.Errorf("unknown file, %v", f.Name)
 			}
-			return nil
+			return loader(rc)
 		}(); err != nil {
 			return nil, err
 		}
