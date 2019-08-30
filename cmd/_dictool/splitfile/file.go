@@ -52,8 +52,8 @@ func min(lhs, rhs int) int {
 func (s *SplitFile) Write(b []byte) (n int, err error) {
 	for p := 0; p < len(b); {
 		if s.file == nil {
-			if err = s.newFile(); err != nil {
-				return
+			if err := s.newFile(); err != nil {
+				return n, err
 			}
 		}
 		cap := s.limit - s.count
@@ -71,7 +71,7 @@ func (s *SplitFile) Write(b []byte) (n int, err error) {
 			s.count = 0
 		}
 	}
-	return
+	return n, nil
 }
 
 func (s *SplitFile) Close() error {

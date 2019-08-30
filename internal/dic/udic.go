@@ -39,11 +39,10 @@ type UserDic struct {
 const UserDicColumnSize = 4
 
 // NewUserDic build a user dictionary from a file.
-func NewUserDic(path string) (udic *UserDic, err error) {
-	udic = new(UserDic)
+func NewUserDic(path string) (*UserDic, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return
+		return nil, err
 	}
 	defer f.Close()
 
@@ -56,19 +55,19 @@ func NewUserDic(path string) (udic *UserDic, err error) {
 		}
 		text = append(text, line)
 	}
-	if err = scanner.Err(); err != nil {
-		return
+	if err := scanner.Err(); err != nil {
+		return nil, err
 	}
 
 	sort.Strings(text)
 
 	prev := ""
 	var keys []string
+	var udic UserDic
 	for _, line := range text {
 		record := strings.Split(line, ",")
 		if len(record) != UserDicColumnSize {
-			err = fmt.Errorf("invalid format: %s", line)
-			return
+			return nil, fmt.Errorf("invalid format: %s", line)
 		}
 		k := strings.TrimSpace(record[0])
 		if prev == k {
@@ -79,11 +78,10 @@ func NewUserDic(path string) (udic *UserDic, err error) {
 		tokens := strings.Split(record[1], " ")
 		yomi := strings.Split(record[2], " ")
 		if len(tokens) == 0 || len(tokens) != len(yomi) {
-			err = fmt.Errorf("invalid format: %s", line)
-			return
+			return nil, fmt.Errorf("invalid format: %s", line)
 		}
 		udic.Contents = append(udic.Contents, UserDicContent{tokens, yomi, record[3]})
 	}
 	udic.Index, err = BuildIndexTable(keys)
-	return
+	return &udic, err
 }

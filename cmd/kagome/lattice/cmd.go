@@ -29,7 +29,7 @@ import (
 var (
 	CommandName  = "lattice"
 	Description  = `lattice viewer`
-	UsageMessage = "%s [-udic userdic_file] [-sysdic (ipa|uni)] [-output output_file] [-v] sentence\n"
+	UsageMessage = "%s [-udic userdic_file] [-sysdic (ipa|uni)] [-mode (normal|search|extended)] [-output output_file] [-v] sentence\n"
 	ErrorWriter  = os.Stderr
 )
 
@@ -37,6 +37,7 @@ var (
 type option struct {
 	udic    string
 	sysdic  string
+	mode    string
 	output  string
 	verbose bool
 	input   string
@@ -53,14 +54,16 @@ func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	// option settings
 	o.flagSet.StringVar(&o.udic, "udic", "", "user dic")
 	o.flagSet.StringVar(&o.sysdic, "sysdic", "ipa", "system dic type (ipa|uni)")
+	o.flagSet.StringVar(&o.mode, "mode", "normal", "tokenize mode (normal|search|extended)")
 	o.flagSet.StringVar(&o.output, "output", "", "output file")
 	o.flagSet.BoolVar(&o.verbose, "v", false, "verbose mode")
+
 	return
 }
 
-func (o *option) parse(args []string) (err error) {
-	if err = o.flagSet.Parse(args); err != nil {
-		return
+func (o *option) parse(args []string) error {
+	if err := o.flagSet.Parse(args); err != nil {
+		return err
 	}
 	// validations
 	if o.flagSet.NArg() == 0 {
@@ -69,15 +72,18 @@ func (o *option) parse(args []string) (err error) {
 	if o.sysdic != "" && o.sysdic != "ipa" && o.sysdic != "uni" {
 		return fmt.Errorf("invalid argument: -sysdic %v\n", o.sysdic)
 	}
+	if o.mode != "" && o.mode != "normal" && o.mode != "search" && o.mode != "extended" {
+		return fmt.Errorf("invalid argument: -mode %v", o.mode)
+	}
 	o.input = strings.Join(o.flagSet.Args(), " ")
-	return
+	return nil
 }
 
 //OptionCheck receives a slice of args and returns an error if it was not successfully parsed
-func OptionCheck(args []string) (err error) {
+func OptionCheck(args []string) error {
 	opt := newOption(ioutil.Discard, flag.ContinueOnError)
-	if e := opt.parse(args); e != nil {
-		return fmt.Errorf("%v, %v", CommandName, e)
+	if err := opt.parse(args); err != nil {
+		return fmt.Errorf("%v, %v", CommandName, err)
 	}
 	return nil
 }
@@ -120,8 +126,16 @@ func command(opt *option) error {
 			t.SetUserDic(udic)
 		}
 	}
-
-	tokens := t.Dot(opt.input, out)
+	mode := tokenizer.Normal
+	switch opt.mode {
+	case "normal":
+		mode = tokenizer.Normal
+	case "search":
+		mode = tokenizer.Search
+	case "extended":
+		mode = tokenizer.Extended
+	}
+	tokens := t.AnalyzeGraph(out, opt.input, mode)
 	if opt.verbose {
 		for i, size := 1, len(tokens); i < size; i++ {
 			tok := tokens[i]
@@ -140,10 +154,10 @@ func command(opt *option) error {
 // Run receives the slice of args and executes the lattice tool
 func Run(args []string) error {
 	opt := newOption(ErrorWriter, flag.ExitOnError)
-	if e := opt.parse(args); e != nil {
+	if err := opt.parse(args); err != nil {
 		Usage()
 		PrintDefaults(flag.ExitOnError)
-		return fmt.Errorf("%v, %v", CommandName, e)
+		return fmt.Errorf("%v, %v", CommandName, err)
 	}
 	return command(opt)
 }

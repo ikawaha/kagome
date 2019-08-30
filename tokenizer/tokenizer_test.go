@@ -73,8 +73,8 @@ func TestAnalyze02(t *testing.T) {
 
 func TestAnalyze03(t *testing.T) {
 	tnz := New()
-	udic, e := NewUserDic(testUserDicPath)
-	if e != nil {
+	udic, err := NewUserDic(testUserDicPath)
+	if err != nil {
 		t.Fatalf("new user dic: unexpected error")
 	}
 	tnz.SetUserDic(udic)
@@ -191,8 +191,8 @@ func TestSearchModeAnalyze02(t *testing.T) {
 
 func TestSearchModeAnalyze03(t *testing.T) {
 	tnz := New()
-	udic, e := NewUserDic(testUserDicPath)
-	if e != nil {
+	udic, err := NewUserDic(testUserDicPath)
+	if err != nil {
 		t.Fatalf("new user dic: unexpected error")
 	}
 	tnz.SetUserDic(udic)
@@ -288,8 +288,8 @@ func TestExtendedModeAnalyze02(t *testing.T) {
 
 func TestExtendedModeAnalyze03(t *testing.T) {
 	tnz := New()
-	udic, e := NewUserDic(testUserDicPath)
-	if e != nil {
+	udic, err := NewUserDic(testUserDicPath)
+	if err != nil {
 		t.Fatalf("new user dic: unexpected error")
 	}
 	tnz.SetUserDic(udic)
@@ -376,14 +376,14 @@ func TestTokenizerDot(t *testing.T) {
 
 	// test empty case
 	var b bytes.Buffer
-	tnz.Dot("", &b)
+	tnz.Dot(&b, "")
 	if b.String() == "" {
 		t.Errorf("got empty string")
 	}
 
 	// only idling
 	b.Reset()
-	tnz.Dot("わたしまけましたわ", &b)
+	tnz.Dot(&b, "わたしまけましたわ")
 	if b.String() == "" {
 		t.Errorf("got empty string")
 	}
@@ -395,14 +395,14 @@ func TestTokenizerAnalyzeGraph(t *testing.T) {
 	// test empty case
 	for _, mode := range []TokenizeMode{Normal, Search, Extended} {
 		var b bytes.Buffer
-		tnz.AnalyzeGraph("", mode, &b)
+		tnz.AnalyzeGraph(&b, "", mode)
 		if b.String() == "" {
 			t.Errorf("got empty string")
 		}
 
 		// only idling
 		b.Reset()
-		tnz.Dot("わたしまけましたわ", &b)
+		tnz.Dot(&b, "わたしまけましたわ")
 		if b.String() == "" {
 			t.Errorf("got empty string")
 		}

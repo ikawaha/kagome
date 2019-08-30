@@ -231,29 +231,28 @@ func saveIpaDic(d *IpaDic, base string, archive bool) error {
 	return zw.Close()
 }
 
-func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
+func buildIpaDic(mecabPath, neologdPath string) (*IpaDic, error) {
 	// Morphs, Contents, Index
-	var files []string
-	files, err = filepath.Glob(mecabPath + "/*.csv")
+	files, err := filepath.Glob(mecabPath + "/*.csv")
 	if err != nil {
-		return
+		return nil, err
 	}
 	var records ipaMorphRecordSlice
 	for _, file := range files {
-		if err = func() error {
-			f, e := os.Open(file)
-			if e != nil {
-				return e
+		if err := func() error {
+			f, err := os.Open(file)
+			if err != nil {
+				return err
 			}
 			defer f.Close()
 			r := csv.NewReader(transform.NewReader(f, japanese.EUCJP.NewDecoder()))
 			r.Comma = ','
 			for {
-				rec, e := r.Read()
-				if e == io.EOF {
+				rec, err := r.Read()
+				if err == io.EOF {
 					break
-				} else if e != nil {
-					return e
+				} else if err != nil {
+					return err
 				} else if len(rec) != ipaMorphCsvColSize {
 					return fmt.Errorf("invalid format csv: %v, %v", file, rec)
 				}
@@ -261,27 +260,27 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 			}
 			return nil
 		}(); err != nil {
-			return
+			return nil, err
 		}
 	}
-	if err = func() error {
+	if err := func() error {
 		if neologdPath == "" {
 			return nil
 		}
-		f, e := os.Open(neologdPath)
-		if e != nil {
-			return e
+		f, err := os.Open(neologdPath)
+		if err != nil {
+			return err
 		}
 		defer f.Close()
 		r := csv.NewReader(f)
 		r.Comma = ','
 		r.LazyQuotes = true
 		for {
-			rec, e := r.Read()
-			if e == io.EOF {
+			rec, err := r.Read()
+			if err == io.EOF {
 				break
-			} else if e != nil {
-				return e
+			} else if err != nil {
+				return err
 			} else if len(rec) != ipaMorphCsvColSize {
 				return fmt.Errorf("invalid format csv: %v, %v", neologdPath, rec)
 			}
@@ -289,11 +288,11 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 		}
 		return nil
 	}(); err != nil {
-		return
+		return nil, err
 	}
 
 	sort.Sort(records)
-	d = new(IpaDic)
+	var d IpaDic
 	d.Morphs = make([]dic.Morph, 0, len(records))
 	d.POSTable = dic.POSTable{
 		POSs: make([]dic.POS, 0, len(records)),
@@ -305,15 +304,17 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 	)
 	for _, rec := range records {
 		keywords = append(keywords, rec[ipaMrophRecordSurfaceIndex])
-		var l, r, w int
-		if l, err = strconv.Atoi(rec[ipaMorphRecordLeftIDIndex]); err != nil {
-			return
+		l, err := strconv.Atoi(rec[ipaMorphRecordLeftIDIndex])
+		if err != nil {
+			return nil, err
 		}
-		if r, err = strconv.Atoi(rec[ipaMorphRecordRightIDIndex]); err != nil {
-			return
+		r, err := strconv.Atoi(rec[ipaMorphRecordRightIDIndex])
+		if err != nil {
+			return nil, err
 		}
-		if w, err = strconv.Atoi(rec[ipaMorphRecordWeightIndex]); err != nil {
-			return
+		w, err := strconv.Atoi(rec[ipaMorphRecordWeightIndex])
+		if err != nil {
+			return nil, err
 		}
 		m := dic.Morph{LeftID: int16(l), RightID: int16(r), Weight: int16(w)}
 		d.Morphs = append(d.Morphs, m)
@@ -325,13 +326,12 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 	d.POSTable.NameList = posMap.List()
 
 	if d.Index, err = dic.BuildIndexTable(keywords); err != nil {
-		return
+		return nil, err
 	}
 
 	// ConnectionTable
-	if r, c, v, e := loadIpaMatrixDefFile(mecabPath + "/" + ipaMatrixDefFileName); e != nil {
-		err = e
-		return
+	if r, c, v, err := loadIpaMatrixDefFile(mecabPath + "/" + ipaMatrixDefFileName); err != nil {
+		return nil, err
 	} else {
 		d.Connection.Row = r
 		d.Connection.Col = c
@@ -339,9 +339,8 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 	}
 
 	// CharDef
-	if cc, cm, inv, grp, e := loadIpaCharClassDefFile(mecabPath + "/" + ipaCharDefFileName); e != nil {
-		err = e
-		return
+	if cc, cm, inv, grp, err := loadIpaCharClassDefFile(mecabPath + "/" + ipaCharDefFileName); err != nil {
+		return nil, err
 	} else {
 		d.CharClass = cc
 		d.CharCategory = cm
@@ -350,9 +349,8 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 	}
 
 	// Unk
-	if records, e := loadIpaUnkFile(mecabPath + "/" + ipaUnkDefFileName); e != nil {
-		err = e
-		return
+	if records, err := loadIpaUnkFile(mecabPath + "/" + ipaUnkDefFileName); e != nil {
+		return nil, err
 	} else {
 		d.UnkIndex = make(map[int32]int32)
 		d.UnkIndexDup = make(map[int32]int32)
@@ -366,59 +364,58 @@ func buildIpaDic(mecabPath, neologdPath string) (d *IpaDic, err error) {
 				}
 			}
 			if catid < 0 {
-				err = fmt.Errorf("unknown unk category: %v", rec[ipaUnkRecordCategoryIndex])
-				return
+				return nil, fmt.Errorf("unknown unk category: %v", rec[ipaUnkRecordCategoryIndex])
 			}
 			if _, ok := d.UnkIndex[catid]; !ok {
 				d.UnkIndex[catid] = int32(len(d.UnkContents))
 			} else {
 				d.UnkIndexDup[catid]++
 			}
-			var l, r, w int
-			if l, err = strconv.Atoi(rec[ipaUnkRecordLeftIDIndex]); err != nil {
-				return
+			l, err := strconv.Atoi(rec[ipaUnkRecordLeftIDIndex])
+			if err != nil {
+				return nil, err
 			}
-			if r, err = strconv.Atoi(rec[ipaUnkRecordRightIndex]); err != nil {
-				return
+			r, err := strconv.Atoi(rec[ipaUnkRecordRightIndex])
+			if err != nil {
+				return nil, err
 			}
-			if w, err = strconv.Atoi(rec[ipaUnkRecordWeigthIndex]); err != nil {
-				return
+			w, err := strconv.Atoi(rec[ipaUnkRecordWeigthIndex])
+			if err != nil {
+				return nil, err
 			}
 			m := dic.Morph{LeftID: int16(l), RightID: int16(r), Weight: int16(w)}
 			d.UnkMorphs = append(d.UnkMorphs, m)
 			d.UnkContents = append(d.UnkContents, rec[ipaUnkRecordOtherContentsStartIndex:])
 		}
 	}
-	return
+	return &d, err
 }
 
-func loadIpaMorphFile(path string) (records [][]string, err error) {
-	var f *os.File
-	f, err = os.Open(path)
+func loadIpaMorphFile(path string) ([][]string, error) {
+	f, err := os.Open(path)
 	if err != nil {
-		return
+		return nil, err
 	}
 	defer f.Close()
 	r := csv.NewReader(transform.NewReader(f, japanese.EUCJP.NewDecoder()))
 	r.Comma = ','
+	var records [][]string
 	for {
-		record, e := r.Read()
-		if e == io.EOF {
+		record, err := r.Read()
+		if err == io.EOF {
 			break
-		} else if e != nil {
-			err = e
-			return
+		} else if err != nil {
+			return nil, err
 		}
 		records = append(records, record)
 	}
-	return
+	return records, nil
 }
 
 func loadIpaMatrixDefFile(path string) (rowSize, colSize int64, vec []int16, err error) {
-	var file *os.File
-	file, err = os.Open(path)
+	file, err := os.Open(path)
 	if err != nil {
-		return
+		return rowSize, colSize, vec, err
 	}
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
@@ -426,49 +423,41 @@ func loadIpaMatrixDefFile(path string) (rowSize, colSize int64, vec []int16, err
 	line := scanner.Text()
 	dim := strings.Split(line, " ")
 	if len(dim) != 2 {
-		err = fmt.Errorf("invalid format: %s", line)
-		return
+		return rowSize, colSize, vec, fmt.Errorf("invalid format: %s", line)
 	}
 	rowSize, err = strconv.ParseInt(dim[0], 10, 0)
 	if err != nil {
-		err = fmt.Errorf("invalid format: %s, %s", err, line)
-		return
+		return rowSize, colSize, vec, fmt.Errorf("invalid format: %s, %s", err, line)
 	}
 	colSize, err = strconv.ParseInt(dim[1], 10, 0)
 	if err != nil {
-		err = fmt.Errorf("invalid format: %s, %s", err, line)
-		return
+		return rowSize, colSize, vec, fmt.Errorf("invalid format: %s, %s", err, line)
 	}
 	vec = make([]int16, rowSize*colSize)
 	for scanner.Scan() {
 		line := scanner.Text()
 		ary := strings.Split(line, " ")
 		if len(ary) != 3 {
-			err = fmt.Errorf("invalid format: %s", line)
-			return
+			return rowSize, colSize, vec, fmt.Errorf("invalid format: %s", line)
 		}
-		row, e := strconv.ParseInt(ary[0], 10, 0)
-		if e != nil {
-			err = fmt.Errorf("invalid format: %s, %s", e, line)
-			return
+		row, err := strconv.ParseInt(ary[0], 10, 0)
+		if err != nil {
+			return rowSize, colSize, vec, fmt.Errorf("invalid format: %s, %s", err, line)
 		}
-		col, e := strconv.ParseInt(ary[1], 10, 0)
-		if e != nil {
-			err = fmt.Errorf("invalid format: %s, %s", e, line)
-			return
+		col, err := strconv.ParseInt(ary[1], 10, 0)
+		if err != nil {
+			return rowSize, colSize, vec, fmt.Errorf("invalid format: %s, %s", err, line)
 		}
-		val, e := strconv.Atoi(ary[2])
-		if e != nil {
-			err = fmt.Errorf("invalid format: %s, %s", e, line)
-			return
+		val, err := strconv.Atoi(ary[2])
+		if err != nil {
+			return rowSize, colSize, vec, fmt.Errorf("invalid format: %s, %s", err, line)
 		}
 		vec[row*colSize+col] = int16(val)
 	}
-	if err = scanner.Err(); err != nil {
-		err = fmt.Errorf("invalid format: %s, %s", err, line)
-		return
+	if err := scanner.Err(); err != nil {
+		return rowSize, colSize, vec, fmt.Errorf("invalid format: %s, %s", err, line)
 	}
-	return
+	return rowSize, colSize, vec, nil
 }
 
 func loadIpaCharClassDefFile(path string) (charClass []string, charCategory []byte, invokeMap, groupMap []bool, err error) {
@@ -520,26 +509,24 @@ func loadIpaCharClassDefFile(path string) (charClass []string, charCategory []by
 	return
 }
 
-func loadIpaUnkFile(path string) (records [][]string, err error) {
-	var file *os.File
-	file, err = os.Open(path)
+func loadIpaUnkFile(path string) ([][]string, error) {
+	file, err := os.Open(path)
 	if err != nil {
-		return
+		return nil, err
 	}
 	r := csv.NewReader(transform.NewReader(file, japanese.EUCJP.NewDecoder()))
 	r.Comma = ','
+	var records [][]string
 	for {
-		rec, e := r.Read()
-		if e == io.EOF {
+		rec, err := r.Read()
+		if err == io.EOF {
 			break
-		} else if e != nil {
-			err = e
-			return
+		} else if err != nil {
+			return nil, err
 		} else if len(rec) != ipaUnkRecordSize {
-			err = fmt.Errorf("invalid format csv: %v, %v", file, rec)
-			return
+			return nil, fmt.Errorf("invalid format csv: %v, %v", file, rec)
 		}
 		records = append(records, rec)
 	}
-	return
+	return records, nil
 }

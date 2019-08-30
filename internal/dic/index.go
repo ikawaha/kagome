@@ -102,8 +102,9 @@ func (idx IndexTable) Search(input string) []int {
 
 // WriteTo saves a index table.
 func (idx IndexTable) WriteTo(w io.Writer) (n int64, err error) {
-	if n, err = idx.Da.WriteTo(w); err != nil {
-		return
+	n, err = idx.Da.WriteTo(w)
+	if err != nil {
+		return n, err
 	}
 	keys := make([]int32, 0, len(idx.Dup))
 	for k := range idx.Dup {
@@ -113,22 +114,22 @@ func (idx IndexTable) WriteTo(w io.Writer) (n int64, err error) {
 		return keys[i] < keys[j]
 	})
 	sz := int64(len(keys))
-	if err = binary.Write(w, binary.LittleEndian, sz); err != nil {
-		return
+	if err := binary.Write(w, binary.LittleEndian, sz); err != nil {
+		return n, err
 	}
 	n += int64(binary.Size(sz))
 	for _, k := range keys {
-		if err = binary.Write(w, binary.LittleEndian, k); err != nil {
-			return
+		if err := binary.Write(w, binary.LittleEndian, k); err != nil {
+			return n, err
 		}
 		n += int64(binary.Size(k))
 		v := idx.Dup[k]
-		if err = binary.Write(w, binary.LittleEndian, v); err != nil {
-			return
+		if err := binary.Write(w, binary.LittleEndian, v); err != nil {
+			return n, err
 		}
 		n += int64(binary.Size(v))
 	}
-	return
+	return n, nil
 }
 
 // ReadIndexTable loads a index table.
