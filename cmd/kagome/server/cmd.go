@@ -246,7 +246,7 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 			cmdErr = "Error"
 			log.Printf("process done with error = %v", err)
 		}
-		tokens = h.tokenizer.AnalyzeGraph(sen, m, w0)
+		tokens = h.tokenizer.AnalyzeGraph(w0, sen, m)
 		w0.Close()
 
 		done := make(chan error, 1)

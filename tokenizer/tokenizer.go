@@ -118,12 +118,12 @@ func (t Tokenizer) Analyze(input string, mode TokenizeMode) (tokens []Token) {
 }
 
 // Dot returns morphs of a sentence and exports a lattice graph to dot format in standard tokenize mode.
-func (t Tokenizer) Dot(input string, w io.Writer) (tokens []Token) {
-	return t.AnalyzeGraph(input, Normal, w)
+func (t Tokenizer) Dot(w io.Writer, input string) (tokens []Token) {
+	return t.AnalyzeGraph(w, input, Normal)
 }
 
 // AnalyzeGraph returns morphs of a sentence and exports a lattice graph to dot format.
-func (t Tokenizer) AnalyzeGraph(input string, mode TokenizeMode, w io.Writer) (tokens []Token) {
+func (t Tokenizer) AnalyzeGraph(w io.Writer, input string, mode TokenizeMode) (tokens []Token) {
 	la := lattice.New(t.dic, t.udic)
 	defer la.Free()
 	la.Build(input)

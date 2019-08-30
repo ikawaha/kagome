@@ -135,7 +135,7 @@ func command(opt *option) error {
 	case "extended":
 		mode = tokenizer.Extended
 	}
-	tokens := t.AnalyzeGraph(opt.input, mode, out)
+	tokens := t.AnalyzeGraph(out, opt.input, mode)
 	if opt.verbose {
 		for i, size := 1, len(tokens); i < size; i++ {
 			tok := tokens[i]
