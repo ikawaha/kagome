@@ -100,6 +100,7 @@ func (la *Lattice) addNode(pos, id, start int, class NodeClass, surface string) 
 	n.ID = id
 	n.Start = start
 	n.Class = class
+	n.Cost = 0
 	n.Left, n.Right, n.Weight = int32(m.LeftID), int32(m.RightID), int32(m.Weight)
 	n.Surface = surface
 	n.Prev = nil
