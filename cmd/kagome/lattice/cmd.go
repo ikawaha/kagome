@@ -70,7 +70,7 @@ func (o *option) parse(args []string) error {
 		return fmt.Errorf("input is empty")
 	}
 	if o.sysdic != "" && o.sysdic != "ipa" && o.sysdic != "uni" {
-		return fmt.Errorf("invalid argument: -sysdic %v\n", o.sysdic)
+		return fmt.Errorf("invalid argument: -sysdic %v", o.sysdic)
 	}
 	if o.mode != "" && o.mode != "normal" && o.mode != "search" && o.mode != "extended" {
 		return fmt.Errorf("invalid argument: -mode %v", o.mode)

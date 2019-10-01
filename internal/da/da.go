@@ -132,7 +132,6 @@ func (d DoubleArray) CommonPrefixSearchCallback(input string, callback func(id, 
 			callback(int(-d[ahead].Base), i+1)
 		}
 	}
-	return
 }
 
 // PrefixSearch returns the longest common prefix keyword in an input if found.

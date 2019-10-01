@@ -180,7 +180,6 @@ func (la *Lattice) Build(inp string) {
 			}
 		}
 	}
-	return
 }
 
 // String returns a debug string of a lattice.
@@ -245,7 +244,6 @@ func (la *Lattice) Forward(m TokenizeMode) {
 			}
 		}
 	}
-	return
 }
 
 // Backward runs backward algorithm of the Viterbi.
