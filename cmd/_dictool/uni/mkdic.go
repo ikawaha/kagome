@@ -345,7 +345,7 @@ func buildUniDic(mecabPath, neologdPath string) (*UniDic, error) {
 	}
 
 	// Unk
-	if records, err := loadUniUnkFile(mecabPath + "/" + uniUnkDefFileName); e != nil {
+	if records, err := loadUniUnkFile(mecabPath + "/" + uniUnkDefFileName); err != nil {
 		return nil, err
 	} else {
 		d.UnkIndex = make(map[int32]int32)

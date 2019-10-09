@@ -83,7 +83,6 @@ func (idx IndexTable) CommonPrefixSearchCallback(input string, callback func(id,
 			callback(i, y)
 		}
 	})
-	return
 }
 
 // Search finds the given keyword and returns the id if found.
