@@ -72,10 +72,14 @@ func New(d *dic.Dic, u *dic.UserDic) *Lattice {
 // Free releases a memory of a lattice.
 func (la *Lattice) Free() {
 	la.Input = ""
+	for i := range la.Output {
+		la.Output[i] = nil
+	}
 	la.Output = la.Output[:0]
 	for i := range la.list {
 		for j := range la.list[i] {
 			nodePool.Put(la.list[i][j])
+			la.list[i][j] = nil
 		}
 		la.list[i] = la.list[i][:0]
 	}
@@ -267,12 +271,12 @@ func (la *Lattice) Backward(m TokenizeMode) {
 		stack := make([]*node, 0, runeLen)
 		i := 0
 		for _, r := range p.Surface {
-			n := nodePool.Get().(*node)
-			n.ID = p.ID
-			n.Start = p.Start + i
-			n.Class = DUMMY
-			n.Surface = string(r)
-			stack = append(stack, n)
+			stack = append(stack, &node{
+				ID:      p.ID,
+				Start:   p.Start + i,
+				Class:   DUMMY,
+				Surface: string(r),
+			})
 			i++
 		}
 		for j, end := 0, len(stack); j < end; j++ {
