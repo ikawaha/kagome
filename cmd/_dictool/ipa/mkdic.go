@@ -349,7 +349,7 @@ func buildIpaDic(mecabPath, neologdPath string) (*IpaDic, error) {
 	}
 
 	// Unk
-	if records, err := loadIpaUnkFile(mecabPath + "/" + ipaUnkDefFileName); e != nil {
+	if records, err := loadIpaUnkFile(mecabPath + "/" + ipaUnkDefFileName); err != nil {
 		return nil, err
 	} else {
 		d.UnkIndex = make(map[int32]int32)
