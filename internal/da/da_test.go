@@ -60,7 +60,7 @@ func TestDaBuildAndSearch03(t *testing.T) {
 	}
 	for _, k := range keywords {
 		if _, ok := d.Find(k); !ok {
-			t.Errorf("does not detected: %v\n", k)
+			t.Errorf("does not detected: %v", k)
 		}
 	}
 
@@ -248,7 +248,7 @@ func TestDaBuildWithIDsAndPrefixSearch03(t *testing.T) {
 	ids = ids[0 : len(ids)-1]
 	d, err := BuildWithIDs(keywords, ids)
 	if err != nil {
-		t.Errorf("unexpected error: %v\n", err)
+		t.Errorf("unexpected error: %v", err)
 	}
 	for key, expectedID := range h {
 		if id, ok := d.Find(key); !ok || id != expectedID {

@@ -34,7 +34,7 @@ func TestPOSTableAdd(t *testing.T) {
 	for i, d := range data {
 		pos := m.Add(d.In)
 		if !reflect.DeepEqual(pos, d.Exp) {
-			t.Errorf("%d, input %v, got %+v, expected %+v\n", i, d.In, pos, d.Exp)
+			t.Errorf("%d, input %v, got %+v, expected %+v", i, d.In, pos, d.Exp)
 		}
 	}
 }
@@ -60,7 +60,7 @@ func TestPOSString(t *testing.T) {
 			got = append(got, table.NameList[id])
 		}
 		if !reflect.DeepEqual(got, want) {
-			t.Errorf("%d, input %v, got %+v, expected %+v\n", i, want, got, want)
+			t.Errorf("%d, input %v, got %+v, expected %+v", i, want, got, want)
 		}
 	}
 }
@@ -84,7 +84,7 @@ func TestPOSTableReadAndWrite(t *testing.T) {
 	var b bytes.Buffer
 	n, err := org.WriteTo(&b)
 	if err != nil {
-		t.Errorf("unexpected error: %v\n", err)
+		t.Errorf("unexpected error: %v", err)
 	}
 	if n != int64(b.Len()) {
 		t.Errorf("write len: got %v, expected %v", n, b.Len())

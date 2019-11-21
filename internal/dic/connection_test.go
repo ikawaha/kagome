@@ -38,7 +38,7 @@ func TestConnectionTableAt(t *testing.T) {
 		for j := 0; j < col; j++ {
 			expected := int16(i*col + j)
 			if r := ct.At(i, j); r != expected {
-				t.Errorf("got %v, expected %v\n", r, expected)
+				t.Errorf("got %v, expected %v", r, expected)
 			}
 		}
 	}

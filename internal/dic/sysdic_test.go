@@ -32,7 +32,7 @@ func TestSystemDic(t *testing.T) {
 	const expected = IPADICEntrySize
 	c := len(d.Morphs)
 	if c != expected {
-		t.Errorf("got %v, expected %v\n", c, expected)
+		t.Errorf("got %v, expected %v", c, expected)
 	}
 }
 
@@ -43,21 +43,21 @@ func TestSystemDicSimple(t *testing.T) {
 	const expected = IPADICEntrySize
 	c := len(d.Morphs)
 	if c != expected {
-		t.Errorf("got %v, expected %v\n", c, expected)
+		t.Errorf("got %v, expected %v", c, expected)
 	}
 }
 
 func TestSystemDicIPAPath01(t *testing.T) {
 	expected := "dic/ipa/ipa.dic"
 	if IPADicPath != expected {
-		t.Errorf("got %v, expected %v\n", IPADicPath, expected)
+		t.Errorf("got %v, expected %v", IPADicPath, expected)
 	}
 }
 
 func TestSystemDicUniPath01(t *testing.T) {
 	expected := "dic/uni/uni.dic"
 	if UniDicPath != expected {
-		t.Errorf("got %v, expected %v\n", UniDicPath, expected)
+		t.Errorf("got %v, expected %v", UniDicPath, expected)
 	}
 }
 
@@ -67,7 +67,7 @@ func TestSystemDicIPAMorphs01(t *testing.T) {
 	const expected = IPADICEntrySize
 	c := len(d.Morphs)
 	if c != expected {
-		t.Errorf("got %v, expected %v\n", c, expected)
+		t.Errorf("got %v, expected %v", c, expected)
 	}
 }
 
@@ -77,7 +77,7 @@ func TestSystemDicIPASimpleMorphs01(t *testing.T) {
 	const expected = IPADICEntrySize
 	c := len(d.Morphs)
 	if c != expected {
-		t.Errorf("got %v, expected %v\n", c, expected)
+		t.Errorf("got %v, expected %v", c, expected)
 	}
 }
 
@@ -87,7 +87,7 @@ func TestSystemDicUniMorphs01(t *testing.T) {
 	const expected = UniDICEntrySize
 	c := len(d.Morphs)
 	if c != expected {
-		t.Errorf("got %v, expected %v\n", c, expected)
+		t.Errorf("got %v, expected %v", c, expected)
 	}
 }
 
@@ -97,7 +97,7 @@ func TestSystemDicUniSimpleMorphs01(t *testing.T) {
 	const expected = UniDICEntrySize
 	c := len(d.Morphs)
 	if c != expected {
-		t.Errorf("got %v, expected %v\n", c, expected)
+		t.Errorf("got %v, expected %v", c, expected)
 	}
 }
 
@@ -107,7 +107,7 @@ func TestSystemDicIPAContents01(t *testing.T) {
 	const expected = IPADICEntrySize
 	c := len(d.Contents)
 	if c != expected {
-		t.Errorf("got %v, expected %v\n", c, expected)
+		t.Errorf("got %v, expected %v", c, expected)
 	}
 }
 
@@ -117,7 +117,7 @@ func TestSystemDicIPASimpleContents01(t *testing.T) {
 	const expected = 0
 	c := len(d.Contents)
 	if c != expected {
-		t.Errorf("got %v, expected %v\n", c, expected)
+		t.Errorf("got %v, expected %v", c, expected)
 	}
 }
 
@@ -127,7 +127,7 @@ func TestSystemDicUniContents01(t *testing.T) {
 	const expected = UniDICEntrySize
 	c := len(d.Contents)
 	if c != expected {
-		t.Errorf("got %v, expected %v\n", c, expected)
+		t.Errorf("got %v, expected %v", c, expected)
 	}
 }
 
@@ -137,7 +137,7 @@ func TestSystemDicUniSimpleContents01(t *testing.T) {
 	const expected = 0
 	c := len(d.Contents)
 	if c != expected {
-		t.Errorf("got %v, expected %v\n", c, expected)
+		t.Errorf("got %v, expected %v", c, expected)
 	}
 }
 
@@ -154,7 +154,7 @@ func TestSystemDicIPAIndex01(t *testing.T) {
 	for _, cr := range testSet {
 		ids := d.Index.Search(cr.input)
 		if !reflect.DeepEqual(ids, cr.ids) {
-			t.Errorf("input %v, got %v, expected %v\n", cr.input, ids, cr.ids)
+			t.Errorf("input %v, got %v, expected %v", cr.input, ids, cr.ids)
 		}
 	}
 }
@@ -172,7 +172,7 @@ func TestSystemDicUniIndex01(t *testing.T) {
 	for _, cr := range testSet {
 		ids := d.Index.Search(cr.input)
 		if !reflect.DeepEqual(ids, cr.ids) {
-			t.Errorf("input %v, got %v, expected %v\n", cr.input, ids, cr.ids)
+			t.Errorf("input %v, got %v, expected %v", cr.input, ids, cr.ids)
 		}
 	}
 }
@@ -207,13 +207,13 @@ func TestSystemDicIPAIndex02(t *testing.T) {
 	for _, cr := range testSet {
 		lens, ids := d.Index.CommonPrefixSearch(cr.input)
 		if !reflect.DeepEqual(lens, cr.lens) {
-			t.Errorf("input %v, got lens %v,\n expected %v\n", cr.input, lens, cr.lens)
+			t.Errorf("input %v, got lens %v,\n expected %v", cr.input, lens, cr.lens)
 		}
 		if len(ids) != len(cr.ids) {
-			t.Errorf("input %v, got ids len %v, expected len %v\n", cr.input, len(ids), len(cr.ids))
+			t.Errorf("input %v, got ids len %v, expected len %v", cr.input, len(ids), len(cr.ids))
 		}
 		if !reflect.DeepEqual(ids, cr.ids) {
-			t.Errorf("input %v, got ids %v,\n expected %v\n", cr.input, ids, cr.ids)
+			t.Errorf("input %v, got ids %v,\n expected %v", cr.input, ids, cr.ids)
 		}
 	}
 
@@ -251,13 +251,13 @@ func TestSystemDicUniIndex02(t *testing.T) {
 	for _, cr := range testSet {
 		lens, ids := d.Index.CommonPrefixSearch(cr.input)
 		if !reflect.DeepEqual(lens, cr.lens) {
-			t.Errorf("input %v, got lens %v,\n expected %v\n", cr.input, lens, cr.lens)
+			t.Errorf("input %v, got lens %v,\n expected %v", cr.input, lens, cr.lens)
 		}
 		if len(ids) != len(cr.ids) {
-			t.Errorf("input %v, got ids len %v, expected len %v\n", cr.input, len(ids), len(cr.ids))
+			t.Errorf("input %v, got ids len %v, expected len %v", cr.input, len(ids), len(cr.ids))
 		}
 		if !reflect.DeepEqual(ids, cr.ids) {
-			t.Errorf("input %v, got ids %v,\n expected %v\n", cr.input, ids, cr.ids)
+			t.Errorf("input %v, got ids %v,\n expected %v", cr.input, ids, cr.ids)
 		}
 	}
 
@@ -280,7 +280,7 @@ func TestSystemDicIPACharClass01(t *testing.T) {
 		"CYRILLIC",     //10
 	}
 	if !reflect.DeepEqual(d.CharClass, expected) {
-		t.Errorf("got %v, expected %v\n", d.CharClass, expected)
+		t.Errorf("got %v, expected %v", d.CharClass, expected)
 	}
 }
 
@@ -301,7 +301,7 @@ func TestSystemDicUniCharClass01(t *testing.T) {
 		"CYRILLIC",     //10
 	}
 	if !reflect.DeepEqual(d.CharClass, expected) {
-		t.Errorf("got %v, expected %v\n", d.CharClass, expected)
+		t.Errorf("got %v, expected %v", d.CharClass, expected)
 	}
 }
 
@@ -477,11 +477,11 @@ func TestSystemDicIPACharCategory01(t *testing.T) {
 	for _, cr := range testSet {
 		category := d.CharCategory[cr.input]
 		if category != cr.category {
-			t.Errorf("input %04X, got %v, expected %v\n", cr.input, category, cr.category)
+			t.Errorf("input %04X, got %v, expected %v", cr.input, category, cr.category)
 		}
 		category = d.CharacterCategory(rune(cr.input))
 		if category != cr.category {
-			t.Errorf("input %04X, got %v, expected %v\n", cr.input, category, cr.category)
+			t.Errorf("input %04X, got %v, expected %v", cr.input, category, cr.category)
 		}
 	}
 }
@@ -658,11 +658,11 @@ func TestSystemDicUniCharCategory01(t *testing.T) {
 	for _, cr := range testSet {
 		category := d.CharCategory[cr.input]
 		if category != cr.category {
-			t.Errorf("input %04X, got %v, expected %v\n", cr.input, category, cr.category)
+			t.Errorf("input %04X, got %v, expected %v", cr.input, category, cr.category)
 		}
 		category = d.CharacterCategory(rune(cr.input))
 		if category != cr.category {
-			t.Errorf("input %04X, got %v, expected %v\n", cr.input, category, cr.category)
+			t.Errorf("input %04X, got %v, expected %v", cr.input, category, cr.category)
 		}
 	}
 }
@@ -701,7 +701,7 @@ func TestSystemDicIPAInvokeList01(t *testing.T) {
 	d := SysDicIPA()
 	for _, cr := range crs {
 		if iv := d.InvokeList[cr.class]; iv != cr.invoke {
-			t.Errorf("input %v: got %v, expected %v\n", cr.class, iv, cr.invoke)
+			t.Errorf("input %v: got %v, expected %v", cr.class, iv, cr.invoke)
 		}
 	}
 }
@@ -740,7 +740,7 @@ func TestSystemDicUniInvokeList01(t *testing.T) {
 	d := SysDicUni()
 	for _, cr := range crs {
 		if iv := d.InvokeList[cr.class]; iv != cr.invoke {
-			t.Errorf("input %v: got %v, expected %v\n", cr.class, iv, cr.invoke)
+			t.Errorf("input %v: got %v, expected %v", cr.class, iv, cr.invoke)
 		}
 	}
 }
@@ -779,7 +779,7 @@ func TestSystemDicIPAGroupList01(t *testing.T) {
 	d := SysDicIPA()
 	for _, cr := range crs {
 		if iv := d.GroupList[cr.class]; iv != cr.invoke {
-			t.Errorf("input %v: got %v, expected %v\n", cr.class, iv, cr.invoke)
+			t.Errorf("input %v: got %v, expected %v", cr.class, iv, cr.invoke)
 		}
 	}
 }
@@ -818,7 +818,7 @@ func TestSystemDicUniGroupList01(t *testing.T) {
 	d := SysDicUni()
 	for _, cr := range crs {
 		if iv := d.GroupList[cr.class]; iv != cr.invoke {
-			t.Errorf("input %v: got %v, expected %v\n", cr.class, iv, cr.invoke)
+			t.Errorf("input %v: got %v, expected %v", cr.class, iv, cr.invoke)
 		}
 	}
 }
