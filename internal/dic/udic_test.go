@@ -45,7 +45,7 @@ func TestNewUserDicIndex01(t *testing.T) {
 	}
 	for _, cr := range callAndRespose {
 		if ids := udic.Index.Search(cr.inp); (len(ids) != 0) != cr.ok {
-			t.Errorf("got %v, expected %v\n", ids, cr.ok)
+			t.Errorf("got %v, expected %v", ids, cr.ok)
 		}
 	}
 }
@@ -57,7 +57,7 @@ func TestNewUserDicContents01(t *testing.T) {
 	}
 	expectedLen := 3
 	if len(udic.Contents) != expectedLen {
-		t.Errorf("got %v, expected %v\n", len(udic.Contents), expectedLen)
+		t.Errorf("got %v, expected %v", len(udic.Contents), expectedLen)
 	}
 
 	type tuple struct {
@@ -92,7 +92,7 @@ func TestNewUserDicContents01(t *testing.T) {
 	for _, cr := range callAndRespose {
 		c := udic.Contents[cr.inp]
 		if !reflect.DeepEqual(c, cr.out) {
-			t.Errorf("got %v, expected %v\n", c, cr.out)
+			t.Errorf("got %v, expected %v", c, cr.out)
 		}
 	}
 }

@@ -160,7 +160,7 @@ func (la *Lattice) Build(inp string) {
 			}
 			unkWordLen := 1
 			if la.dic.GroupList[int(class)] {
-				for i, w, size := endPos, 1, len(inp); i < size; i += w {
+				for i, w, size := endPos, 0, len(inp); i < size; i += w {
 					var c rune
 					c, w = utf8.DecodeRuneInString(inp[i:])
 					if la.dic.CharacterCategory(c) != class {

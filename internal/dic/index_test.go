@@ -78,7 +78,7 @@ func TestCommonPrefixSearch(t *testing.T) {
 	}
 	expectdOutputs := [][]int{{0}, {1, 2, 3, 4}, {5, 6}}
 	if !reflect.DeepEqual(outputs, expectdOutputs) {
-		t.Errorf("common prefix search outputs, got %v, expected %v\n", outputs, expectdOutputs)
+		t.Errorf("common prefix search outputs, got %v, expected %v", outputs, expectdOutputs)
 	}
 }
 
@@ -168,7 +168,7 @@ func TestIndexTableReadAndWrite(t *testing.T) {
 	var b bytes.Buffer
 	n, err := org.WriteTo(&b)
 	if err != nil {
-		t.Errorf("unexpected error: %v\n", err)
+		t.Errorf("unexpected error: %v", err)
 	}
 	if n != int64(b.Len()) {
 		t.Errorf("write len: got %v, expected %v", n, b.Len())

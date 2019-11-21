@@ -71,7 +71,7 @@ func command(opt *option) error {
 		return err
 	}
 	if saveIpaDic(d, opt.output, opt.archive); err != nil {
-		return fmt.Errorf("build error: %v\n", err)
+		return fmt.Errorf("build error: %v", err)
 	}
 	return nil
 }

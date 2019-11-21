@@ -47,7 +47,7 @@ func TestNewUserDicIndex01(t *testing.T) {
 	}
 	for _, cr := range callAndRespose {
 		if ids := udic.dic.Index.Search(cr.inp); (len(ids) != 0) != cr.ok {
-			t.Errorf("got %v, expected %v\n", ids, cr.ok)
+			t.Errorf("got %v, expected %v", ids, cr.ok)
 		}
 	}
 }
