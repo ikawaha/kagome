@@ -27,8 +27,7 @@ after_success:
   - |
     if [[ $TRAVIS_GO_VERSION = 1.14.x ]]
     then
-      go test -covermode=count -coverprofile=coverage.txt ./...
-      $GOPATH/bin/goveralls -coverprofile=coverage.txt -service=travis-ci
+      /bin/sh ./go-coverall.sh
     else
       echo skip coverage test, $TRAVIS_GO_VERSION
     fi
