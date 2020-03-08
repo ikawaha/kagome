@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/ikawaha/kagome.svg?branch=master)](https://travis-ci.org/ikawaha/kagome)
 [![BuildStatus(Windows)](https://ci.appveyor.com/api/projects/status/k4g4bpy1ijqoasbe/branch/master?svg=true)](https://ci.appveyor.com/project/ikawaha/kagome)
 [![Coverage Status](https://coveralls.io/repos/ikawaha/kagome/badge.svg?branch=master&service=github)](https://coveralls.io/github/ikawaha/kagome?branch=master) 
-[![GoDoc](https://godoc.org/github.com/ikawaha/kagome?status.svg)](https://godoc.org/github.com/ikawaha/kagome)
+[![GoDoc](https://godoc.org/github.com/ikawaha/kagome?status.svg)](https://pkg.go.dev/github.com/ikawaha/kagome?tab=doc)
 [![Docker Pulls](https://img.shields.io/docker/pulls/ikawaha/kagome.svg?style)](https://hub.docker.com/r/ikawaha/kagome/)
 [![Docker Automated build](https://img.shields.io/docker/cloud/automated/ikawaha/kagome.svg)](https://hub.docker.com/r/ikawaha/kagome/)
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
