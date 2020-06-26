@@ -19,7 +19,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/ikawaha/kagome/internal/dic"
+	"github.com/ikawaha/kagome/v2/internal/dic"
 )
 
 func TestLatticeBuild01(t *testing.T) {

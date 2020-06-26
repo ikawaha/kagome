@@ -31,8 +31,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ikawaha/kagome/cmd/_dictool/splitfile"
-	"github.com/ikawaha/kagome/internal/dic"
+	"github.com/ikawaha/kagome/v2/cmd/_dictool/splitfile"
+	"github.com/ikawaha/kagome/v2/internal/dic"
 )
 
 const (

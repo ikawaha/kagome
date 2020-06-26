@@ -1,5 +1,3 @@
-module github.com/ikawaha/kagome
+module github.com/ikawaha/kagome/v2
 
-// go: no requirements found in Godeps/Godeps.json
-
-go 1.13
+go 1.14

@@ -20,9 +20,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ikawaha/kagome/cmd/kagome/lattice"
-	"github.com/ikawaha/kagome/cmd/kagome/server"
-	"github.com/ikawaha/kagome/cmd/kagome/tokenize"
+	"github.com/ikawaha/kagome/v2/cmd/kagome/lattice"
+	"github.com/ikawaha/kagome/v2/cmd/kagome/server"
+	"github.com/ikawaha/kagome/v2/cmd/kagome/tokenize"
 )
 
 type subcommand struct {
@@ -84,7 +84,7 @@ This must be specified by -X option during the go build. Such like:
 
 //Usage prints to stdout information about the tool
 func Usage() {
-	fmt.Fprintf(errorWriter, "Japanese Morphological Analyzer -- github.com/ikawaha/kagome\n")
+	fmt.Fprintf(errorWriter, "Japanese Morphological Analyzer -- github.com/ikawaha/kagome/v2/v2\n")
 	fmt.Fprintf(errorWriter, "usage: %s <command>\n", filepath.Base(os.Args[0]))
 }
 

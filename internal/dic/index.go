@@ -20,7 +20,7 @@ import (
 	"io"
 	"sort"
 
-	"github.com/ikawaha/kagome/internal/da"
+	"github.com/ikawaha/kagome/v2/internal/da"
 )
 
 // IndexTable represents a dictionary index.
