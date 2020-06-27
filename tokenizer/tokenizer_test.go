@@ -341,9 +341,13 @@ func TestExtendedModeAnalyze04(t *testing.T) {
 
 func TestTokenizerSetDic(t *testing.T) {
 	d := SysDic()
-	tnz := NewWithDic(d)
-
-	tnz.SetDic(d)
+	tnz, err := NewWithDic(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	if err := tnz.SetDic(d); err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	if tnz.dic != d.dic {
 		t.Errorf("got %v, expected %v", tnz.dic, d)
 	}

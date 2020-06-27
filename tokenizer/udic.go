@@ -31,16 +31,16 @@ type UserDic struct {
 }
 
 // NewUserDic build a user dictionary from a file.
-func NewUserDic(path string) (UserDic, error) {
+func NewUserDic(path string) (*UserDic, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return UserDic{}, err
+		return nil, err
 	}
 	defer f.Close()
 
 	r, err := NewUserDicRecords(f)
 	if err != nil {
-		return UserDic{}, err
+		return nil, err
 	}
 	return r.NewUserDic()
 }
@@ -98,7 +98,7 @@ func NewUserDicRecords(r io.Reader) (UserDicRecords, error) {
 }
 
 // NewUserDic builds a user dictionary.
-func (u UserDicRecords) NewUserDic() (UserDic, error) {
+func (u UserDicRecords) NewUserDic() (*UserDic, error) {
 	udic := new(dic.UserDic)
 	sort.Sort(u)
 
@@ -107,12 +107,12 @@ func (u UserDicRecords) NewUserDic() (UserDic, error) {
 	for _, r := range u {
 		k := strings.TrimSpace(r.Text)
 		if prev == k {
-			return UserDic{}, fmt.Errorf("duplicated error, %+v", r)
+			return nil, fmt.Errorf("duplicated error, %+v", r)
 		}
 		prev = k
 		keys = append(keys, k)
 		if len(r.Tokens) == 0 || len(r.Tokens) != len(r.Yomi) {
-			return UserDic{}, fmt.Errorf("invalid format, %+v", r)
+			return nil, fmt.Errorf("invalid format, %+v", r)
 		}
 		c := dic.UserDicContent{
 			Tokens: r.Tokens,
@@ -123,5 +123,5 @@ func (u UserDicRecords) NewUserDic() (UserDic, error) {
 	}
 	idx, err := dic.BuildIndexTable(keys)
 	udic.Index = idx
-	return UserDic{dic: udic}, err
+	return &UserDic{dic: udic}, err
 }

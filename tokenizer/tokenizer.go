@@ -15,6 +15,7 @@
 package tokenizer
 
 import (
+	"fmt"
 	"io"
 	"unicode/utf8"
 
@@ -43,32 +44,43 @@ type Tokenizer struct {
 }
 
 // New create a default tokenize.
-func New() (t Tokenizer) {
-	return Tokenizer{dic: dic.SysDic()}
+func New() (t *Tokenizer) {
+	return &Tokenizer{dic: dic.SysDic()}
 }
 
 // NewWithDic create a tokenizer with specified dictionary.
-func NewWithDic(d Dic) (t Tokenizer) {
-	return Tokenizer{dic: d.dic}
+func NewWithDic(d *Dic) (*Tokenizer, error) {
+	if d == nil {
+		return nil, fmt.Errorf("invalid dictionary")
+	}
+	return &Tokenizer{dic: d.dic}, nil
 }
 
 // NewWithDicPath create a tokenizer with a dictionary that loads from path.
-func NewWithDicPath(p string) (Tokenizer, error) {
+func NewWithDicPath(p string) (*Tokenizer, error) {
 	d, err := dic.Load(p)
 	if err != nil {
-		return Tokenizer{dic: dic.SysDic()}, err
+		return nil, err
 	}
-	return NewWithDic(Dic{d}), nil
+	return NewWithDic(&Dic{dic: d})
 }
 
-// SetDic sets dictionary to dic.
-func (t *Tokenizer) SetDic(d Dic) {
+// SetDic sets dictionary to the tokenizer.
+func (t *Tokenizer) SetDic(d *Dic) error {
+	if d == nil {
+		return fmt.Errorf("invalid dictionary")
+	}
 	t.dic = d.dic
+	return nil
 }
 
 // SetUserDic sets user dictionary to udic.
-func (t *Tokenizer) SetUserDic(d UserDic) {
+func (t *Tokenizer) SetUserDic(d *UserDic) error {
+	if d == nil {
+		return fmt.Errorf("invalid user dictionary")
+	}
 	t.udic = d.dic
+	return nil
 }
 
 // Tokenize analyze a sentence in standard tokenize mode.

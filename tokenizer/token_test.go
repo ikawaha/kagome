@@ -28,10 +28,10 @@ func TestTokenClassString(t *testing.T) {
 		inp TokenClass
 		out string
 	}{
-		{DUMMY, "DUMMY"},
-		{KNOWN, "KNOWN"},
-		{UNKNOWN, "UNKNOWN"},
-		{USER, "USER"},
+		{inp: DUMMY, out: "DUMMY"},
+		{inp: KNOWN, out: "KNOWN"},
+		{inp: UNKNOWN, out: "UNKNOWN"},
+		{inp: USER, out: "USER"},
 	}
 
 	for _, p := range pairs {

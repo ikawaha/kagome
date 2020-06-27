@@ -96,7 +96,7 @@ func OptionCheck(args []string) error {
 
 // command main
 func command(opt *option) error {
-	var dic tokenizer.Dic
+	var dic *tokenizer.Dic
 	if opt.dic == "" {
 		if opt.sysdic == "ipa" {
 			if opt.simple {
@@ -131,7 +131,7 @@ func command(opt *option) error {
 			}
 		}
 	}
-	var udic tokenizer.UserDic
+	var udic *tokenizer.UserDic
 	if opt.udic != "" {
 		var err error
 		udic, err = tokenizer.NewUserDic(opt.udic)
@@ -149,8 +149,13 @@ func command(opt *option) error {
 		defer fp.Close()
 	}
 
-	t := tokenizer.NewWithDic(dic)
-	t.SetUserDic(udic)
+	t, err := tokenizer.NewWithDic(dic)
+	if err != nil {
+		return err
+	}
+	if err := t.SetUserDic(udic); err != nil {
+		return err
+	}
 
 	mode := tokenizer.Normal
 	switch opt.mode {

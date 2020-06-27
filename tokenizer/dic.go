@@ -22,43 +22,43 @@ type Dic struct {
 }
 
 // SysDic returns the system dictionary (IPA dictionary).
-func SysDic() Dic {
-	return Dic{dic.SysDic()}
+func SysDic() *Dic {
+	return &Dic{dic: dic.SysDic()}
 }
 
 // SysDicSimple returns the system dictionary (IPA dictionary w/o contents).
-func SysDicSimple() Dic {
-	return Dic{dic.SysDicSimple()}
+func SysDicSimple() *Dic {
+	return &Dic{dic: dic.SysDicSimple()}
 }
 
 // SysDicIPA returns the IPA dictionary as the system dictionary.
-func SysDicIPA() Dic {
-	return Dic{dic.SysDicIPA()}
+func SysDicIPA() *Dic {
+	return &Dic{dic: dic.SysDicIPA()}
 }
 
 // SysDicIPASimple returns the simple IPA dictionary as the system dictionary (w/o contents).
-func SysDicIPASimple() Dic {
-	return Dic{dic.SysDicIPASimple()}
+func SysDicIPASimple() *Dic {
+	return &Dic{dic: dic.SysDicIPASimple()}
 }
 
 // SysDicUni returns the UniDic dictionary as the system dictionary.
-func SysDicUni() Dic {
-	return Dic{dic.SysDicUni()}
+func SysDicUni() *Dic {
+	return &Dic{dic: dic.SysDicUni()}
 }
 
 // SysDicUniSimple returns the simple UniDic dictionary as the system dictionary (w/o contents).
-func SysDicUniSimple() Dic {
-	return Dic{dic.SysDicUniSimple()}
+func SysDicUniSimple() *Dic {
+	return &Dic{dic: dic.SysDicUniSimple()}
 }
 
 // NewDic loads a dictionary from a file.
-func NewDic(path string) (Dic, error) {
+func NewDic(path string) (*Dic, error) {
 	d, err := dic.Load(path)
-	return Dic{d}, err
+	return &Dic{dic: d}, err
 }
 
 // NewDicSimple loads a dictionary from a file w/o contents.
-func NewDicSimple(path string) (Dic, error) {
+func NewDicSimple(path string) (*Dic, error) {
 	d, err := dic.LoadSimple(path)
-	return Dic{d}, err
+	return &Dic{dic: d}, err
 }

@@ -88,7 +88,7 @@ func OptionCheck(args []string) error {
 
 // command main
 func command(opt *option) error {
-	var dic tokenizer.Dic
+	var dic *tokenizer.Dic
 	if opt.sysdic == "ipa" {
 		dic = tokenizer.SysDicIPA()
 	} else if opt.sysdic == "uni" {
@@ -96,15 +96,20 @@ func command(opt *option) error {
 	} else {
 		dic = tokenizer.SysDic()
 	}
-	var udic tokenizer.UserDic
+	var udic *tokenizer.UserDic
 	if opt.udic != "" {
 		var err error
 		if udic, err = tokenizer.NewUserDic(opt.udic); err != nil {
 			return err
 		}
 	}
-	t := tokenizer.NewWithDic(dic)
-	t.SetUserDic(udic)
+	t, err := tokenizer.NewWithDic(dic)
+	if err != nil {
+		return err
+	}
+	if err := t.SetUserDic(udic); err != nil {
+		return err
+	}
 
 	mux := http.NewServeMux()
 	mux.Handle("/", &TokenizeDemoHandler{tokenizer: t})
@@ -116,7 +121,7 @@ func command(opt *option) error {
 
 // TokenizeHandler represents the tokenizer API server struct
 type TokenizeHandler struct {
-	tokenizer tokenizer.Tokenizer
+	tokenizer *tokenizer.Tokenizer
 }
 
 func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -187,7 +192,7 @@ func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 //TokenizeDemoHandler represents the tokenizer demo server struct
 type TokenizeDemoHandler struct {
-	tokenizer tokenizer.Tokenizer
+	tokenizer *tokenizer.Tokenizer
 }
 
 func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

@@ -90,7 +90,7 @@ func OptionCheck(args []string) error {
 
 // command main
 func command(opt *option) error {
-	var dic tokenizer.Dic
+	var dic *tokenizer.Dic
 	if opt.sysdic == "ipa" {
 		dic = tokenizer.SysDicIPA()
 	} else if opt.sysdic == "uni" {
@@ -98,7 +98,10 @@ func command(opt *option) error {
 	} else {
 		dic = tokenizer.SysDic()
 	}
-	t := tokenizer.NewWithDic(dic)
+	t, err := tokenizer.NewWithDic(dic)
+	if err != nil {
+		return fmt.Errorf("invalid dictionary")
+	}
 	var out = os.Stdout
 	if opt.output != "" {
 		var err error
@@ -109,22 +112,23 @@ func command(opt *option) error {
 		}
 		defer out.Close()
 	}
-	var udic tokenizer.UserDic
+	var udic *tokenizer.UserDic
 	if opt.udic != "" {
 		var err error
 		udic, err = tokenizer.NewUserDic(opt.udic)
 		if err != nil {
 			return err
 		}
-		t.SetUserDic(udic)
+		if err := t.SetUserDic(udic); err != nil {
+			return err
+		}
 	}
 	if opt.udic != "" {
-		if udic, err := tokenizer.NewUserDic(opt.udic); err != nil {
-			fmt.Fprintln(ErrorWriter, err)
-			os.Exit(1)
-		} else {
-			t.SetUserDic(udic)
+		udic, err := tokenizer.NewUserDic(opt.udic)
+		if err != nil {
+			return err
 		}
+		t.SetUserDic(udic)
 	}
 	mode := tokenizer.Normal
 	switch opt.mode {
