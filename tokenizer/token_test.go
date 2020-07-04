@@ -19,8 +19,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ikawaha/kagome/internal/dic"
-	"github.com/ikawaha/kagome/internal/lattice"
+	"github.com/ikawaha/kagome/tokenizer/dic"
+	"github.com/ikawaha/kagome/tokenizer/lattice"
 )
 
 func TestTokenClassString(t *testing.T) {

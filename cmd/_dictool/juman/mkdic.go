@@ -31,7 +31,7 @@ import (
 	"strings"
 
 	"github.com/ikawaha/kagome/cmd/_dictool/splitfile"
-	"github.com/ikawaha/kagome/internal/dic"
+	"github.com/ikawaha/kagome/tokenizer/dic"
 )
 
 const (

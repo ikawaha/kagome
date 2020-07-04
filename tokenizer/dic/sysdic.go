@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/ikawaha/kagome/internal/dic/data"
+	"github.com/ikawaha/kagome/tokenizer/dic/data"
 )
 
 const (

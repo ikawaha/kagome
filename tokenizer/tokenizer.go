@@ -18,8 +18,8 @@ import (
 	"io"
 	"unicode/utf8"
 
-	"github.com/ikawaha/kagome/internal/dic"
-	"github.com/ikawaha/kagome/internal/lattice"
+	"github.com/ikawaha/kagome/tokenizer/dic"
+	"github.com/ikawaha/kagome/tokenizer/lattice"
 )
 
 // TokenizeMode represents a mode of tokenize.
