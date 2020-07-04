@@ -124,7 +124,7 @@ func saveJumanDic(d *jumanDic, base string, archive bool) error {
 		if err != nil {
 			return err
 		}
-		_, err = dic.MorphSlice(d.Morphs).WriteTo(out)
+		_, err = dic.Morphs(d.Morphs).WriteTo(out)
 		return err
 	}(); err != nil {
 		return err

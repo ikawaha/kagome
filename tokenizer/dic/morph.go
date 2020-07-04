@@ -24,11 +24,11 @@ type Morph struct {
 	LeftID, RightID, Weight int16
 }
 
-// MorphSlice represents a slice of morphs.
-type MorphSlice []Morph
+// Morphs represents a slice of morphs.
+type Morphs []Morph
 
 // WriteTo implements the io.WriterTo interface
-func (m MorphSlice) WriteTo(w io.Writer) (n int64, err error) {
+func (m Morphs) WriteTo(w io.Writer) (n int64, err error) {
 	l := int64(len(m))
 	if err := binary.Write(w, binary.LittleEndian, l); err != nil {
 		return n, err

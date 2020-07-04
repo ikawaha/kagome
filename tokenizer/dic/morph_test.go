@@ -27,7 +27,7 @@ func TestMorphsSave(t *testing.T) {
 		{3, 3, 3},
 	}
 	var b bytes.Buffer
-	n, err := MorphSlice(m).WriteTo(&b)
+	n, err := Morphs(m).WriteTo(&b)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -43,7 +43,7 @@ func TestLoadMorphSlice(t *testing.T) {
 		{3, 3, 3},
 	}
 	var b bytes.Buffer
-	_, err := MorphSlice(src).WriteTo(&b)
+	_, err := Morphs(src).WriteTo(&b)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
