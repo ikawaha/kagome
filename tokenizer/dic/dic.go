@@ -24,15 +24,15 @@ import (
 
 // Dic represents a dictionary of a tokenizer.
 type Dic struct {
-	Morphs       []Morph
+	Morphs       Morphs
 	POSTable     POSTable
-	Contents     [][]string
+	Contents     Contents
 	Connection   ConnectionTable
 	Index        IndexTable
-	CharClass    []string
-	CharCategory []byte
-	InvokeList   []bool
-	GroupList    []bool
+	CharClass    CharClass
+	CharCategory CharCategory
+	InvokeList   InvokeList
+	GroupList    GroupList
 
 	UnkDic
 }

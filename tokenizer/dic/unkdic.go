@@ -25,10 +25,10 @@ import (
 
 // UnkDic represents an unknown word dictionary part.
 type UnkDic struct {
-	UnkMorphs   []Morph
+	UnkMorphs   Morphs
 	UnkIndex    map[int32]int32
 	UnkIndexDup map[int32]int32
-	UnkContents [][]string
+	UnkContents Contents
 }
 
 func writeMap(w io.Writer, m map[int32]int32) (n int64, err error) {
