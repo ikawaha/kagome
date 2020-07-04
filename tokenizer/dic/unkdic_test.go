@@ -33,7 +33,7 @@ func TestWriteMap(t *testing.T) {
 
 func TestUnkDic_WriteAndRead(t *testing.T) {
 	d := UnkDic{
-		UnkMorphs: []Morph{
+		UnkMorphs: Morphs{
 			{LeftID: 1, RightID: 2, Weight: 3},
 			{LeftID: 11, RightID: 22, Weight: 33},
 		},

@@ -266,7 +266,7 @@ func TestSystemDicUniIndex02(t *testing.T) {
 func TestSystemDicIPACharClass01(t *testing.T) {
 	initSysDicIPA = sync.Once{}
 	d := SysDicIPA()
-	expected := []string{
+	expected := CharClass{
 		"DEFAULT",      // 0
 		"SPACE",        // 1
 		"KANJI",        // 2
@@ -287,7 +287,7 @@ func TestSystemDicIPACharClass01(t *testing.T) {
 func TestSystemDicUniCharClass01(t *testing.T) {
 	initSysDicUni = sync.Once{}
 	d := SysDicUni()
-	expected := []string{
+	expected := CharClass{
 		"DEFAULT",      // 0
 		"SPACE",        // 1
 		"KANJI",        // 2

@@ -124,7 +124,7 @@ func TestDicCharClass01(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	expected := []string{
+	expected := CharClass{
 		"DEFAULT",      // 0
 		"SPACE",        // 1
 		"KANJI",        // 2
