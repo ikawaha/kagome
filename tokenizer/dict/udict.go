@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package dic
+package dict
 
 import (
 	"bufio"
@@ -22,24 +22,24 @@ import (
 	"strings"
 )
 
-// UserDicContent represents contents of a word in a user dictionary.
-type UserDicContent struct {
+// UserDictContent represents contents of a word in a user dictionary.
+type UserDictContent struct {
 	Tokens []string
 	Yomi   []string
 	Pos    string
 }
 
-// UserDic represents a user dictionary.
-type UserDic struct {
+// UserDict represents a user dictionary.
+type UserDict struct {
 	Index    IndexTable
-	Contents []UserDicContent
+	Contents []UserDictContent
 }
 
-// UserDicColumnSize is the column size of the user dictionary.
-const UserDicColumnSize = 4
+// UserDictColumnSize is the column size of the user dictionary.
+const UserDictColumnSize = 4
 
-// NewUserDic build a user dictionary from a file.
-func NewUserDic(path string) (*UserDic, error) {
+// NewUserDict build a user dictionary from a file.
+func NewUserDict(path string) (*UserDict, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -63,10 +63,10 @@ func NewUserDic(path string) (*UserDic, error) {
 
 	prev := ""
 	var keys []string
-	var udic UserDic
+	var udic UserDict
 	for _, line := range text {
 		record := strings.Split(line, ",")
-		if len(record) != UserDicColumnSize {
+		if len(record) != UserDictColumnSize {
 			return nil, fmt.Errorf("invalid format: %s", line)
 		}
 		k := strings.TrimSpace(record[0])
@@ -80,7 +80,7 @@ func NewUserDic(path string) (*UserDic, error) {
 		if len(tokens) == 0 || len(tokens) != len(yomi) {
 			return nil, fmt.Errorf("invalid format: %s", line)
 		}
-		udic.Contents = append(udic.Contents, UserDicContent{tokens, yomi, record[3]})
+		udic.Contents = append(udic.Contents, UserDictContent{tokens, yomi, record[3]})
 	}
 	udic.Index, err = BuildIndexTable(keys)
 	return &udic, err

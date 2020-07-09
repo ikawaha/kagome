@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package dic
+package dict
 
 import (
 	"archive/zip"
@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/ikawaha/kagome/tokenizer/dic/data"
+	"github.com/ikawaha/kagome/tokenizer/dict/data"
 )
 
 const (
@@ -31,25 +31,25 @@ const (
 )
 
 var (
-	sysDicIPA     *Dic
+	sysDicIPA     *Dict
 	initSysDicIPA sync.Once
 
-	sysDicUni     *Dic
+	sysDicUni     *Dict
 	initSysDicUni sync.Once
 )
 
 // SysDic returns the kagome system dictionary.
-func SysDic() *Dic {
+func SysDic() *Dict {
 	return SysDicIPA()
 }
 
 // SysDicSimple returns the kagome system dictionary without contents.
-func SysDicSimple() *Dic {
+func SysDicSimple() *Dict {
 	return SysDicIPASimple()
 }
 
 // SysDicIPA returns the IPA system dictionary.
-func SysDicIPA() *Dic {
+func SysDicIPA() *Dict {
 	initSysDicIPA.Do(func() {
 		sysDicIPA = loadInternalSysDicFull(IPADicPath)
 	})
@@ -57,7 +57,7 @@ func SysDicIPA() *Dic {
 }
 
 // SysDicUni returns the UniDic system dictionary.
-func SysDicUni() *Dic {
+func SysDicUni() *Dict {
 	initSysDicUni.Do(func() {
 		sysDicUni = loadInternalSysDicFull(UniDicPath)
 	})
@@ -65,7 +65,7 @@ func SysDicUni() *Dic {
 }
 
 // SysDicIPASimple returns the IPA system dictionary without contents.
-func SysDicIPASimple() *Dic {
+func SysDicIPASimple() *Dict {
 	initSysDicIPA.Do(func() {
 		sysDicIPA = loadInternalSysDicSimple(IPADicPath)
 	})
@@ -73,22 +73,22 @@ func SysDicIPASimple() *Dic {
 }
 
 // SysDicUniSimple returns the IPA system dictionary without contents.
-func SysDicUniSimple() *Dic {
+func SysDicUniSimple() *Dict {
 	initSysDicUni.Do(func() {
 		sysDicUni = loadInternalSysDicSimple(UniDicPath)
 	})
 	return sysDicUni
 }
 
-func loadInternalSysDicFull(path string) (d *Dic) {
+func loadInternalSysDicFull(path string) (d *Dict) {
 	return loadInternalSysDic(path, true)
 }
 
-func loadInternalSysDicSimple(path string) (d *Dic) {
+func loadInternalSysDicSimple(path string) (d *Dict) {
 	return loadInternalSysDic(path, false)
 }
 
-func loadInternalSysDic(path string, full bool) (d *Dic) {
+func loadInternalSysDic(path string, full bool) (d *Dict) {
 	buf := make([]byte, 0, 36*1024*1024) // 36MB
 	defer func() { buf = nil }()
 

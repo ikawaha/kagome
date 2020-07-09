@@ -22,15 +22,15 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/ikawaha/kagome/tokenizer/dic"
+	"github.com/ikawaha/kagome/tokenizer/dict"
 )
 
-// UserDic represents a user dictionary.
+// UserDict represents a user dictionary.
 type UserDic struct {
-	dic *dic.UserDic
+	dic *dict.UserDict
 }
 
-// NewUserDic build a user dictionary from a file.
+// NewUserDict build a user dictionary from a file.
 func NewUserDic(path string) (UserDic, error) {
 	f, err := os.Open(path)
 	if err != nil {
@@ -78,7 +78,7 @@ func NewUserDicRecords(r io.Reader) (UserDicRecords, error) {
 	var records UserDicRecords
 	for _, line := range text {
 		vec := strings.Split(line, ",")
-		if len(vec) != dic.UserDicColumnSize {
+		if len(vec) != dict.UserDictColumnSize {
 			return nil, fmt.Errorf("invalid format: %s", line)
 		}
 		tokens := strings.Split(vec[1], " ")
@@ -97,9 +97,9 @@ func NewUserDicRecords(r io.Reader) (UserDicRecords, error) {
 	return records, nil
 }
 
-// NewUserDic builds a user dictionary.
+// NewUserDict builds a user dictionary.
 func (u UserDicRecords) NewUserDic() (UserDic, error) {
-	udic := new(dic.UserDic)
+	udic := new(dict.UserDict)
 	sort.Sort(u)
 
 	prev := ""
@@ -114,14 +114,14 @@ func (u UserDicRecords) NewUserDic() (UserDic, error) {
 		if len(r.Tokens) == 0 || len(r.Tokens) != len(r.Yomi) {
 			return UserDic{}, fmt.Errorf("invalid format, %+v", r)
 		}
-		c := dic.UserDicContent{
+		c := dict.UserDictContent{
 			Tokens: r.Tokens,
 			Yomi:   r.Yomi,
 			Pos:    r.Pos,
 		}
 		udic.Contents = append(udic.Contents, c)
 	}
-	idx, err := dic.BuildIndexTable(keys)
+	idx, err := dict.BuildIndexTable(keys)
 	udic.Index = idx
 	return UserDic{dic: udic}, err
 }

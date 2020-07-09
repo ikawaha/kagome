@@ -14,51 +14,51 @@
 
 package tokenizer
 
-import "github.com/ikawaha/kagome/tokenizer/dic"
+import "github.com/ikawaha/kagome/tokenizer/dict"
 
-// Dic represents a dictionary.
+// Dict represents a dictionary.
 type Dic struct {
-	dic *dic.Dic
+	dic *dict.Dict
 }
 
 // SysDic returns the system dictionary (IPA dictionary).
 func SysDic() Dic {
-	return Dic{dic.SysDic()}
+	return Dic{dict.SysDic()}
 }
 
 // SysDicSimple returns the system dictionary (IPA dictionary w/o contents).
 func SysDicSimple() Dic {
-	return Dic{dic.SysDicSimple()}
+	return Dic{dict.SysDicSimple()}
 }
 
 // SysDicIPA returns the IPA dictionary as the system dictionary.
 func SysDicIPA() Dic {
-	return Dic{dic.SysDicIPA()}
+	return Dic{dict.SysDicIPA()}
 }
 
 // SysDicIPASimple returns the simple IPA dictionary as the system dictionary (w/o contents).
 func SysDicIPASimple() Dic {
-	return Dic{dic.SysDicIPASimple()}
+	return Dic{dict.SysDicIPASimple()}
 }
 
 // SysDicUni returns the UniDic dictionary as the system dictionary.
 func SysDicUni() Dic {
-	return Dic{dic.SysDicUni()}
+	return Dic{dict.SysDicUni()}
 }
 
 // SysDicUniSimple returns the simple UniDic dictionary as the system dictionary (w/o contents).
 func SysDicUniSimple() Dic {
-	return Dic{dic.SysDicUniSimple()}
+	return Dic{dict.SysDicUniSimple()}
 }
 
 // NewDic loads a dictionary from a file.
 func NewDic(path string) (Dic, error) {
-	d, err := dic.Load(path)
+	d, err := dict.Load(path)
 	return Dic{d}, err
 }
 
 // NewDicSimple loads a dictionary from a file w/o contents.
 func NewDicSimple(path string) (Dic, error) {
-	d, err := dic.LoadSimple(path)
+	d, err := dict.LoadSimple(path)
 	return Dic{d}, err
 }

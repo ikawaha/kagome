@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package dic
+package dict
 
 import (
 	"archive/zip"
@@ -22,8 +22,8 @@ import (
 	"io/ioutil"
 )
 
-// Dic represents a dictionary of a tokenizer.
-type Dic struct {
+// Dict represents a dictionary of a tokenizer.
+type Dict struct {
 	Morphs       Morphs
 	POSTable     POSTable
 	Contents     Contents
@@ -34,19 +34,19 @@ type Dic struct {
 	InvokeList   InvokeList
 	GroupList    GroupList
 
-	UnkDic
+	UnkDict
 }
 
 // CharacterCategory returns the category of a rune.
-func (d Dic) CharacterCategory(r rune) byte {
+func (d Dict) CharacterCategory(r rune) byte {
 	if int(r) < len(d.CharCategory) {
 		return d.CharCategory[r]
 	}
 	return d.CharCategory[0] // default
 }
 
-func (d *Dic) loadMorphDicPart(r io.Reader) error {
-	m, err := LoadMorphSlice(r)
+func (d *Dict) loadMorphDicPart(r io.Reader) error {
+	m, err := ReadMorphs(r)
 	if err != nil {
 		return fmt.Errorf("dic initializer, Morphs: %v", err)
 	}
@@ -54,7 +54,7 @@ func (d *Dic) loadMorphDicPart(r io.Reader) error {
 	return nil
 }
 
-func (d *Dic) loadPOSDicPart(r io.Reader) error {
+func (d *Dict) loadPOSDicPart(r io.Reader) error {
 	p, err := ReadPOSTable(r)
 	if err != nil {
 		return fmt.Errorf("dic initializer, POSs: %v", err)
@@ -63,7 +63,7 @@ func (d *Dic) loadPOSDicPart(r io.Reader) error {
 	return nil
 }
 
-func (d *Dic) loadContentDicPart(r io.Reader) error {
+func (d *Dict) loadContentDicPart(r io.Reader) error {
 	buf, err := ioutil.ReadAll(r)
 	if err != nil {
 		return fmt.Errorf("dic initializer, Contents: %v", err)
@@ -72,7 +72,7 @@ func (d *Dic) loadContentDicPart(r io.Reader) error {
 	return nil
 }
 
-func (d *Dic) loadIndexDicPart(r io.Reader) error {
+func (d *Dict) loadIndexDicPart(r io.Reader) error {
 	idx, err := ReadIndexTable(r)
 	if err != nil {
 		return fmt.Errorf("dic initializer, Index: %v", err)
@@ -81,7 +81,7 @@ func (d *Dic) loadIndexDicPart(r io.Reader) error {
 	return nil
 }
 
-func (d *Dic) loadConnectionDicPart(r io.Reader) error {
+func (d *Dict) loadConnectionDicPart(r io.Reader) error {
 	t, err := LoadConnectionTable(r)
 	if err != nil {
 		return fmt.Errorf("dic initializer, Connection: %v", err)
@@ -90,7 +90,7 @@ func (d *Dic) loadConnectionDicPart(r io.Reader) error {
 	return nil
 }
 
-func (d *Dic) loadCharDefDicPart(r io.Reader) error {
+func (d *Dict) loadCharDefDicPart(r io.Reader) error {
 	dec := gob.NewDecoder(r)
 	if err := dec.Decode(&d.CharClass); err != nil {
 		return fmt.Errorf("dic initializer, CharClass: %v", err)
@@ -107,17 +107,17 @@ func (d *Dic) loadCharDefDicPart(r io.Reader) error {
 	return nil
 }
 
-func (d *Dic) loadUnkDicPart(r io.Reader) error {
+func (d *Dict) loadUnkDicPart(r io.Reader) error {
 	unk, err := ReadUnkDic(r)
 	if err != nil {
-		return fmt.Errorf("dic initializer, UnkDic: %v", err)
+		return fmt.Errorf("dic initializer, UnkDict: %v", err)
 	}
-	d.UnkDic = unk
+	d.UnkDict = unk
 	return nil
 }
 
 // Load loads a dictionary from a file.
-func Load(path string) (d *Dic, err error) {
+func Load(path string) (d *Dict, err error) {
 	r, err := zip.OpenReader(path)
 	if err != nil {
 		return d, err
@@ -127,7 +127,7 @@ func Load(path string) (d *Dic, err error) {
 }
 
 // LoadSimple loads a dictionary from a file without contents.
-func LoadSimple(path string) (d *Dic, err error) {
+func LoadSimple(path string) (d *Dict, err error) {
 	r, err := zip.OpenReader(path)
 	if err != nil {
 		return d, err
@@ -136,8 +136,8 @@ func LoadSimple(path string) (d *Dic, err error) {
 	return load(&r.Reader, false)
 }
 
-func load(r *zip.Reader, full bool) (*Dic, error) {
-	var d Dic
+func load(r *zip.Reader, full bool) (*Dict, error) {
+	var d Dict
 	type dictionaryPartLoader func(io.Reader) error
 	loaders := map[string]dictionaryPartLoader{
 		"morph.dic":      d.loadMorphDicPart,

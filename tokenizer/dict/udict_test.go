@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package dic
+package dict
 
 import (
 	"reflect"
@@ -22,13 +22,13 @@ import (
 var testFile = "../../_sample/userdic.txt"
 
 func TestNewUserDic01(t *testing.T) {
-	if _, err := NewUserDic(""); err == nil {
+	if _, err := NewUserDict(""); err == nil {
 		t.Error("expected error, but no occurred\n")
 	}
 }
 
 func TestNewUserDicIndex01(t *testing.T) {
-	udic, err := NewUserDic(testFile)
+	udic, err := NewUserDict(testFile)
 	if err != nil {
 		t.Fatalf("unexpected error: %v\n", err)
 	}
@@ -51,7 +51,7 @@ func TestNewUserDicIndex01(t *testing.T) {
 }
 
 func TestNewUserDicContents01(t *testing.T) {
-	udic, err := NewUserDic(testFile)
+	udic, err := NewUserDict(testFile)
 	if err != nil {
 		t.Fatalf("unexpected error: %v\n", err)
 	}
@@ -62,12 +62,12 @@ func TestNewUserDicContents01(t *testing.T) {
 
 	type tuple struct {
 		inp int
-		out UserDicContent
+		out UserDictContent
 	}
 	callAndRespose := []tuple{
 		{
 			inp: 0,
-			out: UserDicContent{
+			out: UserDictContent{
 				Tokens: []string{"日本", "経済", "新聞"},
 				Yomi:   []string{"ニホン", "ケイザイ", "シンブン"},
 				Pos:    "カスタム名詞",
@@ -75,14 +75,14 @@ func TestNewUserDicContents01(t *testing.T) {
 		},
 		{
 			inp: 1,
-			out: UserDicContent{
+			out: UserDictContent{
 				Tokens: []string{"朝青龍"},
 				Yomi:   []string{"アサショウリュウ"},
 				Pos:    "カスタム人名",
 			},
 		},
 		{inp: 2,
-			out: UserDicContent{
+			out: UserDictContent{
 				Tokens: []string{"関西", "国際", "空港"},
 				Yomi:   []string{"カンサイ", "コクサイ", "クウコウ"},
 				Pos:    "テスト名詞",
