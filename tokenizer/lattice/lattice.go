@@ -1,17 +1,3 @@
-// Copyright 2015 ikawaha
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// 	You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package lattice
 
 import (
@@ -22,7 +8,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/ikawaha/kagome/tokenizer/dic"
+	"github.com/ikawaha/kagome/v2/dict"
 )
 
 const (
@@ -57,12 +43,12 @@ type Lattice struct {
 	Input  string
 	Output []*node
 	list   [][]*node
-	dic    *dic.Dic
-	udic   *dic.UserDic
+	dic    *dict.Dict
+	udic   *dict.UserDict
 }
 
 // New returns a new lattice.
-func New(d *dic.Dic, u *dic.UserDic) *Lattice {
+func New(d *dict.Dict, u *dict.UserDict) *Lattice {
 	la := latticePool.Get().(*Lattice)
 	la.dic = d
 	la.udic = u
@@ -89,14 +75,14 @@ func (la *Lattice) Free() {
 }
 
 func (la *Lattice) addNode(pos, id, start int, class NodeClass, surface string) {
-	var m dic.Morph
+	var m dict.Morph
 	switch class {
 	case DUMMY:
 		//use default cost
 	case KNOWN:
 		m = la.dic.Morphs[id]
 	case UNKNOWN:
-		m = la.dic.UnkMorphs[id]
+		m = la.dic.UnkDict.Morphs[id]
 	case USER:
 		// use default cost
 	}
@@ -173,11 +159,11 @@ func (la *Lattice) Build(inp string) {
 					}
 				}
 			}
-			id := la.dic.UnkIndex[int32(class)]
+			id := la.dic.UnkDict.Index[int32(class)]
 			for i, w := pos, 0; i < endPos; i += w {
 				_, w = utf8.DecodeRuneInString(inp[i:])
 				end := i + w
-				dup := la.dic.UnkIndexDup[int32(class)]
+				dup := la.dic.UnkDict.IndexDup[int32(class)]
 				for x := 0; x < int(dup)+1; x++ {
 					la.addNode(runePos, int(id)+x, runePos, UNKNOWN, inp[pos:end])
 				}
@@ -285,33 +271,33 @@ func (la *Lattice) Backward(m TokenizeMode) {
 	}
 }
 
-func features(dic *dic.Dic, udic *dic.UserDic, n *node) []string {
+func features(dict *dict.Dict, udict *dict.UserDict, n *node) []string {
 	switch n.Class {
 	case DUMMY:
 		return nil
 	case KNOWN:
 		var c int
-		if dic.Contents != nil {
-			c = len(dic.Contents[n.ID])
+		if dict.Contents != nil {
+			c = len(dict.Contents[n.ID])
 		}
-		features := make([]string, 0, len(dic.POSTable.POSs[n.ID])+c)
-		for _, id := range dic.POSTable.POSs[n.ID] {
-			features = append(features, dic.POSTable.NameList[id])
+		features := make([]string, 0, len(dict.POSTable.POSs[n.ID])+c)
+		for _, id := range dict.POSTable.POSs[n.ID] {
+			features = append(features, dict.POSTable.NameList[id])
 		}
-		if dic.Contents != nil {
-			features = append(features, dic.Contents[n.ID]...)
+		if dict.Contents != nil {
+			features = append(features, dict.Contents[n.ID]...)
 		}
 		return features
 	case UNKNOWN:
-		features := make([]string, len(dic.UnkContents[n.ID]))
-		for i := range dic.UnkContents[n.ID] {
-			features[i] = dic.UnkContents[n.ID][i]
+		features := make([]string, len(dict.UnkDict.Contents[n.ID]))
+		for i := range dict.UnkDict.Contents[n.ID] {
+			features[i] = dict.UnkDict.Contents[n.ID][i]
 		}
 		return features
 	case USER:
-		pos := udic.Contents[n.ID].Pos
-		tokens := strings.Join(udic.Contents[n.ID].Tokens, "/")
-		yomi := strings.Join(udic.Contents[n.ID].Yomi, "/")
+		pos := udict.Contents[n.ID].Pos
+		tokens := strings.Join(udict.Contents[n.ID].Tokens, "/")
+		yomi := strings.Join(udict.Contents[n.ID].Yomi, "/")
 		return []string{pos, tokens, yomi}
 	}
 	return nil

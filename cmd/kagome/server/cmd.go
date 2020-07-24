@@ -1,17 +1,3 @@
-// Copyright 2015 ikawaha
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// 	You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package server
 
 import (
@@ -29,22 +15,26 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ikawaha/kagome/tokenizer"
+	"github.com/ikawaha/kagome/v2/dict"
+	"github.com/ikawaha/kagome/v2/dict/ipa"
+	"github.com/ikawaha/kagome/v2/dict/ko"
+	"github.com/ikawaha/kagome/v2/dict/uni"
+	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
 // subcommand property
 var (
 	CommandName  = "server"
 	Description  = `run tokenize server`
-	usageMessage = "%s [-http=:6060] [-udic userdic_file] [-sysdic (ipa|uni)]\n"
+	usageMessage = "%s [-http=:6060] [-userdict userdic_file] [-dict (ipa|uni|ko)]\n"
 	ErrorWriter  = os.Stderr
 )
 
 // options
 type option struct {
 	http    string
-	udic    string
-	sysdic  string
+	udict   string
+	dict    string
 	flagSet *flag.FlagSet
 }
 
@@ -57,9 +47,8 @@ func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	}
 	// option settings
 	o.flagSet.StringVar(&o.http, "http", ":6060", "HTTP service address")
-	o.flagSet.StringVar(&o.udic, "udic", "", "user dictionary")
-	o.flagSet.StringVar(&o.sysdic, "sysdic", "ipa", "system dictionary type (ipa|uni)")
-
+	o.flagSet.StringVar(&o.udict, "userdict", "", "user dict")
+	o.flagSet.StringVar(&o.dict, "dict", "ipa", "system dict type (ipa|uni|ko)")
 	return
 }
 
@@ -71,8 +60,8 @@ func (o *option) parse(args []string) error {
 	if nonFlag := o.flagSet.Args(); len(nonFlag) != 0 {
 		return fmt.Errorf("invalid argument: %v", nonFlag)
 	}
-	if o.sysdic != "" && o.sysdic != "ipa" && o.sysdic != "uni" {
-		return fmt.Errorf("invalid argument: -sysdic %v", o.sysdic)
+	if o.dict != "" && o.dict != "ipa" && o.dict != "uni" && o.dict != "ko" {
+		return fmt.Errorf("invalid argument: -dict %v", o.dict)
 	}
 	return nil
 }
@@ -86,31 +75,37 @@ func OptionCheck(args []string) error {
 	return nil
 }
 
+func selectDict(name string) (*dict.Dict, error) {
+	switch name {
+	case "ipa":
+		return ipa.New(), nil
+	case "uni":
+		return uni.New(), nil
+	case "ko":
+		return ko.New(), nil
+	}
+	return nil, fmt.Errorf("unknown name type, %v", name)
+}
+
 // command main
 func command(opt *option) error {
-	var dic tokenizer.Dic
-	if opt.sysdic == "ipa" {
-		dic = tokenizer.SysDicIPA()
-	} else if opt.sysdic == "uni" {
-		dic = tokenizer.SysDicUni()
-	} else {
-		dic = tokenizer.SysDic()
+	d, err := selectDict(opt.dict)
+	if err != nil {
+		return err
 	}
-	var udic tokenizer.UserDic
-	if opt.udic != "" {
-		var err error
-		if udic, err = tokenizer.NewUserDic(opt.udic); err != nil {
+	t := tokenizer.New(d)
+	if opt.udict != "" {
+		udict, err := dict.NewUserDict(opt.udict)
+		if err != nil {
 			return err
 		}
+		t.SetUserDict(udict)
 	}
-	t := tokenizer.NewWithDic(dic)
-	t.SetUserDic(udic)
 
 	mux := http.NewServeMux()
 	mux.Handle("/", &TokenizeDemoHandler{tokenizer: t})
-	mux.Handle("/a", &TokenizeHandler{tokenizer: t})
+	mux.Handle("/tokenize", &TokenizeHandler{tokenizer: t})
 	log.Fatal(http.ListenAndServe(opt.http, mux))
-
 	return nil
 }
 

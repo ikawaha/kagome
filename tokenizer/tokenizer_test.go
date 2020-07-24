@@ -1,31 +1,22 @@
-// Copyright 2015 ikawaha
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// 	You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package tokenizer
 
 import (
-	"bytes"
-	"reflect"
+	"fmt"
 	"testing"
 
-	"github.com/ikawaha/kagome/tokenizer/lattice"
+	"github.com/ikawaha/kagome/v2/dict/ipa"
 )
 
 const (
 	testUserDicPath = "../_sample/userdic.txt"
 )
 
+func TestHogeIPA(t *testing.T) {
+	tz := New(ipa.New())
+	fmt.Println(tz.Tokenize("すもももももももものうち"))
+}
+
+/*
 func TestAnalyze01(t *testing.T) {
 	tnz := New()
 	tokens := tnz.Analyze("", Normal)
@@ -73,11 +64,11 @@ func TestAnalyze02(t *testing.T) {
 
 func TestAnalyze03(t *testing.T) {
 	tnz := New()
-	udic, err := NewUserDic(testUserDicPath)
+	udict, err := dict.NewUserDict(testUserDicPath)
 	if err != nil {
-		t.Fatalf("new user dic: unexpected error")
+		t.Fatalf("new user dict: unexpected error")
 	}
-	tnz.SetUserDic(udic)
+	tnz.SetUserDict(udict)
 	tokens := tnz.Analyze("関西国際空港", Normal)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -191,11 +182,11 @@ func TestSearchModeAnalyze02(t *testing.T) {
 
 func TestSearchModeAnalyze03(t *testing.T) {
 	tnz := New()
-	udic, err := NewUserDic(testUserDicPath)
+	udict, err := dict.NewUserDict(testUserDicPath)
 	if err != nil {
-		t.Fatalf("new user dic: unexpected error")
+		t.Fatalf("new user dict: unexpected error")
 	}
-	tnz.SetUserDic(udic)
+	tnz.SetUserDict(udict)
 	tokens := tnz.Analyze("関西国際空港", Search)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -288,11 +279,11 @@ func TestExtendedModeAnalyze02(t *testing.T) {
 
 func TestExtendedModeAnalyze03(t *testing.T) {
 	tnz := New()
-	udic, err := NewUserDic(testUserDicPath)
+	udict, err := dict.NewUserDict(testUserDicPath)
 	if err != nil {
-		t.Fatalf("new user dic: unexpected error")
+		t.Fatalf("new user dict: unexpected error")
 	}
-	tnz.SetUserDic(udic)
+	tnz.SetUserDict(udict)
 	tokens := tnz.Analyze("関西国際空港", Extended)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -340,17 +331,17 @@ func TestExtendedModeAnalyze04(t *testing.T) {
 }
 
 func TestTokenizerSetDic(t *testing.T) {
-	d := SysDic()
+	d := SysDict()
 	tnz := NewWithDic(d)
 
 	tnz.SetDic(d)
-	if tnz.dic != d.dic {
-		t.Errorf("got %v, expected %v", tnz.dic, d)
+	if tnz.dict != d.dict {
+		t.Errorf("got %v, expected %v", tnz.dict, d)
 	}
 }
 
 func TestNewWithDicPath(t *testing.T) {
-	result, err := NewWithDicPath("../_sample/ipa.dic")
+	result, err := NewWithDicPath("../_sample/ipa.dict")
 
 	if err != nil {
 		t.Errorf("got err %v loading dictionary", err)
@@ -431,3 +422,4 @@ func BenchmarkAnalyzeExtended(b *testing.B) {
 		tnz.Analyze(benchSampleText, Extended)
 	}
 }
+*/

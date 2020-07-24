@@ -1,17 +1,3 @@
-// Copyright 2015 ikawaha
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// 	You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package tokenize
 
 import (
@@ -23,14 +9,18 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ikawaha/kagome/tokenizer"
+	"github.com/ikawaha/kagome/v2/dict"
+	"github.com/ikawaha/kagome/v2/dict/ipa"
+	"github.com/ikawaha/kagome/v2/dict/ko"
+	"github.com/ikawaha/kagome/v2/dict/uni"
+	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
 // subcommand property
 const (
 	CommandName  = "tokenize"
 	Description  = `command line tokenize`
-	usageMessage = "%s [-file input_file] [-dic dic_file] [-udic userdic_file] [-sysdic (ipa|uni)] [-simple false] [-mode (normal|search|extended)]\n"
+	usageMessage = "%s [-file input_file] [-dict dic_file] [-userdict userdic_file] [-sysdict (ipa|uni|ko)] [-simple false] [-mode (normal|search|extended)]\n"
 )
 
 // ErrorWriter writes to stderr
@@ -41,9 +31,9 @@ var (
 // options
 type option struct {
 	file    string
-	dic     string
-	udic    string
-	sysdic  string
+	dict    string
+	udict   string
+	sysdict string
 	simple  bool
 	mode    string
 	flagSet *flag.FlagSet
@@ -59,9 +49,9 @@ func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	// option settings
 	o.flagSet.SetOutput(w)
 	o.flagSet.StringVar(&o.file, "file", "", "input file")
-	o.flagSet.StringVar(&o.dic, "dic", "", "dic")
-	o.flagSet.StringVar(&o.udic, "udic", "", "user dic")
-	o.flagSet.StringVar(&o.sysdic, "sysdic", "ipa", "system dic type (ipa|uni)")
+	o.flagSet.StringVar(&o.dict, "dict", "", "dict")
+	o.flagSet.StringVar(&o.udict, "udict", "", "user dict")
+	o.flagSet.StringVar(&o.sysdict, "sysdict", "ipa", "system dict type (ipa|uni|ko)")
 	o.flagSet.BoolVar(&o.simple, "simple", false, "display abbreviated dictionary contents")
 	o.flagSet.StringVar(&o.mode, "mode", "normal", "tokenize mode (normal|search|extended)")
 
@@ -79,8 +69,8 @@ func (o *option) parse(args []string) error {
 	if o.mode != "" && o.mode != "normal" && o.mode != "search" && o.mode != "extended" {
 		return fmt.Errorf("invalid argument: -mode %v", o.mode)
 	}
-	if o.sysdic != "" && o.sysdic != "ipa" && o.sysdic != "uni" {
-		return fmt.Errorf("invalid argument: -sysdic %v", o.sysdic)
+	if o.sysdict != "" && o.sysdict != "ipa" && o.sysdict != "uni" && o.sysdict != "ko" {
+		return fmt.Errorf("invalid argument: -sysdict %v", o.sysdict)
 	}
 	return nil
 }
@@ -94,50 +84,58 @@ func OptionCheck(args []string) error {
 	return nil
 }
 
+func selectDict(path, sysdict string, shurink bool) (*dict.Dict, error) {
+	if path != "" {
+		if shurink {
+			return dict.LoadShurink(path)
+		}
+		return dict.LoadDictFile(path)
+	}
+	switch sysdict {
+	case "ipa":
+		if shurink {
+			return ipa.NewShrink(), nil
+		}
+		return ipa.New(), nil
+	case "uni":
+		if shurink {
+			return uni.NewShrink(), nil
+		}
+		return uni.New(), nil
+	case "ko":
+		if shurink {
+			return ko.NewShrink(), nil
+		}
+		return ko.New(), nil
+	}
+	return nil, fmt.Errorf("unknown dict type, %v", sysdict)
+}
+
+func selectMode(mode string) tokenizer.TokenizeMode {
+	switch mode {
+	case "normal":
+		return tokenizer.Normal
+	case "search":
+		return tokenizer.Search
+	case "extended":
+		return tokenizer.Extended
+	}
+	return tokenizer.Normal
+}
+
 // command main
 func command(opt *option) error {
-	var dic tokenizer.Dic
-	if opt.dic == "" {
-		if opt.sysdic == "ipa" {
-			if opt.simple {
-				dic = tokenizer.SysDicIPASimple()
-			} else {
-				dic = tokenizer.SysDicIPA()
-			}
-		} else if opt.sysdic == "uni" {
-			if opt.simple {
-				dic = tokenizer.SysDicUniSimple()
-			} else {
-				dic = tokenizer.SysDicUni()
-			}
-		} else {
-			if opt.simple {
-				dic = tokenizer.SysDicSimple()
-			} else {
-				dic = tokenizer.SysDic()
-			}
-		}
-	} else {
-		var err error
-		if opt.simple {
-			dic, err = tokenizer.NewDicSimple(opt.dic)
-			if err != nil {
-				return err
-			}
-		} else {
-			dic, err = tokenizer.NewDic(opt.dic)
-			if err != nil {
-				return err
-			}
-		}
+	d, err := selectDict(opt.dict, opt.sysdict, opt.simple)
+	if err != nil {
+		return err
 	}
-	var udic tokenizer.UserDic
-	if opt.udic != "" {
-		var err error
-		udic, err = tokenizer.NewUserDic(opt.udic)
+	t := tokenizer.New(d)
+	if opt.udict != "" {
+		udict, err := dict.NewUserDict(opt.udict)
 		if err != nil {
 			return err
 		}
+		t.SetUserDict(udict)
 	}
 	var fp = os.Stdin
 	if opt.file != "" {
@@ -148,20 +146,7 @@ func command(opt *option) error {
 		}
 		defer fp.Close()
 	}
-
-	t := tokenizer.NewWithDic(dic)
-	t.SetUserDic(udic)
-
-	mode := tokenizer.Normal
-	switch opt.mode {
-	case "normal":
-		mode = tokenizer.Normal
-	case "search":
-		mode = tokenizer.Search
-	case "extended":
-		mode = tokenizer.Extended
-	}
-
+	mode := selectMode(opt.mode)
 	scanner := bufio.NewScanner(fp)
 	for scanner.Scan() {
 		line := scanner.Text()
