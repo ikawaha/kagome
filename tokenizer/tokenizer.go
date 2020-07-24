@@ -1,25 +1,11 @@
-// Copyright 2015 ikawaha
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// 	You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package tokenizer
 
 import (
 	"io"
 	"unicode/utf8"
 
-	"github.com/ikawaha/kagome/internal/dic"
-	"github.com/ikawaha/kagome/internal/lattice"
+	"github.com/ikawaha/kagome/v2/dict"
+	"github.com/ikawaha/kagome/v2/tokenizer/lattice"
 )
 
 // TokenizeMode represents a mode of tokenize.
@@ -38,37 +24,18 @@ const (
 
 // Tokenizer represents morphological analyzer.
 type Tokenizer struct {
-	dic  *dic.Dic     // system dictionary
-	udic *dic.UserDic // user dictionary
+	dict  *dict.Dict     // system dictionary
+	udict *dict.UserDict // user dictionary
 }
 
 // New create a default tokenize.
-func New() (t Tokenizer) {
-	return Tokenizer{dic: dic.SysDic()}
+func New(dict *dict.Dict) (t Tokenizer) {
+	return Tokenizer{dict: dict}
 }
 
-// NewWithDic create a tokenizer with specified dictionary.
-func NewWithDic(d Dic) (t Tokenizer) {
-	return Tokenizer{dic: d.dic}
-}
-
-// NewWithDicPath create a tokenizer with a dictionary that loads from path.
-func NewWithDicPath(p string) (Tokenizer, error) {
-	d, err := dic.Load(p)
-	if err != nil {
-		return Tokenizer{dic: dic.SysDic()}, err
-	}
-	return NewWithDic(Dic{d}), nil
-}
-
-// SetDic sets dictionary to dic.
-func (t *Tokenizer) SetDic(d Dic) {
-	t.dic = d.dic
-}
-
-// SetUserDic sets user dictionary to udic.
-func (t *Tokenizer) SetUserDic(d UserDic) {
-	t.udic = d.dic
+// SetUserDict sets user dictionary to udict.
+func (t *Tokenizer) SetUserDict(d *dict.UserDict) {
+	t.udict = d
 }
 
 // Tokenize analyze a sentence in standard tokenize mode.
@@ -78,7 +45,7 @@ func (t Tokenizer) Tokenize(input string) []Token {
 
 // Analyze tokenizes a sentence in the specified mode.
 func (t Tokenizer) Analyze(input string, mode TokenizeMode) (tokens []Token) {
-	la := lattice.New(t.dic, t.udic)
+	la := lattice.New(t.dict, t.udict)
 	defer la.Free()
 	la.Build(input)
 	m := lattice.Normal
@@ -102,8 +69,8 @@ func (t Tokenizer) Analyze(input string, mode TokenizeMode) (tokens []Token) {
 			Start:   n.Start,
 			End:     n.Start + utf8.RuneCountInString(n.Surface),
 			Surface: n.Surface,
-			dic:     t.dic,
-			udic:    t.udic,
+			dict:    t.dict,
+			udict:   t.udict,
 		}
 		if tok.ID == lattice.BosEosID {
 			if i == 0 {
@@ -124,7 +91,7 @@ func (t Tokenizer) Dot(w io.Writer, input string) (tokens []Token) {
 
 // AnalyzeGraph returns morphs of a sentence and exports a lattice graph to dot format.
 func (t Tokenizer) AnalyzeGraph(w io.Writer, input string, mode TokenizeMode) (tokens []Token) {
-	la := lattice.New(t.dic, t.udic)
+	la := lattice.New(t.dict, t.udict)
 	defer la.Free()
 	la.Build(input)
 	m := lattice.Normal
@@ -148,8 +115,8 @@ func (t Tokenizer) AnalyzeGraph(w io.Writer, input string, mode TokenizeMode) (t
 			Start:   n.Start,
 			End:     n.Start + utf8.RuneCountInString(n.Surface),
 			Surface: n.Surface,
-			dic:     t.dic,
-			udic:    t.udic,
+			dict:    t.dict,
+			udict:   t.udict,
 		}
 		if tok.ID == lattice.BosEosID {
 			if i == 0 {

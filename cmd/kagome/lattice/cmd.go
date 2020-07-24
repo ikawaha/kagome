@@ -1,17 +1,3 @@
-// Copyright 2015 ikawaha
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// 	You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package lattice
 
 import (
@@ -22,26 +8,30 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ikawaha/kagome/tokenizer"
+	"github.com/ikawaha/kagome/v2/dict"
+	"github.com/ikawaha/kagome/v2/dict/ipa"
+	"github.com/ikawaha/kagome/v2/dict/ko"
+	"github.com/ikawaha/kagome/v2/dict/uni"
+	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
 // subcommand property
 var (
 	CommandName  = "lattice"
 	Description  = `lattice viewer`
-	UsageMessage = "%s [-udic userdic_file] [-sysdic (ipa|uni)] [-mode (normal|search|extended)] [-output output_file] [-v] sentence\n"
+	UsageMessage = "%s [-userDict userdic_file] [-dict (ipa|uni|ko)] [-mode (normal|search|extended)] [-output output_file] [-v] sentence\n"
 	ErrorWriter  = os.Stderr
 )
 
 // options
 type option struct {
-	udic    string
-	sysdic  string
-	mode    string
-	output  string
-	verbose bool
-	input   string
-	flagSet *flag.FlagSet
+	userDict string
+	dict     string
+	mode     string
+	output   string
+	verbose  bool
+	input    string
+	flagSet  *flag.FlagSet
 }
 
 // ContinueOnError ErrorHandling // Return a descriptive error.
@@ -52,8 +42,8 @@ func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 		flagSet: flag.NewFlagSet(CommandName, eh),
 	}
 	// option settings
-	o.flagSet.StringVar(&o.udic, "udic", "", "user dic")
-	o.flagSet.StringVar(&o.sysdic, "sysdic", "ipa", "system dic type (ipa|uni)")
+	o.flagSet.StringVar(&o.userDict, "userDict", "", "user dict")
+	o.flagSet.StringVar(&o.dict, "dict", "ipa", "dict type (ipa|uni|ko)")
 	o.flagSet.StringVar(&o.mode, "mode", "normal", "tokenize mode (normal|search|extended)")
 	o.flagSet.StringVar(&o.output, "output", "", "output file")
 	o.flagSet.BoolVar(&o.verbose, "v", false, "verbose mode")
@@ -69,8 +59,8 @@ func (o *option) parse(args []string) error {
 	if o.flagSet.NArg() == 0 {
 		return fmt.Errorf("input is empty")
 	}
-	if o.sysdic != "" && o.sysdic != "ipa" && o.sysdic != "uni" {
-		return fmt.Errorf("invalid argument: -sysdic %v", o.sysdic)
+	if o.dict != "" && o.dict != "ipa" && o.dict != "uni" && o.dict != "ko" {
+		return fmt.Errorf("invalid argument: -dict %v", o.dict)
 	}
 	if o.mode != "" && o.mode != "normal" && o.mode != "search" && o.mode != "extended" {
 		return fmt.Errorf("invalid argument: -mode %v", o.mode)
@@ -88,53 +78,56 @@ func OptionCheck(args []string) error {
 	return nil
 }
 
+func selectDict(name string) (*dict.Dict, error) {
+	switch name {
+	case "ipa":
+		return ipa.New(), nil
+	case "uni":
+		return uni.New(), nil
+	case "ko":
+		return ko.New(), nil
+	}
+	return nil, fmt.Errorf("unknown name type, %v", name)
+}
+
+func selectMode(mode string) tokenizer.TokenizeMode {
+	switch mode {
+	case "normal":
+		return tokenizer.Normal
+	case "search":
+		return tokenizer.Search
+	case "extended":
+		return tokenizer.Extended
+	}
+	return tokenizer.Normal
+}
+
 // command main
 func command(opt *option) error {
-	var dic tokenizer.Dic
-	if opt.sysdic == "ipa" {
-		dic = tokenizer.SysDicIPA()
-	} else if opt.sysdic == "uni" {
-		dic = tokenizer.SysDicUni()
-	} else {
-		dic = tokenizer.SysDic()
+	d, err := selectDict(opt.dict)
+	if err != nil {
+		return err
 	}
-	t := tokenizer.NewWithDic(dic)
+	t := tokenizer.New(d)
 	var out = os.Stdout
 	if opt.output != "" {
 		var err error
 		out, err = os.OpenFile(opt.output, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0666)
 		if err != nil {
-			fmt.Fprintln(ErrorWriter, err)
-			os.Exit(1)
+			return err
 		}
 		defer out.Close()
 	}
-	var udic tokenizer.UserDic
-	if opt.udic != "" {
+	if opt.userDict != "" {
 		var err error
-		udic, err = tokenizer.NewUserDic(opt.udic)
+		udict, err := dict.NewUserDict(opt.userDict)
 		if err != nil {
 			return err
 		}
-		t.SetUserDic(udic)
+		t.SetUserDict(udict)
 	}
-	if opt.udic != "" {
-		if udic, err := tokenizer.NewUserDic(opt.udic); err != nil {
-			fmt.Fprintln(ErrorWriter, err)
-			os.Exit(1)
-		} else {
-			t.SetUserDic(udic)
-		}
-	}
-	mode := tokenizer.Normal
-	switch opt.mode {
-	case "normal":
-		mode = tokenizer.Normal
-	case "search":
-		mode = tokenizer.Search
-	case "extended":
-		mode = tokenizer.Extended
-	}
+
+	mode := selectMode(opt.mode)
 	tokens := t.AnalyzeGraph(out, opt.input, mode)
 	if opt.verbose {
 		for i, size := 1, len(tokens); i < size; i++ {

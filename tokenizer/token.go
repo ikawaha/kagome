@@ -1,25 +1,11 @@
-// Copyright 2015 ikawaha
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// 	You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package tokenizer
 
 import (
 	"fmt"
 	"strings"
 
-	"github.com/ikawaha/kagome/internal/dic"
-	"github.com/ikawaha/kagome/internal/lattice"
+	"github.com/ikawaha/kagome/v2/dict"
+	"github.com/ikawaha/kagome/v2/tokenizer/lattice"
 )
 
 // TokenClass represents the token type.
@@ -58,8 +44,8 @@ type Token struct {
 	Start   int
 	End     int
 	Surface string
-	dic     *dic.Dic
-	udic    *dic.UserDic
+	dict    *dict.Dict
+	udict   *dict.UserDict
 }
 
 // Features returns contents of a token.
@@ -69,27 +55,27 @@ func (t Token) Features() []string {
 		return nil
 	case lattice.KNOWN:
 		var c int
-		if t.dic.Contents != nil {
-			c = len(t.dic.Contents[t.ID])
+		if t.dict.Contents != nil {
+			c = len(t.dict.Contents[t.ID])
 		}
-		features := make([]string, 0, len(t.dic.POSTable.POSs[t.ID])+c)
-		for _, id := range t.dic.POSTable.POSs[t.ID] {
-			features = append(features, t.dic.POSTable.NameList[id])
+		features := make([]string, 0, len(t.dict.POSTable.POSs[t.ID])+c)
+		for _, id := range t.dict.POSTable.POSs[t.ID] {
+			features = append(features, t.dict.POSTable.NameList[id])
 		}
-		if t.dic.Contents != nil {
-			features = append(features, t.dic.Contents[t.ID]...)
+		if t.dict.Contents != nil {
+			features = append(features, t.dict.Contents[t.ID]...)
 		}
 		return features
 	case lattice.UNKNOWN:
-		features := make([]string, len(t.dic.UnkContents[t.ID]))
-		for i := range t.dic.UnkContents[t.ID] {
-			features[i] = t.dic.UnkContents[t.ID][i]
+		features := make([]string, len(t.dict.UnkDict.Contents[t.ID]))
+		for i := range t.dict.UnkDict.Contents[t.ID] {
+			features[i] = t.dict.UnkDict.Contents[t.ID][i]
 		}
 		return features
 	case lattice.USER:
-		pos := t.udic.Contents[t.ID].Pos
-		tokens := strings.Join(t.udic.Contents[t.ID].Tokens, "/")
-		yomi := strings.Join(t.udic.Contents[t.ID].Yomi, "/")
+		pos := t.udict.Contents[t.ID].Pos
+		tokens := strings.Join(t.udict.Contents[t.ID].Tokens, "/")
+		yomi := strings.Join(t.udict.Contents[t.ID].Yomi, "/")
 		return []string{pos, tokens, yomi}
 	}
 	return nil

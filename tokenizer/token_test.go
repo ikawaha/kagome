@@ -1,17 +1,3 @@
-// Copyright 2015 ikawaha
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// 	You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package tokenizer
 
 import (
@@ -19,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ikawaha/kagome/internal/dic"
-	"github.com/ikawaha/kagome/internal/lattice"
+	"github.com/ikawaha/kagome/v2/dict"
+	"github.com/ikawaha/kagome/v2/tokenizer/lattice"
 )
 
 func TestTokenClassString(t *testing.T) {
@@ -49,7 +35,7 @@ func TestFeatures01(t *testing.T) {
 		End:     1,
 		Surface: "",
 	}
-	tok.dic = dic.SysDic()
+	tok.dict = dict.SysDic()
 
 	f := tok.Features()
 	expected := []string{"名詞", "一般", "*", "*", "*", "*", "Tシャツ", "ティーシャツ", "ティーシャツ"}
@@ -66,7 +52,7 @@ func TestFeatures02(t *testing.T) {
 		End:     1,
 		Surface: "",
 	}
-	tok.dic = dic.SysDic()
+	tok.dict = dict.SysDic()
 
 	f := tok.Features()
 	expected := []string{"名詞", "固有名詞", "地域", "一般", "*", "*", "*"}
@@ -83,11 +69,11 @@ func TestFeatures03(t *testing.T) {
 		End:     1,
 		Surface: "",
 	}
-	tok.dic = dic.SysDic()
-	if udic, err := dic.NewUserDic("../_sample/userdic.txt"); err != nil {
-		t.Fatalf("build user dic error: %v", err)
+	tok.dict = dict.SysDic()
+	if udic, err := dict.NewUserDict("../_sample/userdic.txt"); err != nil {
+		t.Fatalf("build user dict error: %v", err)
 	} else {
-		tok.udic = udic
+		tok.udict = udic
 	}
 
 	f := tok.Features()
@@ -105,11 +91,11 @@ func TestFeatures04(t *testing.T) {
 		End:     1,
 		Surface: "",
 	}
-	tok.dic = dic.SysDic()
-	if udic, err := dic.NewUserDic("../_sample/userdic.txt"); err != nil {
-		t.Fatalf("build user dic error: %v", err)
+	tok.dict = dict.SysDic()
+	if udic, err := dict.NewUserDict("../_sample/userdic.txt"); err != nil {
+		t.Fatalf("build user dict error: %v", err)
 	} else {
-		tok.udic = udic
+		tok.udict = udic
 	}
 
 	f := tok.Features()
@@ -126,7 +112,7 @@ func TestFeaturesAndPos01(t *testing.T) {
 		End:     1,
 		Surface: "",
 	}
-	tok.dic = dic.SysDic()
+	tok.dict = dict.SysDic()
 
 	f := tok.Features()
 	expected := []string{"名詞", "一般", "*", "*", "*", "*", "Tシャツ", "ティーシャツ", "ティーシャツ"}
@@ -146,7 +132,7 @@ func TestFeaturesAndPos02(t *testing.T) {
 		End:     1,
 		Surface: "",
 	}
-	tok.dic = dic.SysDic()
+	tok.dict = dict.SysDic()
 
 	f := tok.Features()
 	expected := []string{"名詞", "固有名詞", "地域", "一般", "*", "*", "*"}
@@ -166,11 +152,11 @@ func TestFeaturesAndPos03(t *testing.T) {
 		End:     1,
 		Surface: "",
 	}
-	tok.dic = dic.SysDic()
-	if udic, err := dic.NewUserDic("../_sample/userdic.txt"); err != nil {
-		t.Fatalf("build user dic error: %v", err)
+	tok.dict = dict.SysDic()
+	if udic, err := dict.NewUserDict("../_sample/userdic.txt"); err != nil {
+		t.Fatalf("build user dict error: %v", err)
 	} else {
-		tok.udic = udic
+		tok.udict = udic
 	}
 
 	f := tok.Features()
@@ -191,11 +177,11 @@ func TestFeaturesAndPos04(t *testing.T) {
 		End:     1,
 		Surface: "",
 	}
-	tok.dic = dic.SysDic()
-	if udic, err := dic.NewUserDic("../_sample/userdic.txt"); err != nil {
-		t.Fatalf("build user dic error: %v", err)
+	tok.dict = dict.SysDic()
+	if udic, err := dict.NewUserDict("../_sample/userdic.txt"); err != nil {
+		t.Fatalf("build user dict error: %v", err)
 	} else {
-		tok.udic = udic
+		tok.udict = udic
 	}
 
 	f := tok.Features()
