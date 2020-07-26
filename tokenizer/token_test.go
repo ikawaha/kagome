@@ -5,9 +5,12 @@ import (
 	"reflect"
 	"testing"
 
+	ipa "github.com/ikawaha/kagome-dict-ipa"
 	"github.com/ikawaha/kagome/v2/dict"
 	"github.com/ikawaha/kagome/v2/tokenizer/lattice"
 )
+
+const userDictSample = "../_sample/userdict.txt"
 
 func TestTokenClassString(t *testing.T) {
 	pairs := []struct {
@@ -35,7 +38,7 @@ func TestFeatures01(t *testing.T) {
 		End:     1,
 		Surface: "",
 	}
-	tok.dict = dict.SysDic()
+	tok.dict = ipa.Dict()
 
 	f := tok.Features()
 	expected := []string{"名詞", "一般", "*", "*", "*", "*", "Tシャツ", "ティーシャツ", "ティーシャツ"}
@@ -52,7 +55,7 @@ func TestFeatures02(t *testing.T) {
 		End:     1,
 		Surface: "",
 	}
-	tok.dict = dict.SysDic()
+	tok.dict = ipa.Dict()
 
 	f := tok.Features()
 	expected := []string{"名詞", "固有名詞", "地域", "一般", "*", "*", "*"}
@@ -69,8 +72,8 @@ func TestFeatures03(t *testing.T) {
 		End:     1,
 		Surface: "",
 	}
-	tok.dict = dict.SysDic()
-	if udic, err := dict.NewUserDict("../_sample/userdic.txt"); err != nil {
+	tok.dict = ipa.Dict()
+	if udic, err := dict.NewUserDict(userDictSample); err != nil {
 		t.Fatalf("build user dict error: %v", err)
 	} else {
 		tok.udict = udic
@@ -91,8 +94,8 @@ func TestFeatures04(t *testing.T) {
 		End:     1,
 		Surface: "",
 	}
-	tok.dict = dict.SysDic()
-	if udic, err := dict.NewUserDict("../_sample/userdic.txt"); err != nil {
+	tok.dict = ipa.Dict()
+	if udic, err := dict.NewUserDict(userDictSample); err != nil {
 		t.Fatalf("build user dict error: %v", err)
 	} else {
 		tok.udict = udic
@@ -112,7 +115,7 @@ func TestFeaturesAndPos01(t *testing.T) {
 		End:     1,
 		Surface: "",
 	}
-	tok.dict = dict.SysDic()
+	tok.dict = ipa.Dict()
 
 	f := tok.Features()
 	expected := []string{"名詞", "一般", "*", "*", "*", "*", "Tシャツ", "ティーシャツ", "ティーシャツ"}
@@ -132,7 +135,7 @@ func TestFeaturesAndPos02(t *testing.T) {
 		End:     1,
 		Surface: "",
 	}
-	tok.dict = dict.SysDic()
+	tok.dict = ipa.Dict()
 
 	f := tok.Features()
 	expected := []string{"名詞", "固有名詞", "地域", "一般", "*", "*", "*"}
@@ -152,8 +155,8 @@ func TestFeaturesAndPos03(t *testing.T) {
 		End:     1,
 		Surface: "",
 	}
-	tok.dict = dict.SysDic()
-	if udic, err := dict.NewUserDict("../_sample/userdic.txt"); err != nil {
+	tok.dict = ipa.Dict()
+	if udic, err := dict.NewUserDict(userDictSample); err != nil {
 		t.Fatalf("build user dict error: %v", err)
 	} else {
 		tok.udict = udic
@@ -177,8 +180,8 @@ func TestFeaturesAndPos04(t *testing.T) {
 		End:     1,
 		Surface: "",
 	}
-	tok.dict = dict.SysDic()
-	if udic, err := dict.NewUserDict("../_sample/userdic.txt"); err != nil {
+	tok.dict = ipa.Dict()
+	if udic, err := dict.NewUserDict(userDictSample); err != nil {
 		t.Fatalf("build user dict error: %v", err)
 	} else {
 		tok.udict = udic

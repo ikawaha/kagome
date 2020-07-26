@@ -9,10 +9,10 @@ import (
 	"os"
 	"strings"
 
+	ipa "github.com/ikawaha/kagome-dict-ipa"
+	ko "github.com/ikawaha/kagome-dict-ko"
+	uni "github.com/ikawaha/kagome-dict-uni"
 	"github.com/ikawaha/kagome/v2/dict"
-	"github.com/ikawaha/kagome/v2/dict/ipa"
-	"github.com/ikawaha/kagome/v2/dict/ko"
-	"github.com/ikawaha/kagome/v2/dict/uni"
 	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
@@ -94,19 +94,19 @@ func selectDict(path, sysdict string, shurink bool) (*dict.Dict, error) {
 	switch sysdict {
 	case "ipa":
 		if shurink {
-			return ipa.NewShrink(), nil
+			return ipa.DictShrink(), nil
 		}
-		return ipa.New(), nil
+		return ipa.Dict(), nil
 	case "uni":
 		if shurink {
-			return uni.NewShrink(), nil
+			return uni.DictShrink(), nil
 		}
-		return uni.New(), nil
+		return uni.Dict(), nil
 	case "ko":
 		if shurink {
-			return ko.NewShrink(), nil
+			return ko.DictShrink(), nil
 		}
-		return ko.New(), nil
+		return ko.Dict(), nil
 	}
 	return nil, fmt.Errorf("unknown dict type, %v", sysdict)
 }

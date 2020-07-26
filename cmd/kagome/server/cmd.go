@@ -15,10 +15,10 @@ import (
 	"strings"
 	"time"
 
+	ipa "github.com/ikawaha/kagome-dict-ipa"
+	ko "github.com/ikawaha/kagome-dict-ko"
+	uni "github.com/ikawaha/kagome-dict-uni"
 	"github.com/ikawaha/kagome/v2/dict"
-	"github.com/ikawaha/kagome/v2/dict/ipa"
-	"github.com/ikawaha/kagome/v2/dict/ko"
-	"github.com/ikawaha/kagome/v2/dict/uni"
 	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
@@ -78,11 +78,11 @@ func OptionCheck(args []string) error {
 func selectDict(name string) (*dict.Dict, error) {
 	switch name {
 	case "ipa":
-		return ipa.New(), nil
+		return ipa.Dict(), nil
 	case "uni":
-		return uni.New(), nil
+		return uni.Dict(), nil
 	case "ko":
-		return ko.New(), nil
+		return ko.Dict(), nil
 	}
 	return nil, fmt.Errorf("unknown name type, %v", name)
 }

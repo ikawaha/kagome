@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ikawaha/kagome/v2/dict/ipa"
+	ipa "github.com/ikawaha/kagome-dict-ipa"
 )
 
 const (
@@ -12,7 +12,7 @@ const (
 )
 
 func TestHogeIPA(t *testing.T) {
-	tz := New(ipa.New())
+	tz := New(ipa.Dict())
 	fmt.Println(tz.Tokenize("すもももももももものうち"))
 }
 
