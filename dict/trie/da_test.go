@@ -311,7 +311,7 @@ func TestDaEfficiency01(t *testing.T) {
 }
 
 func TestDaTorture(t *testing.T) {
-	const testdata = "_testdata/words.txt"
+	const testdata = "testdata/words.txt"
 	fp, err := os.Open(testdata)
 	if err != nil {
 		t.Fatalf("unexpected error, %v", err)

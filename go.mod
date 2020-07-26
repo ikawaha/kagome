@@ -3,8 +3,9 @@ module github.com/ikawaha/kagome/v2
 go 1.14
 
 require (
-	github.com/ikawaha/kagome-dict-ipa v0.0.0-20200724121204-9534a901d6e5
-	github.com/ikawaha/kagome-dict-ko v0.0.0-20200724121725-e6b465841a68
-	github.com/ikawaha/kagome-dict-uni v0.0.0-20200724121429-6ac571d51c1c
+	github.com/ikawaha/kagome-dict-ipa v0.0.0-20200726055902-faa3da2479fa
+	github.com/ikawaha/kagome-dict-ko v0.0.0-20200726063707-3f48298e8eab
+	github.com/ikawaha/kagome-dict-test v0.0.0-20200724140631-d8a16f0faeb6
+	github.com/ikawaha/kagome-dict-uni v0.0.0-20200726062252-18aacf759219
 	golang.org/x/text v0.3.3
 )

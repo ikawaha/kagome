@@ -19,11 +19,12 @@ import (
 	"testing"
 	"unicode/utf8"
 
+	ipa "github.com/ikawaha/kagome-dict-ipa"
 	"github.com/ikawaha/kagome/v2/dict"
 )
 
 func TestLatticeBuild01(t *testing.T) {
-	la := New(dict.SysDic(), nil)
+	la := New(ipa.Dict(), nil)
 	if la == nil {
 		t.Error("cannot new a lattice")
 	}
@@ -55,7 +56,7 @@ func TestLatticeBuild01(t *testing.T) {
 }
 
 func TestLatticeBuild02(t *testing.T) {
-	la := New(dict.SysDic(), nil)
+	la := New(ipa.Dict(), nil)
 	if la == nil {
 		t.Fatal("cannot new a lattice")
 	}
@@ -102,13 +103,13 @@ func TestLatticeBuild02(t *testing.T) {
 
 func TestLatticeBuild03(t *testing.T) {
 
-	const udicPath = "../../_sample/userdic.txt"
+	const udicPath = "../../_sample/userdict.txt"
 
 	udic, err := dict.NewUserDict(udicPath)
 	if err != nil {
 		t.Fatalf("unexpected error: cannot load user dic, %v", err)
 	}
-	la := New(dict.SysDic(), udic)
+	la := New(ipa.Dict(), udic)
 	if la == nil {
 		t.Fatal("cannot new a lattice")
 	}
@@ -136,7 +137,7 @@ func TestLatticeBuild03(t *testing.T) {
 }
 
 func TestLatticeBuild04(t *testing.T) {
-	la := New(dict.SysDic(), nil)
+	la := New(ipa.Dict(), nil)
 	if la == nil {
 		t.Fatal("cannot new a lattice")
 	}
@@ -198,7 +199,7 @@ func TestLatticeBuild04(t *testing.T) {
 
 func TestLatticeBuild05(t *testing.T) {
 
-	la := New(dict.SysDic(), nil)
+	la := New(ipa.Dict(), nil)
 	if la == nil {
 		t.Fatal("cannot new a lattice")
 	}
@@ -224,7 +225,7 @@ func TestLatticeBuild05(t *testing.T) {
 
 func TestLatticeBuildInvalidInput(t *testing.T) {
 
-	la := New(dict.SysDic(), nil)
+	la := New(ipa.Dict(), nil)
 	if la == nil {
 		t.Fatal("cannot new a lattice")
 	}
@@ -267,7 +268,7 @@ func TestKanjiOnly01(t *testing.T) {
 }
 
 func TestLatticeString(t *testing.T) {
-	la := New(dict.SysDic(), nil)
+	la := New(ipa.Dict(), nil)
 	if la == nil {
 		t.Fatal("cannot new a lattice")
 	}
@@ -287,7 +288,7 @@ func TestLatticeString(t *testing.T) {
 }
 
 func TestLatticeDot(t *testing.T) {
-	la := New(dict.SysDic(), nil)
+	la := New(ipa.Dict(), nil)
 	if la == nil {
 		t.Fatal("cannot new a lattice")
 	}
@@ -317,7 +318,7 @@ node [shape=box, style=filled, fillcolor="#e8e8f0", fontname=Helvetica]
 
 func TestLatticeNewAndFree(t *testing.T) {
 	for i := 0; i < 100; i++ {
-		la := New(dict.SysDic(), nil)
+		la := New(ipa.Dict(), nil)
 		if la == nil {
 			t.Fatal("unexpected error: cannot new a lattice")
 		}
@@ -334,7 +335,7 @@ func TestLatticeNewAndFree(t *testing.T) {
 		la.Free()
 
 		// renew
-		la = New(dict.SysDic(), nil)
+		la = New(ipa.Dict(), nil)
 		if la == nil {
 			t.Fatal("unexpected error: cannot new a lattice")
 		}
@@ -352,7 +353,7 @@ func TestLatticeNewAndFree(t *testing.T) {
 }
 
 func TestForward(t *testing.T) {
-	la := New(dict.SysDic(), nil)
+	la := New(ipa.Dict(), nil)
 	if la == nil {
 		t.Fatal("unexpected error: cannot new a lattice")
 	}
@@ -368,7 +369,7 @@ func TestForward(t *testing.T) {
 }
 
 func TestBackward01(t *testing.T) {
-	la := New(dict.SysDic(), nil)
+	la := New(ipa.Dict(), nil)
 	if la == nil {
 		t.Fatal("unexpected error: cannot new a lattice")
 	}
