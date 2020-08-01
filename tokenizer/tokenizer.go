@@ -51,7 +51,7 @@ type Tokenizer struct {
 	userDict *dict.UserDict // user dictionary
 }
 
-// New create a tokenizer.
+// New creates a tokenizer.
 func New(d *dict.Dict, opts ...Option) (*Tokenizer, error) {
 	if d == nil {
 		return nil, errors.New("empty dictionary")
@@ -65,9 +65,21 @@ func New(d *dict.Dict, opts ...Option) (*Tokenizer, error) {
 	return t, nil
 }
 
-// Tokenize analyze a sentence in standard tokenize mode.
+// Tokenize analyzes a sentence in standard tokenize mode.
 func (t Tokenizer) Tokenize(input string) []Token {
 	return t.Analyze(input, Normal)
+}
+
+// Wakati tokenizes a sentence and returns its divided surface strings.
+func (t Tokenizer) Wakati(input string) []string {
+	ts := t.Analyze(input, Normal)
+	ret := make([]string, 0, len(ts))
+	for _, v := range ts {
+		if v.Class != DUMMY && v.Surface != "" {
+			ret = append(ret, v.Surface)
+		}
+	}
+	return ret
 }
 
 // Analyze tokenizes a sentence in the specified mode.

@@ -482,6 +482,36 @@ func Test_TokenizerAnalyzeGraph(t *testing.T) {
 	}
 }
 
+func Test_Wakati(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	testdata := []struct {
+		Input  string
+		Output []string
+	}{
+		{
+			Input:  "すもももももももものうち",
+			Output: []string{"すもも", "も", "もも", "も", "もも", "の", "うち"},
+		},
+		{
+			Input:  "寿司が食べたい。",
+			Output: []string{"寿司", "が", "食べ", "たい", "。"},
+		},
+	}
+	for _, v := range testdata {
+		got := tnz.Wakati(v.Input)
+		if want := v.Output; !reflect.DeepEqual(want, got) {
+			t.Errorf("want %+v, got %+v", want, got)
+		}
+	}
+}
+
 var benchSampleText = "人魚は、南の方の海にばかり棲んでいるのではありません。北の海にも棲んでいたのであります。北方の海の色は、青うございました。ある時、岩の上に、女の人魚があがって、あたりの景色を眺めながら休んでいました。"
 
 func BenchmarkAnalyzeNormal(b *testing.B) {
