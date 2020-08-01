@@ -11,6 +11,7 @@ import (
 	"golang.org/x/text/transform"
 )
 
+// MorphRecordInfo represents a format of CSV records.
 type MorphRecordInfo struct {
 	ColSize                 int
 	SurfaceIndex            int
@@ -21,6 +22,7 @@ type MorphRecordInfo struct {
 	OtherContentsStartIndex int
 }
 
+// UnkRecordInfo represents a format of unk CSV records.
 type UnkRecordInfo struct {
 	ColSize                 int
 	CategoryIndex           int
@@ -30,7 +32,10 @@ type UnkRecordInfo struct {
 	OtherContentsStartIndex int
 }
 
+// Record represents a record of CSV.
 type Record []string
+
+// Records represents records of CSV.
 type Records []Record
 
 func (p Records) Len() int           { return len(p) }
@@ -57,7 +62,6 @@ func parseCSVFiles(path string, enc encoding.Encoding, colSize int) (Records, er
 }
 
 func parseCSVFile(path string, enc encoding.Encoding, colSize int) (Records, error) {
-	ret := Records{}
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -69,6 +73,8 @@ func parseCSVFile(path string, enc encoding.Encoding, colSize int) (Records, err
 	}
 	cr := csv.NewReader(r)
 	cr.Comma = ','
+
+	var ret Records
 	for {
 		rec, err := cr.Read()
 		if err == io.EOF {

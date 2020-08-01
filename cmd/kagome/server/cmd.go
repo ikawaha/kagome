@@ -93,13 +93,17 @@ func command(opt *option) error {
 	if err != nil {
 		return err
 	}
-	t := tokenizer.New(d)
+	udict := tokenizer.Nop()
 	if opt.udict != "" {
-		udict, err := dict.NewUserDict(opt.udict)
+		d, err := dict.NewUserDict(opt.udict)
 		if err != nil {
 			return err
 		}
-		t.SetUserDict(udict)
+		udict = tokenizer.UserDict(d)
+	}
+	t, err := tokenizer.New(d, udict)
+	if err != nil {
+		return err
 	}
 
 	mux := http.NewServeMux()
@@ -111,7 +115,7 @@ func command(opt *option) error {
 
 // TokenizeHandler represents the tokenizer API server struct
 type TokenizeHandler struct {
-	tokenizer tokenizer.Tokenizer
+	tokenizer *tokenizer.Tokenizer
 }
 
 func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -182,7 +186,7 @@ func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 //TokenizeDemoHandler represents the tokenizer demo server struct
 type TokenizeDemoHandler struct {
-	tokenizer tokenizer.Tokenizer
+	tokenizer *tokenizer.Tokenizer
 }
 
 func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

@@ -108,7 +108,18 @@ func command(opt *option) error {
 	if err != nil {
 		return err
 	}
-	t := tokenizer.New(d)
+	udict := tokenizer.Nop()
+	if opt.userDict != "" {
+		d, err := dict.NewUserDict(opt.userDict)
+		if err != nil {
+			return err
+		}
+		udict = tokenizer.UserDict(d)
+	}
+	t, err := tokenizer.New(d, udict)
+	if err != nil {
+		return err
+	}
 	var out = os.Stdout
 	if opt.output != "" {
 		var err error
@@ -117,14 +128,6 @@ func command(opt *option) error {
 			return err
 		}
 		defer out.Close()
-	}
-	if opt.userDict != "" {
-		var err error
-		udict, err := dict.NewUserDict(opt.userDict)
-		if err != nil {
-			return err
-		}
-		t.SetUserDict(udict)
 	}
 
 	mode := selectMode(opt.mode)

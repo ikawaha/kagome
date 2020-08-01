@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestConnectionTableAt(t *testing.T) {
+func Test_ConnectionTableAt(t *testing.T) {
 	var ct ConnectionTable
 	const (
 		row = 4
@@ -31,7 +31,7 @@ func TestConnectionTableAt(t *testing.T) {
 
 }
 
-func TestConnectionTableWriteTo(t *testing.T) {
+func Test_ConnectionTableWriteTo(t *testing.T) {
 	ct := ConnectionTable{
 		Row: 2,
 		Col: 3,
@@ -47,7 +47,7 @@ func TestConnectionTableWriteTo(t *testing.T) {
 	}
 }
 
-func TestLoadConnectionTable(t *testing.T) {
+func Test_LoadConnectionTable(t *testing.T) {
 	src := ConnectionTable{
 		Row: 2,
 		Col: 3,

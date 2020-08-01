@@ -65,7 +65,7 @@ func newTestDict(t *testing.T) *Dict {
 }
 
 // save <--> load
-func TestDictSaveLoad(t *testing.T) {
+func Test_DictSaveLoad(t *testing.T) {
 	dict := newTestDict(t)
 
 	var b bytes.Buffer

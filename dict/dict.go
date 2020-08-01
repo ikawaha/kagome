@@ -8,13 +8,20 @@ import (
 )
 
 const (
-	MorphDictFileName      = "morph.dict"
-	POSDictFileName        = "pos.dict"
-	ContentDictFileName    = "content.dict"
-	IndexDictFileName      = "index.dict"
+	// MorphDictFileName is the default file name of a morph dict.
+	MorphDictFileName = "morph.dict"
+	// POSDictFileName is the default file name of a part of speech dict.
+	POSDictFileName = "pos.dict"
+	// ContentDictFileName is the default file name of a content dict.
+	ContentDictFileName = "content.dict"
+	// IndexDictFileName is the default filename of a dictionary index.
+	IndexDictFileName = "index.dict"
+	// ConnectionDictFileName is the default filename of a connection dict.
 	ConnectionDictFileName = "connection.dict"
-	CharDefDictFileName    = "chardef.dict"
-	UnkDictFileName        = "unk.dict"
+	// CharDefDictFileName is the default filename of a char def.
+	CharDefDictFileName = "chardef.dict"
+	// UnkDictFileName is the default filename of an unknown dict.
+	UnkDictFileName = "unk.dict"
 )
 
 // Dict represents a dictionary of a tokenizer.
@@ -115,8 +122,8 @@ func LoadDictFile(path string) (d *Dict, err error) {
 	return Load(&r.Reader, true)
 }
 
-// LoadSimple loads a dictionary from a file without contents.
-func LoadShurink(path string) (d *Dict, err error) {
+// LoadShrink loads a dictionary from a file without contents.
+func LoadShrink(path string) (d *Dict, err error) {
 	r, err := zip.OpenReader(path)
 	if err != nil {
 		return d, err
@@ -137,6 +144,7 @@ var loaders = map[string]dictionaryPartLoader{
 	UnkDictFileName:        (*Dict).loadUnkDict,
 }
 
+// Load loads a dictionary from a zipped reader.
 func Load(r *zip.Reader, full bool) (*Dict, error) {
 	var d Dict
 	for _, f := range r.File {
@@ -184,6 +192,7 @@ var savers = map[string]dictionaryPartSaver{
 	UnkDictFileName:        Dict.saveUnkDict,
 }
 
+// Save saves a dictionary in a zipped format.
 func (d Dict) Save(zw *zip.Writer) error {
 	for _, f := range dictionaryPartFiles {
 		saver, ok := savers[f]

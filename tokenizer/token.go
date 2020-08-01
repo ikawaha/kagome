@@ -8,7 +8,7 @@ import (
 	"github.com/ikawaha/kagome/v2/tokenizer/lattice"
 )
 
-// TokenClass represents the token type.
+// TokenClass represents the token class.
 type TokenClass lattice.NodeClass
 
 const (
@@ -22,6 +22,7 @@ const (
 	USER = TokenClass(lattice.USER)
 )
 
+// String returns string representation of a token class.
 func (c TokenClass) String() string {
 	ret := ""
 	switch c {

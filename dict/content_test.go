@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestContentsSave(t *testing.T) {
+func Test_ContentsSave(t *testing.T) {
 	m := [][]string{
 		{"11", "12", "13"},
 		{"21", "22", "23"},
@@ -22,7 +22,7 @@ func TestContentsSave(t *testing.T) {
 	}
 }
 
-func TestNewContents(t *testing.T) {
+func Test_NewContents(t *testing.T) {
 	src := [][]string{
 		{"11", "12", "13"},
 		{"21", "22", "23"},

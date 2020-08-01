@@ -1,6 +1,8 @@
 package tokenizer
 
 import (
+	"errors"
+	"fmt"
 	"io"
 	"unicode/utf8"
 
@@ -22,20 +24,45 @@ const (
 	BosEosID = lattice.BosEosID
 )
 
+// Option represents an option for the tokenizer.
+type Option func(*Tokenizer) error
+
+// Nop represents a no operation option.
+func Nop() Option {
+	return func(t *Tokenizer) error {
+		return nil
+	}
+}
+
+// UserDict is a tokenizer option to sets a user dictionary.
+func UserDict(d *dict.UserDict) Option {
+	return func(t *Tokenizer) error {
+		if d == nil {
+			return errors.New("empty user dictionary")
+		}
+		t.userDict = d
+		return nil
+	}
+}
+
 // Tokenizer represents morphological analyzer.
 type Tokenizer struct {
-	dict  *dict.Dict     // system dictionary
-	udict *dict.UserDict // user dictionary
+	dict     *dict.Dict     // system dictionary
+	userDict *dict.UserDict // user dictionary
 }
 
-// New create a default tokenize.
-func New(dict *dict.Dict) (t Tokenizer) {
-	return Tokenizer{dict: dict}
-}
-
-// SetUserDict sets user dictionary to udict.
-func (t *Tokenizer) SetUserDict(d *dict.UserDict) {
-	t.udict = d
+// New create a tokenizer.
+func New(d *dict.Dict, opts ...Option) (*Tokenizer, error) {
+	if d == nil {
+		return nil, errors.New("empty dictionary")
+	}
+	t := &Tokenizer{dict: d}
+	for _, opt := range opts {
+		if err := opt(t); err != nil {
+			return nil, fmt.Errorf("invalid option: %v", err)
+		}
+	}
+	return t, nil
 }
 
 // Tokenize analyze a sentence in standard tokenize mode.
@@ -45,7 +72,7 @@ func (t Tokenizer) Tokenize(input string) []Token {
 
 // Analyze tokenizes a sentence in the specified mode.
 func (t Tokenizer) Analyze(input string, mode TokenizeMode) (tokens []Token) {
-	la := lattice.New(t.dict, t.udict)
+	la := lattice.New(t.dict, t.userDict)
 	defer la.Free()
 	la.Build(input)
 	m := lattice.Normal
@@ -70,7 +97,7 @@ func (t Tokenizer) Analyze(input string, mode TokenizeMode) (tokens []Token) {
 			End:     n.Start + utf8.RuneCountInString(n.Surface),
 			Surface: n.Surface,
 			dict:    t.dict,
-			udict:   t.udict,
+			udict:   t.userDict,
 		}
 		if tok.ID == lattice.BosEosID {
 			if i == 0 {
@@ -91,7 +118,7 @@ func (t Tokenizer) Dot(w io.Writer, input string) (tokens []Token) {
 
 // AnalyzeGraph returns morphs of a sentence and exports a lattice graph to dot format.
 func (t Tokenizer) AnalyzeGraph(w io.Writer, input string, mode TokenizeMode) (tokens []Token) {
-	la := lattice.New(t.dict, t.udict)
+	la := lattice.New(t.dict, t.userDict)
 	defer la.Free()
 	la.Build(input)
 	m := lattice.Normal
@@ -116,7 +143,7 @@ func (t Tokenizer) AnalyzeGraph(w io.Writer, input string, mode TokenizeMode) (t
 			End:     n.Start + utf8.RuneCountInString(n.Surface),
 			Surface: n.Surface,
 			dict:    t.dict,
-			udict:   t.udict,
+			udict:   t.userDict,
 		}
 		if tok.ID == lattice.BosEosID {
 			if i == 0 {

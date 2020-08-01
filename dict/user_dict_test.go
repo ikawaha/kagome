@@ -9,13 +9,13 @@ import (
 
 var testFile = "./testdata/userdic.txt"
 
-func TestNewUserDict(t *testing.T) {
+func Test_NewUserDict(t *testing.T) {
 	if _, err := NewUserDict(""); err == nil {
 		t.Error("expected error, but no occurred\n")
 	}
 }
 
-func TestNewUserDictIndex(t *testing.T) {
+func Test_NewUserDictIndex(t *testing.T) {
 	udict, err := NewUserDict(testFile)
 	if err != nil {
 		t.Fatalf("unexpected error: %v\n", err)
@@ -38,7 +38,7 @@ func TestNewUserDictIndex(t *testing.T) {
 	}
 }
 
-func TestNewUserDictRecords(t *testing.T) {
+func Test_NewUserDictRecords(t *testing.T) {
 	r := UserDictRecords{
 		{
 			Text:   "日本経済新聞",
@@ -72,7 +72,7 @@ func TestNewUserDictRecords(t *testing.T) {
 	}
 }
 
-func TestNewUserDicRecords(t *testing.T) {
+func Test_NewUserDicRecords(t *testing.T) {
 	t.Run("from string", func(t *testing.T) {
 		s := `
 日本経済新聞,日本 経済 新聞,ニホン ケイザイ シンブン,カスタム名詞

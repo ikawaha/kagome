@@ -1,17 +1,3 @@
-// Copyright 2015 ikawaha
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// 	You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package lattice
 
 import (
@@ -23,10 +9,10 @@ import (
 	"github.com/ikawaha/kagome/v2/dict"
 )
 
-func TestLatticeBuild01(t *testing.T) {
+func Test_LatticeBuildEmptyInput(t *testing.T) {
 	la := New(ipa.Dict(), nil)
 	if la == nil {
-		t.Error("cannot new a lattice")
+		t.Fatal("lattice new failed")
 	}
 	defer la.Free()
 
@@ -55,10 +41,10 @@ func TestLatticeBuild01(t *testing.T) {
 	}
 }
 
-func TestLatticeBuild02(t *testing.T) {
+func Test_LatticeBuild(t *testing.T) {
 	la := New(ipa.Dict(), nil)
 	if la == nil {
-		t.Fatal("cannot new a lattice")
+		t.Fatal("lattice new failed")
 	}
 	defer la.Free()
 
@@ -101,11 +87,11 @@ func TestLatticeBuild02(t *testing.T) {
 	}
 }
 
-func TestLatticeBuild03(t *testing.T) {
+func Test_LatticeBuildWithUserDict(t *testing.T) {
 
-	const udicPath = "../../_sample/userdict.txt"
+	const udictPath = "../../_sample/userdict.txt"
 
-	udic, err := dict.NewUserDict(udicPath)
+	udic, err := dict.NewUserDict(udictPath)
 	if err != nil {
 		t.Fatalf("unexpected error: cannot load user dic, %v", err)
 	}
@@ -136,10 +122,10 @@ func TestLatticeBuild03(t *testing.T) {
 	}
 }
 
-func TestLatticeBuild04(t *testing.T) {
+func Test_LatticeBuildUnknown(t *testing.T) {
 	la := New(ipa.Dict(), nil)
 	if la == nil {
-		t.Fatal("cannot new a lattice")
+		t.Fatal("lattice new failed")
 	}
 	defer la.Free()
 
@@ -197,7 +183,7 @@ func TestLatticeBuild04(t *testing.T) {
 	}
 }
 
-func TestLatticeBuild05(t *testing.T) {
+func Test_LatticeBuildMaximumUnknownWordLength(t *testing.T) {
 
 	la := New(ipa.Dict(), nil)
 	if la == nil {
@@ -223,7 +209,7 @@ func TestLatticeBuild05(t *testing.T) {
 	}
 }
 
-func TestLatticeBuildInvalidInput(t *testing.T) {
+func Test_LatticeBuildInvalidInput(t *testing.T) {
 
 	la := New(ipa.Dict(), nil)
 	if la == nil {
@@ -247,7 +233,7 @@ func TestLatticeBuildInvalidInput(t *testing.T) {
 	}
 }
 
-func TestKanjiOnly01(t *testing.T) {
+func Test_KanjiOnly(t *testing.T) {
 	callAndResponse := []struct {
 		in  string
 		out bool
@@ -267,7 +253,7 @@ func TestKanjiOnly01(t *testing.T) {
 	}
 }
 
-func TestLatticeString(t *testing.T) {
+func Test_LatticeString(t *testing.T) {
 	la := New(ipa.Dict(), nil)
 	if la == nil {
 		t.Fatal("cannot new a lattice")
@@ -287,7 +273,7 @@ func TestLatticeString(t *testing.T) {
 	}
 }
 
-func TestLatticeDot(t *testing.T) {
+func Test_LatticeDot(t *testing.T) {
 	la := New(ipa.Dict(), nil)
 	if la == nil {
 		t.Fatal("cannot new a lattice")
@@ -316,7 +302,7 @@ node [shape=box, style=filled, fillcolor="#e8e8f0", fontname=Helvetica]
 	}
 }
 
-func TestLatticeNewAndFree(t *testing.T) {
+func Test_LatticeNewAndFree(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		la := New(ipa.Dict(), nil)
 		if la == nil {
@@ -352,7 +338,7 @@ func TestLatticeNewAndFree(t *testing.T) {
 	}
 }
 
-func TestForward(t *testing.T) {
+func Test_Forward(t *testing.T) {
 	la := New(ipa.Dict(), nil)
 	if la == nil {
 		t.Fatal("unexpected error: cannot new a lattice")
@@ -368,7 +354,7 @@ func TestForward(t *testing.T) {
 	}
 }
 
-func TestBackward01(t *testing.T) {
+func Test_Backward(t *testing.T) {
 	la := New(ipa.Dict(), nil)
 	if la == nil {
 		t.Fatal("unexpected error: cannot new a lattice")

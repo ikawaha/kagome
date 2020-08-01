@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// MatrixDef represents matrix.def.
 type MatrixDef struct {
 	rowSize int64
 	colSize int64

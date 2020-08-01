@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestBuildIndexTable(t *testing.T) {
+func Test_BuildIndexTable(t *testing.T) {
 	sortedKeywords := []string{
 		"aaa", //0
 		"bbb", //1
@@ -43,7 +43,7 @@ func TestBuildIndexTable(t *testing.T) {
 	}
 }
 
-func TestCommonPrefixSearch(t *testing.T) {
+func Test_CommonPrefixSearch(t *testing.T) {
 	sortedKeywords := []string{
 		"す",    //0
 		"すし",   //1
@@ -68,7 +68,7 @@ func TestCommonPrefixSearch(t *testing.T) {
 	}
 }
 
-func TestCommonPrefixSearchCallback(t *testing.T) {
+func Test_CommonPrefixSearchCallback(t *testing.T) {
 	sortedKeywords := []string{
 		"す",    //0
 		"すし",   //1
@@ -106,7 +106,7 @@ func TestCommonPrefixSearchCallback(t *testing.T) {
 	})
 }
 
-func TestSearch(t *testing.T) {
+func Test_Search(t *testing.T) {
 	sortedKeywords := []string{
 		"す",    //0
 		"すし",   //1
@@ -136,7 +136,7 @@ func TestSearch(t *testing.T) {
 	}
 }
 
-func TestIndexTableReadAndWrite(t *testing.T) {
+func Test_IndexTableReadAndWrite(t *testing.T) {
 	sortedKeywords := []string{
 		"す",    //0
 		"すし",   //1

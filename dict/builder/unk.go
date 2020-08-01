@@ -14,25 +14,26 @@ func parseUnkDefFile(path string, enc encoding.Encoding, info *UnkRecordInfo, ch
 	if err != nil {
 		return nil, err
 	}
-	ret := dict.UnkDict{}
-	ret.Index = make(map[int32]int32)
-	ret.IndexDup = make(map[int32]int32)
+	ret := dict.UnkDict{
+		Index:    map[int32]int32{},
+		IndexDup: map[int32]int32{},
+	}
 	sort.Sort(Records(records))
 	for _, rec := range records {
-		catid := int32(-1)
+		categoryID := int32(-1)
 		for id, cat := range charClass {
 			if cat == rec[info.CategoryIndex] {
-				catid = int32(id)
+				categoryID = int32(id)
 				break
 			}
 		}
-		if catid < 0 {
+		if categoryID < 0 {
 			return nil, fmt.Errorf("unknown unk category: %v", rec[info.CategoryIndex])
 		}
-		if _, ok := ret.Index[catid]; !ok {
-			ret.Index[catid] = int32(len(ret.Contents))
+		if _, ok := ret.Index[categoryID]; !ok {
+			ret.Index[categoryID] = int32(len(ret.Contents))
 		} else {
-			ret.IndexDup[catid]++
+			ret.IndexDup[categoryID]++
 		}
 		l, err := strconv.Atoi(rec[info.LeftIDIndex])
 		if err != nil {

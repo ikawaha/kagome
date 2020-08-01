@@ -13,7 +13,7 @@ type Morph struct {
 // Morphs represents a slice of morphs.
 type Morphs []Morph
 
-// WriteTo implements the io.WriterTo interface
+// WriteTo implements the io.WriterTo interface.
 func (m Morphs) WriteTo(w io.Writer) (n int64, err error) {
 	l := int64(len(m))
 	if err := binary.Write(w, binary.LittleEndian, l); err != nil {
@@ -37,7 +37,7 @@ func (m Morphs) WriteTo(w io.Writer) (n int64, err error) {
 	return n, nil
 }
 
-// ReadMorphs loads morph data from io.Reader
+// ReadMorphs loads morph data from io.Reader.
 func ReadMorphs(r io.Reader) (Morphs, error) {
 	var l int64
 	if err := binary.Read(r, binary.LittleEndian, &l); err != nil {
