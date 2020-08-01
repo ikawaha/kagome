@@ -12,25 +12,25 @@ import (
 
 const userDictSample = "../_sample/userdict.txt"
 
-func TestTokenClassString(t *testing.T) {
-	pairs := []struct {
+func Test_TokenClassString(t *testing.T) {
+	testdata := []struct {
 		inp TokenClass
 		out string
 	}{
-		{DUMMY, "DUMMY"},
-		{KNOWN, "KNOWN"},
-		{UNKNOWN, "UNKNOWN"},
-		{USER, "USER"},
+		{inp: DUMMY, out: "DUMMY"},
+		{inp: KNOWN, out: "KNOWN"},
+		{inp: UNKNOWN, out: "UNKNOWN"},
+		{inp: USER, out: "USER"},
 	}
 
-	for _, p := range pairs {
-		if p.inp.String() != p.out {
-			t.Errorf("got %v, expected %v", p.inp.String(), p.out)
+	for _, v := range testdata {
+		if v.inp.String() != v.out {
+			t.Errorf("got %v, expected %v", v.inp.String(), v.out)
 		}
 	}
 }
 
-func TestFeatures01(t *testing.T) {
+func Test_FeaturesKnown(t *testing.T) {
 	tok := Token{
 		ID:      0,
 		Class:   TokenClass(lattice.KNOWN),
@@ -47,7 +47,7 @@ func TestFeatures01(t *testing.T) {
 	}
 }
 
-func TestFeatures02(t *testing.T) {
+func Test_FeaturesUnknown(t *testing.T) {
 	tok := Token{
 		ID:      0,
 		Class:   TokenClass(lattice.UNKNOWN),
@@ -64,7 +64,7 @@ func TestFeatures02(t *testing.T) {
 	}
 }
 
-func TestFeatures03(t *testing.T) {
+func Test_FeaturesUser(t *testing.T) {
 	tok := Token{
 		ID:      0,
 		Class:   TokenClass(lattice.USER),
@@ -86,7 +86,7 @@ func TestFeatures03(t *testing.T) {
 	}
 }
 
-func TestFeatures04(t *testing.T) {
+func Test_FeaturesDummy(t *testing.T) {
 	tok := Token{
 		ID:      0,
 		Class:   DUMMY,
@@ -107,7 +107,7 @@ func TestFeatures04(t *testing.T) {
 	}
 }
 
-func TestFeaturesAndPos01(t *testing.T) {
+func Test_FeaturesAndPosKnown(t *testing.T) {
 	tok := Token{
 		ID:      0,
 		Class:   TokenClass(lattice.KNOWN),
@@ -127,7 +127,7 @@ func TestFeaturesAndPos01(t *testing.T) {
 	}
 }
 
-func TestFeaturesAndPos02(t *testing.T) {
+func Test_FeaturesAndPosUnknown(t *testing.T) {
 	tok := Token{
 		ID:      0,
 		Class:   TokenClass(lattice.UNKNOWN),
@@ -147,7 +147,7 @@ func TestFeaturesAndPos02(t *testing.T) {
 	}
 }
 
-func TestFeaturesAndPos03(t *testing.T) {
+func Test_FeaturesAndPosUser(t *testing.T) {
 	tok := Token{
 		ID:      0,
 		Class:   TokenClass(lattice.USER),
@@ -172,7 +172,7 @@ func TestFeaturesAndPos03(t *testing.T) {
 	}
 }
 
-func TestFeaturesAndPos04(t *testing.T) {
+func Test_FeaturesAndPosUserDict(t *testing.T) {
 	tok := Token{
 		ID:      0,
 		Class:   DUMMY,
@@ -196,7 +196,7 @@ func TestFeaturesAndPos04(t *testing.T) {
 	}
 }
 
-func TestTokenString01(t *testing.T) {
+func Test_TokenString(t *testing.T) {
 	tok := Token{
 		ID:      123,
 		Class:   TokenClass(lattice.DUMMY),

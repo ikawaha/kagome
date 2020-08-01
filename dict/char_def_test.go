@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestCharDefWriteToReadCharDef(t *testing.T) {
+func Test_CharDefWriteToReadCharDef(t *testing.T) {
 	def := CharDef{
 		CharClass:    CharClass{"class1", "class2", "class3"},
 		CharCategory: CharCategory{'a', 'b', 'c'},

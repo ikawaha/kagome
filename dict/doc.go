@@ -1,2 +1,2 @@
-// Package dic implements the dictionary of the morph analyzer.
+// Package dict implements the dictionary of the morph analyzer.
 package dict

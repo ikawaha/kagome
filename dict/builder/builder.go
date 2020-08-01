@@ -10,8 +10,10 @@ import (
 	"golang.org/x/text/encoding"
 )
 
+// MaxInt16 represents the int16 limit value.
 const MaxInt16 = 1<<15 - 1
 
+// Config represents the configuration of dictionary builder.
 type Config struct {
 	paths      []string
 	recordInfo *MorphRecordInfo
@@ -23,6 +25,7 @@ type Config struct {
 	UnkDefFileName    string
 }
 
+// NewConfig creates a configuration for dictionary builder.
 func NewConfig(path string, other []string, enc encoding.Encoding, info *MorphRecordInfo, unk *UnkRecordInfo) *Config {
 	paths := append([]string{path}, other...)
 	return &Config{
@@ -37,6 +40,7 @@ func NewConfig(path string, other []string, enc encoding.Encoding, info *MorphRe
 	}
 }
 
+// Build builds a dictionary.
 func Build(c *Config) (*dict.Dict, error) {
 	if c == nil {
 		return nil, fmt.Errorf("empty config")

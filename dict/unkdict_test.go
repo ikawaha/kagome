@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestWriteMap(t *testing.T) {
+func Test_WriteMap(t *testing.T) {
 	var b0, b1 bytes.Buffer
 
 	m := map[int32]int32{
@@ -31,7 +31,7 @@ func TestWriteMap(t *testing.T) {
 	}
 }
 
-func TestUnkDic_WriteAndRead(t *testing.T) {
+func Test_UnkDic_WriteAndRead(t *testing.T) {
 	d := UnkDict{
 		Morphs: Morphs{
 			{LeftID: 1, RightID: 2, Weight: 3},

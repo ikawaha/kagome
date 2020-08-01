@@ -70,7 +70,7 @@ This must be specified by -X option during the go build. Such like:
 
 //Usage prints to stdout information about the tool
 func Usage() {
-	fmt.Fprintf(errorWriter, "Japanese Morphological Analyzer -- github.com/ikawaha/kagome\n")
+	fmt.Fprintf(errorWriter, "Japanese Morphological Analyzer -- github.com/ikawaha/kagome/v2\n")
 	fmt.Fprintf(errorWriter, "usage: %s <command>\n", filepath.Base(os.Args[0]))
 }
 

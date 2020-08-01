@@ -1,24 +1,28 @@
 package tokenizer
 
 import (
-	"fmt"
+	"bytes"
+	"reflect"
 	"testing"
 
-	ipa "github.com/ikawaha/kagome-dict-ipa"
+	"github.com/ikawaha/kagome/v2/dict"
+	"github.com/ikawaha/kagome/v2/tokenizer/lattice"
 )
 
 const (
-	testUserDicPath = "../_sample/userdic.txt"
+	testDictPath     = "testdata/ipa.dict"
+	testUserDictPath = "../_sample/userdict.txt"
 )
 
-func TestHogeIPA(t *testing.T) {
-	tz := New(ipa.Dict())
-	fmt.Println(tz.Tokenize("すもももももももものうち"))
-}
-
-/*
-func TestAnalyze01(t *testing.T) {
-	tnz := New()
+func Test_AnalyzeEmptyInput(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	tokens := tnz.Analyze("", Normal)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -36,11 +40,17 @@ func TestAnalyze01(t *testing.T) {
 			t.Errorf("got %v, expected %v", tok, expected[i])
 		}
 	}
-
 }
 
-func TestAnalyze02(t *testing.T) {
-	tnz := New()
+func Test_Analyze(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	tokens := tnz.Analyze("関西国際空港", Normal)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -62,13 +72,19 @@ func TestAnalyze02(t *testing.T) {
 
 }
 
-func TestAnalyze03(t *testing.T) {
-	tnz := New()
-	udict, err := dict.NewUserDict(testUserDicPath)
+func Test_AnalyzeWithUserDict(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
 	if err != nil {
-		t.Fatalf("new user dict: unexpected error")
+		t.Fatalf("unexpected error, %v", err)
 	}
-	tnz.SetUserDict(udict)
+	udict, err := dict.NewUserDict(testUserDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d, UserDict(udict))
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	tokens := tnz.Analyze("関西国際空港", Normal)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -90,8 +106,15 @@ func TestAnalyze03(t *testing.T) {
 
 }
 
-func TestAnalyze04(t *testing.T) {
-	tnz := New()
+func Test_AnalyzeUnknown(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	tokens := tnz.Analyze("ポポピ", Normal)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -113,28 +136,54 @@ func TestAnalyze04(t *testing.T) {
 
 }
 
-func TestTokenizeSpecialCase(t *testing.T) {
+func Test_TokenizeSpecialCase(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	inputs := []string{
 		"\u10000",
 	}
-	tnz := New()
 	for _, s := range inputs {
-		tnz.Tokenize(s)
+		tnz.Tokenize(s) // does not panic.
 	}
 }
 
-func TestTokenize(t *testing.T) {
-	const input = "すもももももももものうち"
-	tnz := New()
-	x := tnz.Tokenize(input)
-	y := tnz.Analyze(input, Normal)
-	if !reflect.DeepEqual(x, y) {
-		t.Errorf("got %v, expected %v", x, y)
+func Test_Tokenize(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	inputs := []string{
+		"すもももももももものうち",
+		"人魚は、南の方の海にばかり棲んでいるのではありません。",
+	}
+	for _, input := range inputs {
+		x := tnz.Tokenize(input)
+		y := tnz.Analyze(input, Normal)
+		if !reflect.DeepEqual(x, y) {
+			t.Errorf("got %v, expected %v", x, y)
+		}
 	}
 }
 
-func TestSearcModeAnalyze01(t *testing.T) {
-	tnz := New()
+func Test_AnalyzeWithSearchModeEmptyInput(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	tokens := tnz.Analyze("", Search)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -152,11 +201,17 @@ func TestSearcModeAnalyze01(t *testing.T) {
 			t.Errorf("got %v, expected %v", tok, expected[i])
 		}
 	}
-
 }
 
-func TestSearchModeAnalyze02(t *testing.T) {
-	tnz := New()
+func Test_AnalyzeWithSearchMode(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	tokens := tnz.Analyze("関西国際空港", Search)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -180,13 +235,20 @@ func TestSearchModeAnalyze02(t *testing.T) {
 
 }
 
-func TestSearchModeAnalyze03(t *testing.T) {
-	tnz := New()
-	udict, err := dict.NewUserDict(testUserDicPath)
+func Test_AnalyzeWithSearchModeWithUserDict(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
 	if err != nil {
-		t.Fatalf("new user dict: unexpected error")
+		t.Fatalf("unexpected error, %v", err)
 	}
-	tnz.SetUserDict(udict)
+	udict, err := dict.NewUserDict(testUserDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d, UserDict(udict))
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+
 	tokens := tnz.Analyze("関西国際空港", Search)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -208,8 +270,16 @@ func TestSearchModeAnalyze03(t *testing.T) {
 
 }
 
-func TestSearchModeAnalyze04(t *testing.T) {
-	tnz := New()
+func Test_AnalyzeWithSearchModeUnknown(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+
 	tokens := tnz.Analyze("ポポピ", Search)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -228,11 +298,18 @@ func TestSearchModeAnalyze04(t *testing.T) {
 			t.Errorf("got %v, expected %v", tok, expected[i])
 		}
 	}
-
 }
 
-func TestExtendedModeAnalyze01(t *testing.T) {
-	tnz := New()
+func Test_AnalyzeWithExtendedModeEmpty(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+
 	tokens := tnz.Analyze("", Extended)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -253,8 +330,16 @@ func TestExtendedModeAnalyze01(t *testing.T) {
 
 }
 
-func TestExtendedModeAnalyze02(t *testing.T) {
-	tnz := New()
+func Test_AnalyzeWithExtendedMode(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+
 	tokens := tnz.Analyze("関西国際空港", Extended)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -277,13 +362,20 @@ func TestExtendedModeAnalyze02(t *testing.T) {
 
 }
 
-func TestExtendedModeAnalyze03(t *testing.T) {
-	tnz := New()
-	udict, err := dict.NewUserDict(testUserDicPath)
+func Test_AnalyzeWithExtendedModeWithUserDict(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
 	if err != nil {
-		t.Fatalf("new user dict: unexpected error")
+		t.Fatalf("unexpected error, %v", err)
 	}
-	tnz.SetUserDict(udict)
+	udict, err := dict.NewUserDict(testUserDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d, UserDict(udict))
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+
 	tokens := tnz.Analyze("関西国際空港", Extended)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -305,8 +397,16 @@ func TestExtendedModeAnalyze03(t *testing.T) {
 
 }
 
-func TestExtendedModeAnalyze04(t *testing.T) {
-	tnz := New()
+func Test_AnalyzeWithExtendedModeUnknown(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+
 	tokens := tnz.Analyze("ポポピ", Extended)
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
@@ -330,40 +430,15 @@ func TestExtendedModeAnalyze04(t *testing.T) {
 
 }
 
-func TestTokenizerSetDic(t *testing.T) {
-	d := SysDict()
-	tnz := NewWithDic(d)
-
-	tnz.SetDic(d)
-	if tnz.dict != d.dict {
-		t.Errorf("got %v, expected %v", tnz.dict, d)
-	}
-}
-
-func TestNewWithDicPath(t *testing.T) {
-	result, err := NewWithDicPath("../_sample/ipa.dict")
-
+func Test_TokenizerDot(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
 	if err != nil {
-		t.Errorf("got err %v loading dictionary", err)
+		t.Fatalf("unexpected error, %v", err)
 	}
-	exp := []string{"BOS", "こんにちは", "、", "元気", "です", "か", "？", "EOS"}
-	tokens := result.Tokenize("こんにちは、元気ですか？")
-	for i, token := range tokens {
-		if token.Surface != exp[i] {
-			t.Errorf("expected %v, got %v", exp[i], token)
-		}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
 	}
-}
-
-func TestNewWithInvalidPath(t *testing.T) {
-	_, err := NewWithDicPath("invalid.zip")
-	if err == nil {
-		t.Errorf("no dictionary should have been loaded")
-	}
-}
-
-func TestTokenizerDot(t *testing.T) {
-	tnz := New()
 
 	// test empty case
 	var b bytes.Buffer
@@ -380,8 +455,15 @@ func TestTokenizerDot(t *testing.T) {
 	}
 }
 
-func TestTokenizerAnalyzeGraph(t *testing.T) {
-	tnz := New()
+func Test_TokenizerAnalyzeGraph(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 
 	// test empty case
 	for _, mode := range []TokenizeMode{Normal, Search, Extended} {
@@ -400,26 +482,82 @@ func TestTokenizerAnalyzeGraph(t *testing.T) {
 	}
 }
 
+func Test_Wakati(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	testdata := []struct {
+		Input  string
+		Output []string
+	}{
+		{
+			Input:  "すもももももももものうち",
+			Output: []string{"すもも", "も", "もも", "も", "もも", "の", "うち"},
+		},
+		{
+			Input:  "寿司が食べたい。",
+			Output: []string{"寿司", "が", "食べ", "たい", "。"},
+		},
+	}
+	for _, v := range testdata {
+		got := tnz.Wakati(v.Input)
+		if want := v.Output; !reflect.DeepEqual(want, got) {
+			t.Errorf("want %+v, got %+v", want, got)
+		}
+	}
+}
+
 var benchSampleText = "人魚は、南の方の海にばかり棲んでいるのではありません。北の海にも棲んでいたのであります。北方の海の色は、青うございました。ある時、岩の上に、女の人魚があがって、あたりの景色を眺めながら休んでいました。"
 
 func BenchmarkAnalyzeNormal(b *testing.B) {
-	tnz := New()
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		b.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		b.Fatalf("unexpected error, %v", err)
+	}
+
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		tnz.Analyze(benchSampleText, Normal)
 	}
 }
 
 func BenchmarkAnalyzeSearch(b *testing.B) {
-	tnz := New()
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		b.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		b.Fatalf("unexpected error, %v", err)
+	}
+
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		tnz.Analyze(benchSampleText, Search)
 	}
 }
 
 func BenchmarkAnalyzeExtended(b *testing.B) {
-	tnz := New()
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		b.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		b.Fatalf("unexpected error, %v", err)
+	}
+
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		tnz.Analyze(benchSampleText, Extended)
 	}
 }
-*/

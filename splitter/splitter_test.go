@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestDefaultSplitter(t *testing.T) {
+func Test_DefaultSplitter(t *testing.T) {
 	testdata := []struct {
 		input  string
 		expect []string
@@ -60,7 +60,7 @@ func TestDefaultSplitter(t *testing.T) {
 	}
 }
 
-func TestDelimWhiteSpace(t *testing.T) {
+func Test_DelimWhiteSpace(t *testing.T) {
 	testdata := []struct {
 		input  string
 		expect []string
@@ -107,7 +107,7 @@ func TestDelimWhiteSpace(t *testing.T) {
 	}
 }
 
-func TestScanSentences(t *testing.T) {
+func Test_ScanSentences(t *testing.T) {
 	testdata := []struct {
 		atEnd   bool
 		data    []byte

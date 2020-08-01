@@ -85,7 +85,7 @@ func (idx IndexTable) Search(input string) []int {
 	return list
 }
 
-// WriteTo saves a index table.
+// WriteTo implements the io.WriterTo interface.
 func (idx IndexTable) WriteTo(w io.Writer) (n int64, err error) {
 	n, err = idx.Da.WriteTo(w)
 	if err != nil {

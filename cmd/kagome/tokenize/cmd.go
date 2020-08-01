@@ -87,7 +87,7 @@ func OptionCheck(args []string) error {
 func selectDict(path, sysdict string, shurink bool) (*dict.Dict, error) {
 	if path != "" {
 		if shurink {
-			return dict.LoadShurink(path)
+			return dict.LoadShrink(path)
 		}
 		return dict.LoadDictFile(path)
 	}
@@ -129,14 +129,19 @@ func command(opt *option) error {
 	if err != nil {
 		return err
 	}
-	t := tokenizer.New(d)
+	udict := tokenizer.Nop()
 	if opt.udict != "" {
-		udict, err := dict.NewUserDict(opt.udict)
+		d, err := dict.NewUserDict(opt.udict)
 		if err != nil {
 			return err
 		}
-		t.SetUserDict(udict)
+		udict = tokenizer.UserDict(d)
 	}
+	t, err := tokenizer.New(d, udict)
+	if err != nil {
+		return err
+	}
+
 	var fp = os.Stdin
 	if opt.file != "" {
 		var err error

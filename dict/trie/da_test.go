@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestDaBuildAndSearch01(t *testing.T) {
+func Test_DaBuildAndSearchBuildNil(t *testing.T) {
 	d, err := Build(nil)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -20,7 +20,7 @@ func TestDaBuildAndSearch01(t *testing.T) {
 	}
 }
 
-func TestDaBuildAndSearch02(t *testing.T) {
+func Test_DaBuildAndSearchBuildEmptySlice(t *testing.T) {
 	d, err := Build([]string{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -30,7 +30,7 @@ func TestDaBuildAndSearch02(t *testing.T) {
 	}
 }
 
-func TestDaBuildAndSearch03(t *testing.T) {
+func Test_DaBuildAndSearch(t *testing.T) {
 	keywords := []string{
 		"12345",
 		"2345",
@@ -56,7 +56,7 @@ func TestDaBuildAndSearch03(t *testing.T) {
 	}
 }
 
-func TestDaBuildAndCommonPrefixSearch01(t *testing.T) {
+func Test_DaBuildAndCommonPrefixSearchBuildNil(t *testing.T) {
 	d, err := Build(nil)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -66,7 +66,7 @@ func TestDaBuildAndCommonPrefixSearch01(t *testing.T) {
 	}
 }
 
-func TestDaBuildAndCommonPrefixSearch02(t *testing.T) {
+func Test_DaBuildAndCommonPrefixSearchBuildEmptySlice(t *testing.T) {
 	d, err := Build([]string{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -76,7 +76,7 @@ func TestDaBuildAndCommonPrefixSearch02(t *testing.T) {
 	}
 }
 
-func TestDaBuildAndCommonPrefixSearch03(t *testing.T) {
+func Test_DaBuildAndCommonPrefixSearch(t *testing.T) {
 	keywords := []string{
 		"電気通信",      //1
 		"電気",        //2
@@ -125,7 +125,7 @@ func TestDaBuildAndCommonPrefixSearch03(t *testing.T) {
 	}
 }
 
-func TestDaBuildAndCommonPrefixSearchCallback01(t *testing.T) {
+func Test_DaBuildAndCommonPrefixSearchCallbackBuildNil(t *testing.T) {
 	d, err := Build(nil)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -135,7 +135,7 @@ func TestDaBuildAndCommonPrefixSearchCallback01(t *testing.T) {
 	})
 }
 
-func TestDaBuildAndCommonPrefixSearchCallback02(t *testing.T) {
+func Test_DaBuildAndCommonPrefixSearchCallbackBuildEmptySlice(t *testing.T) {
 	d, err := Build([]string{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -145,7 +145,7 @@ func TestDaBuildAndCommonPrefixSearchCallback02(t *testing.T) {
 	})
 }
 
-func TestDaBuildAndCommonPrefixSearchCallback03(t *testing.T) {
+func Test_DaBuildAndCommonPrefixSearchCallback(t *testing.T) {
 	keywords := []string{
 		"電気通信",      //1
 		"電気",        //2
@@ -186,7 +186,7 @@ func TestDaBuildAndCommonPrefixSearchCallback03(t *testing.T) {
 	})
 }
 
-func TestDaBuildWithIDsAndCommonPrefixSearch01(t *testing.T) {
+func Test_DaBuildWithIDsAndCommonPrefixSearchBuildNil(t *testing.T) {
 	d, err := BuildWithIDs(nil, nil)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -197,7 +197,7 @@ func TestDaBuildWithIDsAndCommonPrefixSearch01(t *testing.T) {
 	}
 }
 
-func TestDaBuildWithIDsAndCommonPrefixSearch02(t *testing.T) {
+func Test_DaBuildWithIDsAndCommonPrefixSearchEmptySlice(t *testing.T) {
 	d, err := BuildWithIDs([]string{}, []int{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -208,7 +208,7 @@ func TestDaBuildWithIDsAndCommonPrefixSearch02(t *testing.T) {
 	}
 }
 
-func TestDaBuildWithIDsAndPrefixSearch03(t *testing.T) {
+func Test_DaBuildWithIDsAndPrefixSearch(t *testing.T) {
 	keywords := []string{
 		"電気通信大学電気通信学部",
 		"電気",
@@ -243,7 +243,7 @@ func TestDaBuildWithIDsAndPrefixSearch03(t *testing.T) {
 	}
 }
 
-func TestDaBuildAndPrefixSearch01(t *testing.T) {
+func Test_DaBuildAndPrefixSearchBuildNil(t *testing.T) {
 	d, err := Build(nil)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -253,7 +253,7 @@ func TestDaBuildAndPrefixSearch01(t *testing.T) {
 	}
 }
 
-func TestDaBuildAndPrefixSearch02(t *testing.T) {
+func Test_DaBuildAndPrefixSearchBuildEmptySlice(t *testing.T) {
 	d, err := Build([]string{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -263,7 +263,7 @@ func TestDaBuildAndPrefixSearch02(t *testing.T) {
 	}
 }
 
-func TestDaBuildAndPrefixSearch03(t *testing.T) {
+func Test_DaBuildAndPrefixSearch(t *testing.T) {
 	keywords := []string{
 		"電気",           //1
 		"電気通信",         //2
@@ -289,7 +289,7 @@ func TestDaBuildAndPrefixSearch03(t *testing.T) {
 	}
 }
 
-func TestDaEfficiency01(t *testing.T) {
+func Test_DaEfficiency(t *testing.T) {
 	d := &DoubleArray{}
 	d.init()
 	unspent, size, rate := d.efficiency()
@@ -310,7 +310,7 @@ func TestDaEfficiency01(t *testing.T) {
 	}
 }
 
-func TestDaTorture(t *testing.T) {
+func Test_DaTorture(t *testing.T) {
 	const testdata = "testdata/words.txt"
 	fp, err := os.Open(testdata)
 	if err != nil {
@@ -345,7 +345,7 @@ func TestDaTorture(t *testing.T) {
 	}
 }
 
-func TestReadAndWrite(t *testing.T) {
+func Test_ReadAndWrite(t *testing.T) {
 	keywords := []string{
 		"電気",           //1
 		"電気通信",         //2
@@ -380,7 +380,7 @@ func TestReadAndWrite(t *testing.T) {
 	}
 }
 
-func TestDaExpand(t *testing.T) {
+func Test_DaExpand(t *testing.T) {
 	const initSize = 5
 	d := make(DoubleArray, initSize)
 	d[rootID].Base = 1

@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestMorphsSave(t *testing.T) {
+func Test_MorphsSave(t *testing.T) {
 	m := []Morph{
 		{1, 1, 1},
 		{2, 2, 2},
@@ -22,7 +22,7 @@ func TestMorphsSave(t *testing.T) {
 	}
 }
 
-func TestLoadMorphSlice(t *testing.T) {
+func Test_LoadMorphSlice(t *testing.T) {
 	src := Morphs{
 		{1, 1, 1},
 		{2, 2, 2},

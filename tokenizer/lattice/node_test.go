@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestNodeClassString(t *testing.T) {
+func Test_NodeClassString(t *testing.T) {
 
 	pairs := []struct {
 		in  NodeClass
