@@ -51,10 +51,10 @@ type Token struct {
 
 // Features returns contents of a token.
 func (t Token) Features() []string {
-	switch lattice.NodeClass(t.Class) {
-	case lattice.DUMMY:
+	switch t.Class {
+	case DUMMY:
 		return nil
-	case lattice.KNOWN:
+	case KNOWN:
 		var c int
 		if t.dict.Contents != nil {
 			c = len(t.dict.Contents[t.ID])
@@ -67,13 +67,13 @@ func (t Token) Features() []string {
 			features = append(features, t.dict.Contents[t.ID]...)
 		}
 		return features
-	case lattice.UNKNOWN:
+	case UNKNOWN:
 		features := make([]string, len(t.dict.UnkDict.Contents[t.ID]))
 		for i := range t.dict.UnkDict.Contents[t.ID] {
 			features[i] = t.dict.UnkDict.Contents[t.ID][i]
 		}
 		return features
-	case lattice.USER:
+	case USER:
 		pos := t.udict.Contents[t.ID].Pos
 		tokens := strings.Join(t.udict.Contents[t.ID].Tokens, "/")
 		yomi := strings.Join(t.udict.Contents[t.ID].Yomi, "/")
@@ -82,13 +82,59 @@ func (t Token) Features() []string {
 	return nil
 }
 
-// Pos returns the first element of features.
-func (t Token) Pos() string {
+// POS returns POS elements of features.
+func (t Token) POS() []string {
 	f := t.Features()
-	if len(f) < 1 {
-		return ""
+	if len(f) == 0 {
+		return nil
 	}
-	return f[0]
+	var meta dict.ContentsMeta
+	switch t.Class {
+	case KNOWN:
+		meta = t.dict.ContentsMeta
+	case UNKNOWN:
+		meta = t.dict.UnkDict.ContentsMeta
+	}
+	start := meta[dict.POSStartIndex]
+	end, ok := meta[dict.POSEndIndex]
+	if !ok {
+		end = 1
+	}
+	return f[start:end] // default [0:1]
+}
+
+// BaseForm returns the base form feature if exists.
+func (t Token) BaseForm() (string, bool) {
+	return t.pickupFromFeatures(dict.BaseFormIndex)
+}
+
+// Reading returns the reading feature if exists.
+func (t Token) Reading() (string, bool) {
+	return t.pickupFromFeatures(dict.ReadingIndex)
+}
+
+// Pronunciation returns the pronunciation feature if exists.
+func (t Token) Pronunciation() (string, bool) {
+	return t.pickupFromFeatures(dict.PronunciationIndex)
+}
+
+func (t Token) pickupFromFeatures(key string) (string, bool) {
+	f := t.Features()
+	if len(f) == 0 {
+		return "", false
+	}
+	var meta dict.ContentsMeta
+	switch t.Class {
+	case KNOWN:
+		meta = t.dict.ContentsMeta
+	case UNKNOWN:
+		meta = t.dict.UnkDict.ContentsMeta
+	}
+	i, ok := meta[key]
+	if !ok || i < 0 || int(i) >= len(f) {
+		return "", false
+	}
+	return f[i], true
 }
 
 // String returns a string representation of a token.

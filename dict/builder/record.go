@@ -20,6 +20,11 @@ type MorphRecordInfo struct {
 	WeightIndex             int
 	POSStartIndex           int
 	OtherContentsStartIndex int
+
+	// extra info.
+	BaseFormIndex      int
+	ReadingIndex       int
+	PronunciationIndex int
 }
 
 // UnkRecordInfo represents a format of unk CSV records.
@@ -29,6 +34,7 @@ type UnkRecordInfo struct {
 	LeftIDIndex             int
 	RightIndex              int
 	WeigthIndex             int
+	POSStartIndex           int
 	OtherContentsStartIndex int
 }
 

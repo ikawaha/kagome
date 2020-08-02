@@ -192,7 +192,7 @@ type TokenizeDemoHandler struct {
 func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	type record struct {
 		Surface       string
-		Pos           string
+		POS           string
 		Baseform      string
 		Reading       string
 		Pronunciation string
@@ -277,27 +277,27 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 			fs := tok.Features()
 			switch len(fs) {
 			case 17: // unidic
-				m.Pos = strings.Join(fs[0:5], ",")
+				m.POS = strings.Join(fs[0:5], ",")
 				m.Baseform = fs[10]
 				m.Reading = fs[6]
 				m.Pronunciation = fs[9]
 			case 9:
-				m.Pos = strings.Join(fs[0:5], ",")
+				m.POS = strings.Join(fs[0:5], ",")
 				m.Baseform = fs[6]
 				m.Reading = fs[7]
 				m.Pronunciation = fs[8]
 			case 7:
-				m.Pos = strings.Join(fs[0:5], ",")
+				m.POS = strings.Join(fs[0:5], ",")
 				m.Baseform = fs[6]
 				m.Reading = "*"
 				m.Pronunciation = "*"
 			case 6: // unidic
-				m.Pos = strings.Join(fs[0:5], ",")
+				m.POS = strings.Join(fs[0:5], ",")
 				m.Baseform = "*"
 				m.Reading = "*"
 				m.Pronunciation = "*"
 			case 3:
-				m.Pos = fs[0]
+				m.POS = fs[0]
 				m.Baseform = fs[1]
 				m.Reading = fs[2]
 				m.Pronunciation = "*"
@@ -399,7 +399,7 @@ var graphHTML = `
     {{range .Tokens}}
       <tr>
       <td>{{.Surface}}</td>
-      <td>{{.Pos}}</td>
+      <td>{{.POS}}</td>
       <td>{{.Baseform}}</td>
       <td>{{.Reading}}</td>
       <td>{{.Pronunciation}}</td>

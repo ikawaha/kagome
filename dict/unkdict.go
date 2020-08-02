@@ -10,13 +10,14 @@ import (
 
 // UnkDict represents an unknown word dictionary part.
 type UnkDict struct {
-	Morphs   Morphs
-	Index    map[int32]int32
-	IndexDup map[int32]int32
-	Contents Contents
+	Morphs       Morphs
+	Index        map[int32]int32
+	IndexDup     map[int32]int32
+	ContentsMeta ContentsMeta
+	Contents     Contents
 }
 
-func writeMap(w io.Writer, m map[int32]int32) (n int64, err error) {
+func writeMapInt32Int32(w io.Writer, m map[int32]int32) (n int64, err error) {
 	keys := make([]int32, 0, len(m))
 	for k := range m {
 		keys = append(keys, k)
@@ -45,12 +46,12 @@ func writeMap(w io.Writer, m map[int32]int32) (n int64, err error) {
 
 // WriteTo implements the io.WriterTo interface.
 func (u UnkDict) WriteTo(w io.Writer) (n int64, err error) {
-	size, err := writeMap(w, u.Index)
+	size, err := writeMapInt32Int32(w, u.Index)
 	if err != nil {
 		return n, fmt.Errorf("write index error, %v", err)
 	}
 	n += size
-	size, err = writeMap(w, u.IndexDup)
+	size, err = writeMapInt32Int32(w, u.IndexDup)
 	if err != nil {
 		return n, fmt.Errorf("write index dup error, %v", err)
 	}
@@ -58,6 +59,12 @@ func (u UnkDict) WriteTo(w io.Writer) (n int64, err error) {
 	size, err = u.Morphs.WriteTo(w)
 	if err != nil {
 		return n, fmt.Errorf("write morph error, %v", err)
+	}
+	n += size
+
+	size, err = u.ContentsMeta.WriteTo(w)
+	if err != nil {
+		return n, fmt.Errorf("write contents meta, %v", err)
 	}
 	n += size
 
@@ -70,7 +77,7 @@ func (u UnkDict) WriteTo(w io.Writer) (n int64, err error) {
 	return n, nil
 }
 
-func readMap(r io.Reader) (map[int32]int32, error) {
+func readMapInt32Int32(r io.Reader) (map[int32]int32, error) {
 	var sz int64
 	if err := binary.Read(r, binary.LittleEndian, &sz); err != nil {
 		return nil, err
@@ -93,12 +100,12 @@ func readMap(r io.Reader) (map[int32]int32, error) {
 // ReadUnkDic loads an unknown word dictionary.
 func ReadUnkDic(r io.Reader) (UnkDict, error) {
 	d := UnkDict{}
-	ui, err := readMap(r)
+	ui, err := readMapInt32Int32(r)
 	if err != nil {
 		return d, fmt.Errorf("Index: %v", err)
 	}
 	d.Index = ui
-	ud, err := readMap(r)
+	ud, err := readMapInt32Int32(r)
 	if err != nil {
 		return d, fmt.Errorf("IndexDup: %v", err)
 	}
@@ -109,6 +116,12 @@ func ReadUnkDic(r io.Reader) (UnkDict, error) {
 		return d, err
 	}
 	d.Morphs = ms
+
+	me, err := ReadContentsMeta(r)
+	if err != nil {
+		return d, err
+	}
+	d.ContentsMeta =me
 
 	b, err := ioutil.ReadAll(r)
 	if err != nil {

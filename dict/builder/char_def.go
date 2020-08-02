@@ -10,9 +10,9 @@ import (
 )
 
 var (
-	reCharClass         = regexp.MustCompile(`^(\\w+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)`)
-	reCharCategory      = regexp.MustCompile(`^(0x[0-9A-F]+)(?:\\s+([^#\\s]+))(?:\\s+([^#\\s]+))?`)
-	reCharCategoryRange = regexp.MustCompile(`^(0x[0-9A-F]+)..(0x[0-9A-F]+)(?:\\s+([^#\\s]+))(?:\\s+([^#\\s]+))?`)
+	reCharClass         = regexp.MustCompile(`^(\w+)\s+(\d+)\s+(\d+)\s+(\d+)`)
+	reCharCategory      = regexp.MustCompile(`^(0x[0-9A-F]+)(?:\s+([^#\s]+))(?:\s+([^#\s]+))?`)
+	reCharCategoryRange = regexp.MustCompile(`^(0x[0-9A-F]+)..(0x[0-9A-F]+)(?:\s+([^#\s]+))(?:\s+([^#\s]+))?`)
 )
 
 // CharClassDef represents char.def.

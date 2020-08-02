@@ -17,6 +17,10 @@ func parseUnkDefFile(path string, enc encoding.Encoding, info *UnkRecordInfo, ch
 	ret := dict.UnkDict{
 		Index:    map[int32]int32{},
 		IndexDup: map[int32]int32{},
+		ContentsMeta: dict.ContentsMeta{
+			dict.POSStartIndex: int32(info.POSStartIndex - info.POSStartIndex),
+			dict.POSEndIndex:   int32(info.OtherContentsStartIndex - info.POSStartIndex),
+		},
 	}
 	sort.Sort(Records(records))
 	for _, rec := range records {
@@ -58,7 +62,7 @@ func parseUnkDefFile(path string, enc encoding.Encoding, info *UnkRecordInfo, ch
 		}
 		m := dict.Morph{LeftID: int16(l), RightID: int16(r), Weight: int16(w)}
 		ret.Morphs = append(ret.Morphs, m)
-		ret.Contents = append(ret.Contents, rec[info.OtherContentsStartIndex:])
+		ret.Contents = append(ret.Contents, rec[info.POSStartIndex:])
 	}
 	return &ret, nil
 }

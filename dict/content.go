@@ -1,9 +1,11 @@
 package dict
 
 import (
+	"encoding/binary"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"sort"
 	"strings"
 )
 
@@ -11,6 +13,82 @@ const (
 	rowDelimiter = "\n"
 	colDelimiter = "\a"
 )
+
+const (
+	POSStartIndex      = "_pos_start"
+	POSEndIndex        = "_pos_end"
+	BaseFormIndex      = "_base"
+	ReadingIndex       = "_reading"
+	PronunciationIndex = "_pronunciation"
+	Other              = "_other"
+)
+
+// ContentsMeta represents the contents record information.
+type ContentsMeta map[string]int32
+
+func (c ContentsMeta) WriteTo(w io.Writer) (n int64, err error) {
+	return writeMapStringInt32(w, c)
+}
+
+func writeMapStringInt32(w io.Writer, m map[string]int32) (n int64, err error) {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	sz := int64(len(keys))
+	if err := binary.Write(w, binary.LittleEndian, sz); err != nil {
+		return n, err
+	}
+	n += int64(binary.Size(sz))
+	for _, k := range keys {
+		sz := int64(len(k))
+		if err := binary.Write(w, binary.LittleEndian, sz); err != nil {
+			return n, err
+		}
+		n += int64(binary.Size(sz))
+		x, err := io.Copy(w, strings.NewReader(k))
+		if err != nil {
+			return n, err
+		}
+		n += x
+		v := m[k]
+		if err := binary.Write(w, binary.LittleEndian, v); err != nil {
+			return n, err
+		}
+		n += int64(binary.Size(v))
+	}
+	return n, err
+}
+
+func ReadContentsMeta(r io.Reader) (ContentsMeta, error) {
+	return readMapStringInt32(r)
+}
+
+func readMapStringInt32(r io.Reader) (map[string]int32, error) {
+	var sz int64
+	if err := binary.Read(r, binary.LittleEndian, &sz); err != nil {
+		return nil, err
+	}
+	m := make(map[string]int32, sz)
+	for i := int64(0); i < sz; i++ {
+		var x int64
+		if err := binary.Read(r, binary.LittleEndian, &x); err != nil {
+			return nil, err
+		}
+		var buf strings.Builder
+		_, err := io.CopyN(&buf, r, x)
+		if err != nil {
+			return nil, err
+		}
+		var v int32
+		if err := binary.Read(r, binary.LittleEndian, &v); err != nil {
+			return nil, err
+		}
+		m[buf.String()] = v
+	}
+	return m, nil
+}
 
 // Contents represents dictionary contents.
 type Contents [][]string

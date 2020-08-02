@@ -15,11 +15,11 @@ func Test_WriteMap(t *testing.T) {
 		3: 9,
 	}
 
-	sz0, err := writeMap(&b0, m)
+	sz0, err := writeMapInt32Int32(&b0, m)
 	if err != nil {
 		t.Errorf("unexpected error, %v", err)
 	}
-	sz1, err := writeMap(&b1, m)
+	sz1, err := writeMapInt32Int32(&b1, m)
 	if err != nil {
 		t.Errorf("unexpected error, %v", err)
 	}
@@ -47,6 +47,9 @@ func Test_UnkDic_WriteAndRead(t *testing.T) {
 			2: 8,
 			3: 9,
 		},
+		ContentsMeta :ContentsMeta{
+			"meta": 333,
+		},
 		Contents: Contents{
 			{"hello", "goodbye"},
 			{"こんにちは", "さようなら"},
@@ -59,7 +62,7 @@ func Test_UnkDic_WriteAndRead(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected write error, %v", err)
 	}
-	if expected := int64(129); sz != expected {
+	if expected := int64(153); sz != expected {
 		t.Fatalf("silialization size, got %v, expected %v", sz, expected)
 	}
 
