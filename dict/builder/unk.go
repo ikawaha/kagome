@@ -18,8 +18,8 @@ func parseUnkDefFile(path string, enc encoding.Encoding, info *UnkRecordInfo, ch
 		Index:    map[int32]int32{},
 		IndexDup: map[int32]int32{},
 		ContentsMeta: dict.ContentsMeta{
-			dict.POSStartIndex: int32(info.POSStartIndex - info.POSStartIndex),
-			dict.POSEndIndex:   int32(info.OtherContentsStartIndex - info.POSStartIndex),
+			dict.POSStartIndex: int8(info.POSStartIndex - info.POSStartIndex),
+			dict.POSEndIndex:   int8(info.OtherContentsStartIndex - info.POSStartIndex),
 		},
 	}
 	sort.Sort(Records(records))

@@ -24,13 +24,13 @@ const (
 )
 
 // ContentsMeta represents the contents record information.
-type ContentsMeta map[string]int32
+type ContentsMeta map[string]int8
 
 func (c ContentsMeta) WriteTo(w io.Writer) (n int64, err error) {
-	return writeMapStringInt32(w, c)
+	return writeMapStringInt8(w, c)
 }
 
-func writeMapStringInt32(w io.Writer, m map[string]int32) (n int64, err error) {
+func writeMapStringInt8(w io.Writer, m map[string]int8) (n int64, err error) {
 	keys := make([]string, 0, len(m))
 	for k := range m {
 		keys = append(keys, k)
@@ -62,15 +62,15 @@ func writeMapStringInt32(w io.Writer, m map[string]int32) (n int64, err error) {
 }
 
 func ReadContentsMeta(r io.Reader) (ContentsMeta, error) {
-	return readMapStringInt32(r)
+	return readMapStringInt8(r)
 }
 
-func readMapStringInt32(r io.Reader) (map[string]int32, error) {
+func readMapStringInt8(r io.Reader) (map[string]int8, error) {
 	var sz int64
 	if err := binary.Read(r, binary.LittleEndian, &sz); err != nil {
 		return nil, err
 	}
-	m := make(map[string]int32, sz)
+	m := make(map[string]int8, sz)
 	for i := int64(0); i < sz; i++ {
 		var x int64
 		if err := binary.Read(r, binary.LittleEndian, &x); err != nil {
@@ -81,7 +81,7 @@ func readMapStringInt32(r io.Reader) (map[string]int32, error) {
 		if err != nil {
 			return nil, err
 		}
-		var v int32
+		var v int8
 		if err := binary.Read(r, binary.LittleEndian, &v); err != nil {
 			return nil, err
 		}

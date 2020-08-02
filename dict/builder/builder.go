@@ -70,12 +70,12 @@ func Build(c *Config) (*dict.Dict, error) {
 			POSs: make([]dict.POS, 0, len(records)),
 		},
 		ContentsMeta: dict.ContentsMeta{
-			dict.POSStartIndex:      int32(c.recordInfo.POSStartIndex - c.recordInfo.POSStartIndex),
-			dict.POSEndIndex:        int32(c.recordInfo.OtherContentsStartIndex - c.recordInfo.POSStartIndex),
-			dict.BaseFormIndex:      int32(c.recordInfo.BaseFormIndex - c.recordInfo.POSStartIndex),
-			dict.PronunciationIndex: int32(c.recordInfo.PronunciationIndex - c.recordInfo.POSStartIndex),
-			dict.ReadingIndex:       int32(c.recordInfo.ReadingIndex - c.recordInfo.POSStartIndex),
-			dict.Other:              int32(c.recordInfo.OtherContentsStartIndex - c.recordInfo.POSStartIndex),
+			dict.POSStartIndex:      int8(c.recordInfo.POSStartIndex - c.recordInfo.POSStartIndex),
+			dict.POSEndIndex:        int8(c.recordInfo.OtherContentsStartIndex - c.recordInfo.POSStartIndex),
+			dict.BaseFormIndex:      int8(c.recordInfo.BaseFormIndex - c.recordInfo.POSStartIndex),
+			dict.PronunciationIndex: int8(c.recordInfo.PronunciationIndex - c.recordInfo.POSStartIndex),
+			dict.ReadingIndex:       int8(c.recordInfo.ReadingIndex - c.recordInfo.POSStartIndex),
+			dict.Other:              int8(c.recordInfo.OtherContentsStartIndex - c.recordInfo.POSStartIndex),
 		},
 		Contents: make([][]string, 0, len(records)),
 	}

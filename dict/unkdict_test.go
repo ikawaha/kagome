@@ -47,8 +47,8 @@ func Test_UnkDic_WriteAndRead(t *testing.T) {
 			2: 8,
 			3: 9,
 		},
-		ContentsMeta :ContentsMeta{
-			"meta": 333,
+		ContentsMeta: ContentsMeta{
+			"meta": 47,
 		},
 		Contents: Contents{
 			{"hello", "goodbye"},
@@ -62,7 +62,7 @@ func Test_UnkDic_WriteAndRead(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected write error, %v", err)
 	}
-	if expected := int64(153); sz != expected {
+	if expected := int64(150); sz != expected {
 		t.Fatalf("silialization size, got %v, expected %v", sz, expected)
 	}
 
