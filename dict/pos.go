@@ -14,12 +14,12 @@ type POSTable struct {
 }
 
 // POSID represents a ID of part of speech.
-type POSID uint32
+type POSID uint16
 
 // POS represents a vector of part of speech.
 type POS []POSID
 
-const maxPOSID = 1<<32 - 1
+const maxPOSID = 1<<16 - 1
 
 // WriteTo saves a POS table.
 func (p POSTable) WriteTo(w io.Writer) (int64, error) {
