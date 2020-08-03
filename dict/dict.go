@@ -12,6 +12,8 @@ const (
 	MorphDictFileName = "morph.dict"
 	// POSDictFileName is the default file name of a part of speech dict.
 	POSDictFileName = "pos.dict"
+	// ContentMetaFileName is the default file name of content meta.
+	ContentMetaFileName = "content.meta"
 	// ContentDictFileName is the default file name of a content dict.
 	ContentDictFileName = "content.dict"
 	// IndexDictFileName is the default filename of a dictionary index.
@@ -28,6 +30,7 @@ const (
 type Dict struct {
 	Morphs       Morphs
 	POSTable     POSTable
+	ContentsMeta ContentsMeta
 	Contents     Contents
 	Connection   ConnectionTable
 	Index        IndexTable
@@ -62,6 +65,16 @@ func (d *Dict) loadPOSDict(r io.Reader) error {
 	}
 	d.POSTable = p
 	return nil
+}
+
+func (d *Dict) loadContentsMeta(r io.Reader) error {
+	c, err := ReadContentsMeta(r)
+	if err != nil {
+		return fmt.Errorf("dict initializer, Contents meta: %v", err)
+	}
+	d.ContentsMeta = c
+	return nil
+
 }
 
 func (d *Dict) loadContentsDict(r io.Reader) error {
@@ -137,6 +150,7 @@ type dictionaryPartLoader func(*Dict, io.Reader) error
 var loaders = map[string]dictionaryPartLoader{
 	MorphDictFileName:      (*Dict).loadMorphsDict,
 	POSDictFileName:        (*Dict).loadPOSDict,
+	ContentMetaFileName:    (*Dict).loadContentsMeta,
 	ContentDictFileName:    (*Dict).loadContentsDict,
 	IndexDictFileName:      (*Dict).loadIndexDict,
 	ConnectionDictFileName: (*Dict).loadConnectionDict,
@@ -173,6 +187,7 @@ func loadZippedDictPart(f *zip.File, d *Dict) error {
 var dictionaryPartFiles = []string{
 	MorphDictFileName,
 	POSDictFileName,
+	ContentMetaFileName,
 	ContentDictFileName,
 	IndexDictFileName,
 	ConnectionDictFileName,
@@ -185,6 +200,7 @@ type dictionaryPartSaver func(Dict, io.Writer) error
 var savers = map[string]dictionaryPartSaver{
 	MorphDictFileName:      Dict.saveMorphsDict,
 	POSDictFileName:        Dict.savePOSTableDict,
+	ContentMetaFileName:    Dict.saveContentsMeta,
 	ContentDictFileName:    Dict.saveContentsDict,
 	IndexDictFileName:      Dict.saveIndexDict,
 	ConnectionDictFileName: Dict.saveConnectionDict,
@@ -217,6 +233,11 @@ func (d Dict) saveMorphsDict(w io.Writer) error {
 
 func (d Dict) savePOSTableDict(w io.Writer) error {
 	_, err := d.POSTable.WriteTo(w)
+	return err
+}
+
+func (d Dict) saveContentsMeta(w io.Writer) error {
+	_, err := d.ContentsMeta.WriteTo(w)
 	return err
 }
 

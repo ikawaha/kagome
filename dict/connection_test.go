@@ -67,3 +67,30 @@ func Test_LoadConnectionTable(t *testing.T) {
 		t.Errorf("got %v, expected %v", dst, src)
 	}
 }
+
+func Test_ContentInfoWriteToRead(t *testing.T) {
+	c := ContentsMeta{
+		POSStartIndex:      2,
+		POSEndIndex:        22,
+		BaseFormIndex:      3,
+		ReadingIndex:       4,
+		PronunciationIndex: 5,
+		Other:              6,
+		"hoo":              7,
+	}
+	var buf bytes.Buffer
+	n, err := c.WriteTo(&buf)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	if want, got := int64(buf.Len()), n; want != got {
+		t.Errorf("write length, want=%d, got=%d", want, got)
+	}
+	got, err := ReadContentsMeta(&buf)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	if !reflect.DeepEqual(c, got) {
+		t.Errorf("want=%+v, got=%+v", c, got)
+	}
+}

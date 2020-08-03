@@ -5,12 +5,13 @@ import (
 	"reflect"
 	"testing"
 
-	ipa "github.com/ikawaha/kagome-dict-ipa"
 	"github.com/ikawaha/kagome/v2/dict"
-	"github.com/ikawaha/kagome/v2/tokenizer/lattice"
 )
 
-const userDictSample = "../_sample/userdict.txt"
+const (
+	dictPath       = "testdata/ipa.dict"
+	userDictSample = "../_sample/userdict.txt"
+)
 
 func Test_TokenClassString(t *testing.T) {
 	testdata := []struct {
@@ -24,69 +25,88 @@ func Test_TokenClassString(t *testing.T) {
 	}
 
 	for _, v := range testdata {
-		if v.inp.String() != v.out {
-			t.Errorf("got %v, expected %v", v.inp.String(), v.out)
+		if got, want := v.out, v.inp.String(); want != got {
+			t.Errorf("want %v, got %v", got, v.inp.String())
 		}
 	}
 }
 
 func Test_FeaturesKnown(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	tok := Token{
 		ID:      0,
-		Class:   TokenClass(lattice.KNOWN),
+		Class:   KNOWN,
 		Start:   0,
 		End:     1,
 		Surface: "",
 	}
-	tok.dict = ipa.Dict()
+	tok.dict = d
 
-	f := tok.Features()
-	expected := []string{"名詞", "一般", "*", "*", "*", "*", "Tシャツ", "ティーシャツ", "ティーシャツ"}
-	if !reflect.DeepEqual(f, expected) {
-		t.Errorf("got %v, expected %v", f, expected)
+	got := tok.Features()
+	want := []string{"名詞", "一般", "*", "*", "*", "*", "Tシャツ", "ティーシャツ", "ティーシャツ"}
+	if !reflect.DeepEqual(want, got) {
+		t.Errorf("want %v, got %v", want, got)
 	}
 }
 
 func Test_FeaturesUnknown(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	tok := Token{
 		ID:      0,
-		Class:   TokenClass(lattice.UNKNOWN),
+		Class:   UNKNOWN,
 		Start:   0,
 		End:     1,
 		Surface: "",
 	}
-	tok.dict = ipa.Dict()
+	tok.dict = d
 
-	f := tok.Features()
-	expected := []string{"名詞", "固有名詞", "地域", "一般", "*", "*", "*"}
-	if !reflect.DeepEqual(f, expected) {
-		t.Errorf("got %v, expected %v", f, expected)
+	got := tok.Features()
+	want := []string{"名詞", "固有名詞", "地域", "一般", "*", "*", "*"}
+	if len(want) != len(got) {
+		t.Errorf("len: want %d, got %d", len(want), len(got))
+	}
+	if !reflect.DeepEqual(want, got) {
+		t.Errorf("pos: want %v, got %v", want, got)
 	}
 }
 
 func Test_FeaturesUser(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	tok := Token{
 		ID:      0,
-		Class:   TokenClass(lattice.USER),
+		Class:   USER,
 		Start:   0,
 		End:     1,
 		Surface: "",
 	}
-	tok.dict = ipa.Dict()
+	tok.dict = d
 	if udic, err := dict.NewUserDict(userDictSample); err != nil {
 		t.Fatalf("build user dict error: %v", err)
 	} else {
 		tok.udict = udic
 	}
 
-	f := tok.Features()
-	expected := []string{"カスタム名詞", "日本/経済/新聞", "ニホン/ケイザイ/シンブン"}
-	if !reflect.DeepEqual(f, expected) {
-		t.Errorf("got %v, expected %v", f, expected)
+	got := tok.Features()
+	want := []string{"カスタム名詞", "日本/経済/新聞", "ニホン/ケイザイ/シンブン"}
+	if !reflect.DeepEqual(want, got) {
+		t.Errorf("want %v, got %v", want, got)
 	}
 }
 
 func Test_FeaturesDummy(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	tok := Token{
 		ID:      0,
 		Class:   DUMMY,
@@ -94,7 +114,7 @@ func Test_FeaturesDummy(t *testing.T) {
 		End:     1,
 		Surface: "",
 	}
-	tok.dict = ipa.Dict()
+	tok.dict = d
 	if udic, err := dict.NewUserDict(userDictSample); err != nil {
 		t.Fatalf("build user dict error: %v", err)
 	} else {
@@ -108,54 +128,69 @@ func Test_FeaturesDummy(t *testing.T) {
 }
 
 func Test_FeaturesAndPosKnown(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	tok := Token{
 		ID:      0,
-		Class:   TokenClass(lattice.KNOWN),
+		Class:   KNOWN,
 		Start:   0,
 		End:     1,
 		Surface: "",
 	}
-	tok.dict = ipa.Dict()
+	tok.dict = d
 
 	f := tok.Features()
-	expected := []string{"名詞", "一般", "*", "*", "*", "*", "Tシャツ", "ティーシャツ", "ティーシャツ"}
-	if !reflect.DeepEqual(f, expected) {
-		t.Errorf("got %v, expected %v", f, expected)
+	want := []string{"名詞", "一般", "*", "*", "*", "*", "Tシャツ", "ティーシャツ", "ティーシャツ"}
+	if !reflect.DeepEqual(want, f) {
+		t.Errorf("want %v, got %v", want, f)
 	}
-	if p := tok.Pos(); p != f[0] {
-		t.Errorf("got %v, expected %v", p, f[0])
+	if got, want := tok.POS(), want[0:6]; !reflect.DeepEqual(want, got) {
+		t.Errorf("want %v, got %v", want, got)
 	}
 }
 
 func Test_FeaturesAndPosUnknown(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	tok := Token{
 		ID:      0,
-		Class:   TokenClass(lattice.UNKNOWN),
+		Class:   UNKNOWN,
 		Start:   0,
 		End:     1,
 		Surface: "",
 	}
-	tok.dict = ipa.Dict()
+	tok.dict = d
 
-	f := tok.Features()
-	expected := []string{"名詞", "固有名詞", "地域", "一般", "*", "*", "*"}
-	if !reflect.DeepEqual(f, expected) {
-		t.Errorf("got %v, expected %v", f, expected)
+	got := tok.Features()
+	want := []string{"名詞", "固有名詞", "地域", "一般", "*", "*", "*"}
+	if len(want) != len(got) {
+		t.Errorf("len: want %d, got %d", len(want), len(got))
 	}
-	if p := tok.Pos(); p != f[0] {
-		t.Errorf("got %v, expected %v", p, f[0])
+	if !reflect.DeepEqual(want, got) {
+		t.Errorf("want %v, got %v", want, got)
+	}
+	if got := tok.POS(); !reflect.DeepEqual(want, got) {
+		t.Errorf("want %+v, got %+v", want, got)
 	}
 }
 
 func Test_FeaturesAndPosUser(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	tok := Token{
 		ID:      0,
-		Class:   TokenClass(lattice.USER),
+		Class:   USER,
 		Start:   0,
 		End:     1,
 		Surface: "",
 	}
-	tok.dict = ipa.Dict()
+	tok.dict = d
 	if udic, err := dict.NewUserDict(userDictSample); err != nil {
 		t.Fatalf("build user dict error: %v", err)
 	} else {
@@ -163,16 +198,20 @@ func Test_FeaturesAndPosUser(t *testing.T) {
 	}
 
 	f := tok.Features()
-	expected := []string{"カスタム名詞", "日本/経済/新聞", "ニホン/ケイザイ/シンブン"}
-	if !reflect.DeepEqual(f, expected) {
-		t.Errorf("got %v, expected %v", f, expected)
+	want := []string{"カスタム名詞", "日本/経済/新聞", "ニホン/ケイザイ/シンブン"}
+	if !reflect.DeepEqual(want, f) {
+		t.Errorf("want %v, got %v", want, f)
 	}
-	if p := tok.Pos(); p != f[0] {
-		t.Errorf("got %v, expected %v", p, f[0])
+	if got := tok.POS(); !reflect.DeepEqual(want[0:1], got) {
+		t.Errorf("want %v, got %v", want, got)
 	}
 }
 
 func Test_FeaturesAndPosUserDict(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
 	tok := Token{
 		ID:      0,
 		Class:   DUMMY,
@@ -180,7 +219,7 @@ func Test_FeaturesAndPosUserDict(t *testing.T) {
 		End:     1,
 		Surface: "",
 	}
-	tok.dict = ipa.Dict()
+	tok.dict = d
 	if udic, err := dict.NewUserDict(userDictSample); err != nil {
 		t.Fatalf("build user dict error: %v", err)
 	} else {
@@ -191,22 +230,124 @@ func Test_FeaturesAndPosUserDict(t *testing.T) {
 	if len(f) != 0 {
 		t.Errorf("got %v, expected empty", f)
 	}
-	if p := tok.Pos(); p != "" {
-		t.Errorf("got %v, expected empty", p)
+	if got := tok.POS(); len(got) > 0 {
+		t.Errorf("want empty, got %v", got)
 	}
 }
 
 func Test_TokenString(t *testing.T) {
 	tok := Token{
 		ID:      123,
-		Class:   TokenClass(lattice.DUMMY),
+		Class:   DUMMY,
 		Start:   0,
 		End:     1,
 		Surface: "テスト",
 	}
-	expected := "テスト(0, 1)DUMMY[123]"
-	str := fmt.Sprintf("%v", tok)
-	if str != expected {
-		t.Errorf("got %v, expected %v", str, expected)
+	want := "テスト(0, 1)DUMMY[123]"
+	got := fmt.Sprintf("%v", tok)
+	if got != want {
+		t.Errorf("want %v, got %v", want, got)
+	}
+}
+
+func Test_BaseForm(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+
+	tokens := tnz.Tokenize("寿司を食べたい")
+	if want, got := 6, len(tokens); want != got {
+		t.Fatalf("token length: want %d, got %d", want, got)
+	}
+	//BOS
+	if got, ok := tokens[0].BaseForm(); ok {
+		t.Errorf("want !ok, got %q", got)
+	}
+	//食べたい->食べる
+	if got, ok := tokens[3].BaseForm(); !ok {
+		t.Error("want ok, but !ok")
+	} else if want := "食べる"; want != got {
+		t.Fatalf("want %s, got %s", want, got)
+	}
+}
+
+func Test_Reading(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+
+	tokens := tnz.Tokenize("公園に行く")
+	if want, got := 5, len(tokens); want != got {
+		t.Fatalf("token length: want %d, got %d", want, got)
+	}
+	//BOS
+	if got, ok := tokens[0].Reading(); ok {
+		t.Errorf("want !ok, got %q", got)
+	}
+	//公園->コウエン
+	if got, ok := tokens[1].Reading(); !ok {
+		t.Error("want ok, but !ok")
+	} else if want := "コウエン"; want != got {
+		t.Fatalf("want %s, got %s", want, got)
+	}
+}
+
+func Test_Pronunciation(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+
+	tokens := tnz.Tokenize("公園に行く")
+	if want, got := 5, len(tokens); want != got {
+		t.Fatalf("token length: want %d, got %d", want, got)
+	}
+	//BOS
+	if got, ok := tokens[0].Pronunciation(); ok {
+		t.Errorf("want !ok, got %q", got)
+	}
+	//公園->コウエン
+	if got, ok := tokens[1].Pronunciation(); !ok {
+		t.Error("want ok, but !ok")
+	} else if want := "コーエン"; want != got {
+		t.Fatalf("want %s, got %s", want, got)
+	}
+}
+
+func Test_POS(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+
+	tokens := tnz.Tokenize("公園に行く")
+	if want, got := 5, len(tokens); want != got {
+		t.Fatalf("token length: want %d, got %d", want, got)
+	}
+	//BOS
+	if got := tokens[0].POS(); len(got) > 0 {
+		t.Errorf("want empty, got %+v", got)
+	}
+	//行く->
+	if want, got := []string{"動詞", "自立", "*", "*", "五段・カ行促音便", "基本形"}, tokens[3].POS(); !reflect.DeepEqual(want, got) {
+		t.Fatalf("want %+v, got %+v", want, got)
 	}
 }

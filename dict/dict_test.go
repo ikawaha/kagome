@@ -3,6 +3,7 @@ package dict
 import (
 	"archive/zip"
 	"bytes"
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -26,6 +27,9 @@ func newTestDict(t *testing.T) *Dict {
 			NameList: []string{
 				"str1", "str2", "str3", "str4", "str5", "str6", "str7", "str8",
 			},
+		},
+		ContentsMeta: ContentsMeta{
+			"meta": 47,
 		},
 		Contents: Contents{
 			[]string{"a1", "a2", "a3"},
@@ -55,6 +59,9 @@ func newTestDict(t *testing.T) *Dict {
 			IndexDup: map[int32]int32{
 				1: 0,
 				2: 3,
+			},
+			ContentsMeta: ContentsMeta{
+				"unkmeta": 47,
 			},
 			Contents: Contents{
 				[]string{"aa1", "aa2", "aa3"},
@@ -88,6 +95,8 @@ func Test_DictSaveLoad(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(dict, got) {
-		t.Errorf("got %+v, want %+v", got, dict)
+		t.Errorf("want %+v, got %+v", dict, got)
+		fmt.Printf("%T\n", got.ContentsMeta)
+		fmt.Printf("%T\n", dict.ContentsMeta)
 	}
 }

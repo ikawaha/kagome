@@ -13,5 +13,6 @@ github.com/ikawaha/kagome-dict-uni v0.0.0-20200726121442-ac36863174cc h1:P/W9ZEd
 github.com/ikawaha/kagome-dict-uni v0.0.0-20200726121442-ac36863174cc/go.mod h1:hlLwY91ez7sZvW5ibVwYP259Psa2g0VpdsSM5Bg7VEQ=
 github.com/ikawaha/kagome/v2 v2.0.0/go.mod h1:FPWkqFXbc5mdlUPVau8pS4YrZedVQog31EcCTUWa6XQ=
 github.com/ikawaha/kagome/v2 v2.0.1-0.20200726111637-e7a2cfdec05f/go.mod h1:E2m1OBm2/QHvgsIUV7qlRZQjox5Q/2nDVV4HNPflXRk=
+golang.org/x/text v0.3.3 h1:cokOdA+Jmi5PJGXLlLllQSgYigAEfHXJAERHVMaCc2k=
 golang.org/x/text v0.3.3/go.mod h1:5Zoc/QRtKVWzQhOtBMvqHzDpF6irO9z98xDceosuGiQ=
 golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
