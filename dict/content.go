@@ -16,11 +16,12 @@ const (
 
 const (
 	POSStartIndex      = "_pos_start"
-	POSEndIndex        = "_pos_end"
+	POSHierarchy       = "_pos_hierarchy"
+	InflectionalType   = "_inflectional_type"
+	InflectionalForm   = "_inflectional_form"
 	BaseFormIndex      = "_base"
 	ReadingIndex       = "_reading"
 	PronunciationIndex = "_pronunciation"
-	Other              = "_other"
 )
 
 // ContentsMeta represents the contents record information.

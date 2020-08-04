@@ -71,11 +71,10 @@ func Test_LoadConnectionTable(t *testing.T) {
 func Test_ContentInfoWriteToRead(t *testing.T) {
 	c := ContentsMeta{
 		POSStartIndex:      2,
-		POSEndIndex:        22,
+		POSHierarchy:       22,
 		BaseFormIndex:      3,
 		ReadingIndex:       4,
 		PronunciationIndex: 5,
-		Other:              6,
 		"hoo":              7,
 	}
 	var buf bytes.Buffer

@@ -22,9 +22,7 @@ type MorphRecordInfo struct {
 	OtherContentsStartIndex int
 
 	// extra info.
-	BaseFormIndex      int
-	ReadingIndex       int
-	PronunciationIndex int
+	Meta map[string]int8
 }
 
 // UnkRecordInfo represents a format of unk CSV records.

@@ -146,7 +146,7 @@ func Test_FeaturesAndPosKnown(t *testing.T) {
 	if !reflect.DeepEqual(want, f) {
 		t.Errorf("want %v, got %v", want, f)
 	}
-	if got, want := tok.POS(), want[0:6]; !reflect.DeepEqual(want, got) {
+	if got, want := tok.POS(), want[0:4]; !reflect.DeepEqual(want, got) {
 		t.Errorf("want %v, got %v", want, got)
 	}
 }
@@ -173,7 +173,7 @@ func Test_FeaturesAndPosUnknown(t *testing.T) {
 	if !reflect.DeepEqual(want, got) {
 		t.Errorf("want %v, got %v", want, got)
 	}
-	if got := tok.POS(); !reflect.DeepEqual(want, got) {
+	if want, got := want[0:4], tok.POS(); !reflect.DeepEqual(want, got) {
 		t.Errorf("want %+v, got %+v", want, got)
 	}
 }
@@ -250,6 +250,58 @@ func Test_TokenString(t *testing.T) {
 	}
 }
 
+func Test_InflectionalType(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+
+	tokens := tnz.Tokenize("寿司を食べたい")
+	if want, got := 6, len(tokens); want != got {
+		t.Fatalf("token length: want %d, got %d", want, got)
+	}
+	//BOS
+	if got, ok := tokens[0].InflectionalType(); ok {
+		t.Errorf("want !ok, got %q", got)
+	}
+	//食べ 動詞,自立,*,*,一段,連用形,食べる,タベ,タベ
+	if got, ok := tokens[3].InflectionalType(); !ok {
+		t.Error("want ok, but !ok")
+	} else if want := "一段"; want != got {
+		t.Fatalf("want %s, got %s", want, got)
+	}
+}
+
+func Test_InflectionalForm(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+
+	tokens := tnz.Tokenize("寿司を食べたい")
+	if want, got := 6, len(tokens); want != got {
+		t.Fatalf("token length: want %d, got %d", want, got)
+	}
+	//BOS
+	if got, ok := tokens[0].InflectionalForm(); ok {
+		t.Errorf("want !ok, got %q", got)
+	}
+	//食べ 動詞,自立,*,*,一段,連用形,食べる,タベ,タベ
+	if got, ok := tokens[3].InflectionalForm(); !ok {
+		t.Error("want ok, but !ok")
+	} else if want := "連用形"; want != got {
+		t.Fatalf("want %s, got %s", want, got)
+	}
+}
+
 func Test_BaseForm(t *testing.T) {
 	d, err := dict.LoadDictFile(testDictPath)
 	if err != nil {
@@ -268,7 +320,7 @@ func Test_BaseForm(t *testing.T) {
 	if got, ok := tokens[0].BaseForm(); ok {
 		t.Errorf("want !ok, got %q", got)
 	}
-	//食べたい->食べる
+	//食べ->食べる
 	if got, ok := tokens[3].BaseForm(); !ok {
 		t.Error("want ok, but !ok")
 	} else if want := "食べる"; want != got {
@@ -346,8 +398,8 @@ func Test_POS(t *testing.T) {
 	if got := tokens[0].POS(); len(got) > 0 {
 		t.Errorf("want empty, got %+v", got)
 	}
-	//行く->
-	if want, got := []string{"動詞", "自立", "*", "*", "五段・カ行促音便", "基本形"}, tokens[3].POS(); !reflect.DeepEqual(want, got) {
+	//行く
+	if want, got := []string{"動詞", "自立", "*", "*"}, tokens[3].POS(); !reflect.DeepEqual(want, got) {
 		t.Fatalf("want %+v, got %+v", want, got)
 	}
 }

@@ -96,14 +96,27 @@ func (t Token) POS() []string {
 		meta = t.dict.UnkDict.ContentsMeta
 	}
 	start := meta[dict.POSStartIndex]
-	end, ok := meta[dict.POSEndIndex]
-	if !ok {
+	if start < 0 || int(start) > len(f) {
+		start = 0
+	}
+	end, ok := meta[dict.POSHierarchy]
+	if !ok || start+end < 0 || int(start+end) > len(f) {
 		end = 1
 	}
-	return f[start:end] // default [0:1]
+	return f[start : start+end] // default [0:1]
 }
 
-// BaseForm returns the base form feature if exists.
+// InflectionalType returns the inflectional type feature if exists.
+func (t Token) InflectionalType() (string, bool) {
+	return t.pickupFromFeatures(dict.InflectionalType)
+}
+
+// InflectionalForm returns the inflectional form feature if exists.
+func (t Token) InflectionalForm() (string, bool) {
+	return t.pickupFromFeatures(dict.InflectionalForm)
+}
+
+// BaseForm returns the base form features if exists.
 func (t Token) BaseForm() (string, bool) {
 	return t.pickupFromFeatures(dict.BaseFormIndex)
 }
@@ -121,7 +134,7 @@ func (t Token) Pronunciation() (string, bool) {
 func (t Token) pickupFromFeatures(key string) (string, bool) {
 	f := t.Features()
 	if len(f) == 0 {
-		return "", false
+		return "N/A", false
 	}
 	var meta dict.ContentsMeta
 	switch t.Class {
@@ -132,7 +145,7 @@ func (t Token) pickupFromFeatures(key string) (string, bool) {
 	}
 	i, ok := meta[key]
 	if !ok || i < 0 || int(i) >= len(f) {
-		return "", false
+		return "N/A", false
 	}
 	return f[i], true
 }

@@ -9,8 +9,6 @@ The dictionary/statiscal models such as MeCab-IPADIC, UniDic (unidic-mecab), Kor
 * Dictionaries are now maintained in a separate repository and only the dictionaries you need can be embedded in binaries.
 * Brushed up and added several APIs.
 
-If you like kagome, please star the repository! :)
-
 # Usage
 
 ```Go
@@ -70,9 +68,9 @@ EOS
 
 |dict| base version | package |
 |:---|:---|:---|
-|MeCab IPADIC| mecab-ipadic-2.7.0-20070801 | github.com/ikawaha/kagome-dict-ipa| 
-|UniDIC| unidic-mecab-2.1.2_src | github.com/ikawaha/kagome-dict-uni |
-|Korean MeCab|mecab-ko-dic-2.1.1-20180720 | github.com/ikawaha/kagome-dict-ko|
+|MeCab IPADIC| mecab-ipadic-2.7.0-20070801 | [github.com/ikawaha/kagome-dict-ipa](https://github.com/ikawaha/kagome-dict-ipa)| 
+|UniDIC| unidic-mecab-2.1.2_src | [github.com/ikawaha/kagome-dict-uni](https://github.com/ikawaha/kagome-dict-uni) |
+|Korean MeCab|mecab-ko-dic-2.1.1-20180720 | [github.com/ikawaha/kagome-dict-ko](https://github.com/ikawaha/kagome-dict-ko)|
 
 # Commands
 
