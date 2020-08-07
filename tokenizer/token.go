@@ -170,10 +170,6 @@ func (t Token) Pronunciation() (string, bool) {
 }
 
 func (t Token) pickupFromFeatures(key string) (string, bool) {
-	f := t.Features()
-	if len(f) == 0 {
-		return "", false
-	}
 	var meta dict.ContentsMeta
 	switch t.Class {
 	case KNOWN:
@@ -182,10 +178,10 @@ func (t Token) pickupFromFeatures(key string) (string, bool) {
 		meta = t.dict.UnkDict.ContentsMeta
 	}
 	i, ok := meta[key]
-	if !ok || i < 0 || int(i) >= len(f) {
+	if !ok {
 		return "", false
 	}
-	return f[i], true
+	return t.FeatureAt(int(i))
 }
 
 // String returns a string representation of a token.
