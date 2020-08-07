@@ -13,7 +13,25 @@ import (
 // TokenizeMode represents a mode of tokenize.
 type TokenizeMode int
 
+func (m TokenizeMode) String() string {
+	switch m {
+	case Normal:
+		return "normal"
+	case Search:
+		return "search"
+	case Extended:
+		return "extend"
+	}
+	return fmt.Sprintf("unknown tokenize mode (%d)", m)
+}
+
 const (
+	// Segmentation mode for search
+	// Kagome has segmentation mode for search such as Kuromoji.
+	//    Normal: Regular segmentation
+	//    Search: Use a heuristic to do additional segmentation useful for search
+	//    Extended: Similar to search mode, but also unigram unknown words
+	//
 	// Normal is the normal tokenize mode.
 	Normal TokenizeMode = iota + 1
 	// Search is the tokenize mode for search.

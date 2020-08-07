@@ -2,7 +2,9 @@ package tokenizer
 
 import (
 	"bytes"
+	"fmt"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/ikawaha/kagome/v2/dict"
@@ -13,6 +15,47 @@ const (
 	testDictPath     = "testdata/ipa.dict"
 	testUserDictPath = "../_sample/userdict.txt"
 )
+
+func Example_tokenize_mode() {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		panic(err)
+	}
+	t, err := New(d)
+	if err != nil {
+		panic(err)
+	}
+	for _, mode := range []TokenizeMode{Normal, Search, Extended} {
+		tokens := t.Analyze("関西国際空港", Normal)
+		fmt.Printf("---%s---", mode)
+		for _, token := range tokens {
+			if token.Class == DUMMY {
+				// BOS: Begin Of Sentence, EOS: End Of Sentence.
+				fmt.Printf("%s\n", token.Surface)
+				continue
+			}
+			features := strings.Join(token.Features(), ",")
+			fmt.Printf("%s\t%v\n", token.Surface, features)
+		}
+	}
+}
+
+func Test_TokenizeModeString(t *testing.T) {
+	testdata := []struct {
+		mode       TokenizeMode
+		expression string
+	}{
+		{mode: Normal, expression: "normal"},
+		{mode: Search, expression: "search"},
+		{mode: Extended, expression: "extend"},
+		{mode: TokenizeMode(999), expression: "unknown tokenize mode (999)"},
+	}
+	for _, v := range testdata {
+		if want, got := v.expression, v.mode.String(); want != got {
+			t.Errorf("want %q, got %q", want, got)
+		}
+	}
+}
 
 func Test_AnalyzeEmptyInput(t *testing.T) {
 	d, err := dict.LoadDictFile(testDictPath)
