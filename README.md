@@ -122,7 +122,7 @@ tokenize [-file input_file] [-dict dic_file] [-userdict userdic_file] [-sysdict 
     	user dict
 ```
 
-### Tokenization command
+### Tokenize command
 
 ```shellsession
 % kagome
