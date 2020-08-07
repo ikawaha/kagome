@@ -52,8 +52,6 @@ type Token struct {
 // Features returns contents of a token.
 func (t Token) Features() []string {
 	switch t.Class {
-	case DUMMY:
-		return nil
 	case KNOWN:
 		var c int
 		if t.dict.Contents != nil {
@@ -80,6 +78,46 @@ func (t Token) Features() []string {
 		return []string{pos, tokens, yomi}
 	}
 	return nil
+}
+
+// FeatureAt returns the i th feature if exists.
+func (t Token) FeatureAt(i int) (string, bool) {
+	if i < 0 {
+		return "", false
+	}
+	switch t.Class {
+	case KNOWN:
+		pos := t.dict.POSTable.POSs[t.ID]
+		if i < len(pos) {
+			id := pos[i]
+			if id < 0 || int(id) > len(t.dict.POSTable.NameList) {
+				return "", false
+			}
+			return t.dict.POSTable.NameList[id], true
+		}
+		i -= len(pos)
+		c := t.dict.Contents[t.ID]
+		if i < 0 || i >= len(c) {
+			return "", false
+		}
+		return c[i], true
+	case UNKNOWN:
+		c := t.dict.UnkDict.Contents[t.ID]
+		if i < 0 || i >= len(c) {
+			return "", false
+		}
+		return c[i], true
+	case USER:
+		switch i {
+		case 0:
+			return t.udict.Contents[t.ID].Pos, true
+		case 1:
+			return strings.Join(t.udict.Contents[t.ID].Tokens, "/"), true
+		case 2:
+			return strings.Join(t.udict.Contents[t.ID].Yomi, "/"), true
+		}
+	}
+	return "", false
 }
 
 // POS returns POS elements of features.
@@ -134,7 +172,7 @@ func (t Token) Pronunciation() (string, bool) {
 func (t Token) pickupFromFeatures(key string) (string, bool) {
 	f := t.Features()
 	if len(f) == 0 {
-		return "N/A", false
+		return "", false
 	}
 	var meta dict.ContentsMeta
 	switch t.Class {
@@ -145,7 +183,7 @@ func (t Token) pickupFromFeatures(key string) (string, bool) {
 	}
 	i, ok := meta[key]
 	if !ok || i < 0 || int(i) >= len(f) {
-		return "N/A", false
+		return "", false
 	}
 	return f[i], true
 }

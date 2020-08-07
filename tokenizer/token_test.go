@@ -52,6 +52,34 @@ func Test_FeaturesKnown(t *testing.T) {
 	}
 }
 
+func Test_FeatureAtKnown(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tok := Token{
+		ID:      0,
+		Class:   KNOWN,
+		Start:   0,
+		End:     1,
+		Surface: "",
+	}
+	tok.dict = d
+
+	fs := tok.Features()
+	want := []string{"名詞", "一般", "*", "*", "*", "*", "Tシャツ", "ティーシャツ", "ティーシャツ"}
+	if got := fs; !reflect.DeepEqual(want, got) {
+		t.Errorf("want %v, got %v", want, got)
+	}
+	for i, want := range want {
+		if got, ok := tok.FeatureAt(i); !ok {
+			t.Errorf("want ok, got !ok, %d", i)
+		} else if got != want {
+			t.Errorf("want %s, got %s", want, got)
+		}
+	}
+}
+
 func Test_FeaturesUnknown(t *testing.T) {
 	d, err := dict.LoadDictFile(testDictPath)
 	if err != nil {
@@ -73,6 +101,34 @@ func Test_FeaturesUnknown(t *testing.T) {
 	}
 	if !reflect.DeepEqual(want, got) {
 		t.Errorf("pos: want %v, got %v", want, got)
+	}
+}
+
+func Test_FeatureAtUnknown(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tok := Token{
+		ID:      0,
+		Class:   UNKNOWN,
+		Start:   0,
+		End:     1,
+		Surface: "",
+	}
+	tok.dict = d
+
+	fs := tok.Features()
+	want := []string{"名詞", "固有名詞", "地域", "一般", "*", "*", "*"}
+	if got := fs; !reflect.DeepEqual(want, got) {
+		t.Errorf("want %v, got %v", want, got)
+	}
+	for i, want := range want {
+		if got, ok := tok.FeatureAt(i); !ok {
+			t.Errorf("want ok, got !ok, %d", i)
+		} else if got != want {
+			t.Errorf("want %s, got %s", want, got)
+		}
 	}
 }
 
@@ -99,6 +155,39 @@ func Test_FeaturesUser(t *testing.T) {
 	want := []string{"カスタム名詞", "日本/経済/新聞", "ニホン/ケイザイ/シンブン"}
 	if !reflect.DeepEqual(want, got) {
 		t.Errorf("want %v, got %v", want, got)
+	}
+}
+
+func Test_FeatureAtUsers(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tok := Token{
+		ID:      0,
+		Class:   USER,
+		Start:   0,
+		End:     1,
+		Surface: "",
+	}
+	tok.dict = d
+	if udic, err := dict.NewUserDict(userDictSample); err != nil {
+		t.Fatalf("build user dict error: %v", err)
+	} else {
+		tok.udict = udic
+	}
+
+	fs := tok.Features()
+	want := []string{"カスタム名詞", "日本/経済/新聞", "ニホン/ケイザイ/シンブン"}
+	if got := fs; !reflect.DeepEqual(want, got) {
+		t.Errorf("want %v, got %v", want, got)
+	}
+	for i, want := range want {
+		if got, ok := tok.FeatureAt(i); !ok {
+			t.Errorf("want ok, got !ok, %d", i)
+		} else if got != want {
+			t.Errorf("want %s, got %s", want, got)
+		}
 	}
 }
 
