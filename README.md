@@ -6,7 +6,7 @@ The dictionary/statiscal models such as MeCab-IPADIC, UniDic (unidic-mecab), Kor
 
 ### Improvements from v1.
 
-* Dictionaries are now maintained in a separate repository and only the dictionaries you need can be embedded in binaries.
+* Dictionaries are maintained in a separate repository, and only the dictionaries you need are embedded in the binay.
 * Brushed up and added several APIs.
 
 # Usage
@@ -72,6 +72,21 @@ EOS
 |UniDIC| unidic-mecab-2.1.2_src | [github.com/ikawaha/kagome-dict-uni](https://github.com/ikawaha/kagome-dict-uni) |
 |Korean MeCab|mecab-ko-dic-2.1.1-20180720 | [github.com/ikawaha/kagome-dict-ko](https://github.com/ikawaha/kagome-dict-ko)|
 
+## Segmentation mode for search
+
+Kagome has segmentation mode for search such as [Kuromoji](http://www.atilika.com/en/products/kuromoji.html).
+
+* Normal: Regular segmentation
+* Search: Use a heuristic to do additional segmentation useful for search
+* Extended: Similar to search mode, but also uni-gram unknown words
+
+|Untokenized|Normal|Search|Extended|
+|:-------|:---------|:---------|:---------|
+|関西国際空港|関西国際空港|関西　国際　空港|関西　国際　空港|
+|日本経済新聞|日本経済新聞|日本　経済　新聞|日本　経済　新聞|
+|シニアソフトウェアエンジニア|シニアソフトウェアエンジニア|シニア　ソフトウェア　エンジニア|シニア　ソフトウェア　エンジニア|
+|デジカメを買った|デジカメ　を　買っ　た|デジカメ　を　買っ　た|デ　ジ　カ　メ　を　買っ　た|
+
 # Commands
 
 ## Install
@@ -107,53 +122,52 @@ tokenize [-file input_file] [-dict dic_file] [-userdict userdic_file] [-sysdict 
     	user dict
 ```
 
-### Command line mode
+### Tokenization command
 
 ```shellsession
-$ kagome tokenize -h
-Usage of tokenize:
-  -dict string
-    	dict
-  -file string
-    	input file
-  -mode string
-    	tokenize mode (normal|search|extended) (default "normal")
-  -simple
-    	display abbreviated dictionary contents
-  -sysdict string
-    	system dict type (ipa|uni|ko) (default "ipa")
-  -udict string
-    	user dict
+% kagome
+すもももももももものうち
+すもも	名詞,一般,*,*,*,*,すもも,スモモ,スモモ
+も	助詞,係助詞,*,*,*,*,も,モ,モ
+もも	名詞,一般,*,*,*,*,もも,モモ,モモ
+も	助詞,係助詞,*,*,*,*,も,モ,モ
+もも	名詞,一般,*,*,*,*,もも,モモ,モモ
+の	助詞,連体化,*,*,*,*,の,ノ,ノ
+うち	名詞,非自立,副詞可能,*,*,*,うち,ウチ,ウチ
+EOS
 ```
 
-### Server mode
+### Server command
+
+**API**
+
+Start a server and try to access the "/tokenize" endpoint.
 
 ```shellsession
-$ kagome server -h
-Usage of server:
-  -dict string
-    	system dict type (ipa|uni|ko) (default "ipa")
-  -http string
-    	HTTP service address (default ":6060")
-  -userdict string
-    	user dict
+% kagome server &
+% curl -XPUT localhost:6060/tokenize -d'{"sentence":"すもももももももものうち", "mode":"normal"}' | jq . 
 ```
 
-### Lattice mode
+**Web App**
+
+Start a server and access `http://localhost:6060`. 
+(To draw a lattice, demo application uses graphviz . You need graphviz installed.)
 
 ```shellsession
-$ kagome lattice -h
-Usage of lattice:
-  -dict string
-    	dict type (ipa|uni|ko) (default "ipa")
-  -mode string
-    	tokenize mode (normal|search|extended) (default "normal")
-  -output string
-    	output file
-  -userDict string
-    	user dict
-  -v	verbose mode
+% kagome server &
 ```
+
+![Demo](https://raw.githubusercontent.com/wiki/ikawaha/kagome/images/demoapp.gif)
+
+### Lattice command
+
+A debug tool of tokenize process outputs a lattice in graphviz dot format.
+
+```shellsession
+% kagome lattice すもももももももものうち | dot -Tpng -o lattice.png
+```
+
+![lattice](https://raw.githubusercontent.com/wiki/ikawaha/kagome/images/lattice.png)
 
 # Licence
 
