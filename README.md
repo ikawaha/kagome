@@ -4,7 +4,7 @@ Kagome v2
 Kagome is an open source Japanese morphological analyzer written in pure golang.
 The dictionary/statiscal models such as MeCab-IPADIC, UniDic (unidic-mecab), Korean MeCab and so on, be able to embedded in binaries.
 
-### Improvements from v1.
+### Improvements from [v1](https://github.com/ikawaha/kagome/tree/master).
 
 * Dictionaries are maintained in a separate repository, and only the dictionaries you need are embedded in the binay.
 * Brushed up and added several APIs.
