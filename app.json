@@ -1,0 +1,17 @@
+{
+    "name": "kagome",
+    "description": "Kagome Japanese Morphological Analyzer",
+    "env": {
+        "GOVERSION": "go1.14",
+        "GO_INSTALL_PACKAGE_SPEC": "./cmd/kagome"
+    },
+    "buildpacks": [
+        {
+            "url": "https://github.com/heroku/heroku-buildpack-go.git"
+        },
+        {
+            "url": "https://github.com/weibeld/heroku-buildpack-graphviz.git"
+        }
+    ],
+    "stack": "heroku-18"
+}
