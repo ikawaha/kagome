@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/k4g4bpy1ijqoasbe/branch/v2?svg=true)](https://ci.appveyor.com/project/ikawaha/kagome/branch/v2)
+
 Kagome v2
 ===
 
