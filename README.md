@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/ikawaha/kagome.svg?branch=v2)](https://travis-ci.org/ikawaha/kagome)
 [![Build status](https://ci.appveyor.com/api/projects/status/k4g4bpy1ijqoasbe/branch/v2?svg=true)](https://ci.appveyor.com/project/ikawaha/kagome/branch/v2)
+[![Coverage Status](https://coveralls.io/repos/github/ikawaha/kagome/badge.svg?branch=v2)](https://coveralls.io/github/ikawaha/kagome?branch=v2)
 
 Kagome v2
 ===
