@@ -66,7 +66,7 @@ EOS
 
 # Dictionaris
 
-|dict| base version | package |
+|dict| source | package |
 |:---|:---|:---|
 |MeCab IPADIC| mecab-ipadic-2.7.0-20070801 | [github.com/ikawaha/kagome-dict-ipa](https://github.com/ikawaha/kagome-dict-ipa)| 
 |UniDIC| unidic-mecab-2.1.2_src | [github.com/ikawaha/kagome-dict-uni](https://github.com/ikawaha/kagome-dict-uni) |
