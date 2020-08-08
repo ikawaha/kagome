@@ -21,7 +21,6 @@ install:
 script:
   - go test ./...
   - cd tokenizer; go test -benchmem -bench .; cd ..
-  - cd internal/dic; go test -benchmem -bench .; cd ../..
 
 after_success:
   - |
