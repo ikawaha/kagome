@@ -8,6 +8,6 @@
         {
             "url": "https://github.com/weibeld/heroku-buildpack-graphviz.git"
         }
-    ]
+    ],
     "stack": "heroku-18"
 }
