@@ -3,6 +3,9 @@
     "description": "Kagome Japanese Morphological Analyzer",    
     "buildpacks": [
         {
+            "url": "https://github.com/heroku/heroku-buildpack-go.git"
+        },
+        {
             "url": "https://github.com/weibeld/heroku-buildpack-graphviz.git"
         }
     ],
