@@ -1,9 +1,0 @@
-github.com/ikawaha/kagome-dict-ipa v1.0.0 h1:0WbjBDxE6fRJAZXBdCr/WRL0XDjSsyebVyNcs7j28bM=
-github.com/ikawaha/kagome-dict-ipa v1.0.0/go.mod h1:LWSyGsAY7pbu4YjOrP1dqd/XkxYU3e++6bimFI5PZu8=
-github.com/ikawaha/kagome-dict-ko v1.0.0 h1:GU4JB52O4Ml7ivWl02S8fI3t+i2+TnG60VdGWI+DHjE=
-github.com/ikawaha/kagome-dict-ko v1.0.0/go.mod h1:5zeKl7g/M/OBDO1gwxEatyImfEVt50fmVEqi3IRoOrU=
-github.com/ikawaha/kagome-dict-uni v1.0.0 h1:4BbNcnrKAm1qhExMtR/VuVFV1/WEEEWaN0XSoXgidM8=
-github.com/ikawaha/kagome-dict-uni v1.0.0/go.mod h1:6q9UtENfo2p6suhJLNpYCSYhIMcNetmdsAZLMDuWig0=
-golang.org/x/text v0.3.3 h1:cokOdA+Jmi5PJGXLlLllQSgYigAEfHXJAERHVMaCc2k=
-golang.org/x/text v0.3.3/go.mod h1:5Zoc/QRtKVWzQhOtBMvqHzDpF6irO9z98xDceosuGiQ=
-golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
