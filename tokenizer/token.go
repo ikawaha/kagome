@@ -122,26 +122,36 @@ func (t Token) FeatureAt(i int) (string, bool) {
 
 // POS returns POS elements of features.
 func (t Token) POS() []string {
-	f := t.Features()
-	if len(f) == 0 {
-		return nil
-	}
-	var meta dict.ContentsMeta
 	switch t.Class {
 	case KNOWN:
-		meta = t.dict.ContentsMeta
+		ret := make([]string, 0, len(t.dict.POSTable.POSs[t.ID]))
+		for _, id := range t.dict.POSTable.POSs[t.ID] {
+			ret = append(ret, t.dict.POSTable.NameList[id])
+		}
+		return ret
 	case UNKNOWN:
-		meta = t.dict.UnkDict.ContentsMeta
+		start := 0
+		if v, ok := t.dict.UnkDict.ContentsMeta[dict.POSStartIndex]; ok {
+			start = int(v)
+		}
+		end := 1
+		if v, ok := t.dict.UnkDict.ContentsMeta[dict.POSHierarchy]; ok {
+			end = start + int(v)
+		}
+		feature := t.dict.UnkDict.Contents[t.ID]
+		if start >= end || end > len(feature) {
+			return nil
+		}
+		ret := make([]string, 0, end-start)
+		for i := start; i < end; i++ {
+			ret = append(ret, feature[i])
+		}
+		return ret
+	case USER:
+		pos := t.udict.Contents[t.ID].Pos
+		return []string{pos}
 	}
-	start := meta[dict.POSStartIndex]
-	if start < 0 || int(start) > len(f) {
-		start = 0
-	}
-	end, ok := meta[dict.POSHierarchy]
-	if !ok || start+end < 0 || int(start+end) > len(f) {
-		end = 1
-	}
-	return f[start : start+end] // default [0:1]
+	return nil
 }
 
 // InflectionalType returns the inflectional type feature if exists.
