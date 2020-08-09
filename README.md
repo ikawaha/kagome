@@ -176,6 +176,11 @@ A debug tool of tokenize process outputs a lattice in graphviz dot format.
 
 ![lattice](https://raw.githubusercontent.com/wiki/ikawaha/kagome/images/lattice.png)
 
+# Docker
+[![Docker](https://dockeri.co/image/ikawaha/kagome)](https://hub.docker.com/r/ikawaha/kagome)
+
+[![](https://images.microbadger.com/badges/image/ikawaha/kagome.svg)](https://microbadger.com/images/ikawaha/kagome "View image info on microbadger.com")
+
 # Licence
 
 MIT
