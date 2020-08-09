@@ -174,10 +174,10 @@ Start a server and access `http://localhost:6060`.
 A debug tool of tokenize process outputs a lattice in graphviz dot format.
 
 ```shellsession
-% kagome lattice すもももももももものうち | dot -Tpng -o lattice.png
+% kagome lattice 私は鰻 | dot -Tpng -o lattice.png
 ```
 
-![lattice](https://raw.githubusercontent.com/wiki/ikawaha/kagome/images/lattice.png)
+![lattice](https://user-images.githubusercontent.com/4232165/89723585-74717000-da33-11ea-886a-baab85f7a06e.png)
 
 # Docker
 [![Docker](https://dockeri.co/image/ikawaha/kagome)](https://hub.docker.com/r/ikawaha/kagome)
