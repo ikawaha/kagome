@@ -36,13 +36,13 @@ func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		msg := fmt.Sprintf("{\"status\":false,\"error\":\"%v\"}\n", err)
-		if _, err := fmt.Fprintf(w, msg); err != nil {
+		if _, err := fmt.Fprint(w, msg); err != nil {
 			log.Printf("write error, %s, %v", msg, err)
 		}
 		return
 	}
 	if body.Input == "" {
-		msg := fmt.Sprintf("{\"status\":true,\"tokens\":[]}\n")
+		msg := "{\"status\":true,\"tokens\":[]}\n"
 		if _, err := fmt.Fprint(w, msg); err != nil {
 			log.Fatalf("write error, %s, %v", msg, err)
 		}
@@ -85,7 +85,7 @@ func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		msg := fmt.Sprintf("{\"status\":false,\"error\":\"%v\"}", err)
-		if _, err := fmt.Fprintf(w, msg); err != nil {
+		if _, err := fmt.Fprint(w, msg); err != nil {
 			log.Printf("write error, %s, %v", msg, err)
 		}
 		return
