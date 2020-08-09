@@ -42,7 +42,7 @@ Kagome has segmentation mode for search such as [Kuromoji](http://www.atilika.co
 |デジカメを買った|デジカメ　を　買っ　た|デジカメ　を　買っ　た|デ　ジ　カ　メ　を　買っ　た|
 
 
-# Programming 
+# Programming example
 
 ```Go
 package main
@@ -158,7 +158,10 @@ Start a server and try to access the "/tokenize" endpoint.
 % curl -XPUT localhost:6060/tokenize -d'{"sentence":"すもももももももものうち", "mode":"normal"}' | jq . 
 ```
 
-**Web App**
+**Web App** 
+
+[![demo](https://img.shields.io/badge/demo-heroku_deployed-blue.svg)](https://kagome.herokuapp.com/)
+
 
 Start a server and access `http://localhost:6060`. 
 (To draw a lattice, demo application uses graphviz . You need graphviz installed.)
@@ -166,8 +169,6 @@ Start a server and access `http://localhost:6060`.
 ```shellsession
 % kagome server &
 ```
-
-![Demo](https://raw.githubusercontent.com/wiki/ikawaha/kagome/images/demoapp.gif)
 
 ### Lattice command
 
