@@ -3,6 +3,9 @@
 [![Coverage Status](https://coveralls.io/repos/github/ikawaha/kagome/badge.svg?branch=v2)](https://coveralls.io/github/ikawaha/kagome?branch=v2)
 [![deploy](https://img.shields.io/badge/heroku-deploy_to_heroku-blue.svg)](https://heroku.com/deploy?template=https://github.com/ikawaha/kagome/tree/v2)
 [![demo](https://img.shields.io/badge/demo-heroku_deployed-blue.svg)](https://kagome.herokuapp.com/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/ikawaha/kagome.svg?style)](https://hub.docker.com/r/ikawaha/kagome/)
+[![Docker Automated build](https://img.shields.io/docker/cloud/automated/ikawaha/kagome.svg)](https://hub.docker.com/r/ikawaha/kagome/)
+
 
 [Kagome](https://kagome.herokuapp.com/) v2
 ===
