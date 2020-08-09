@@ -39,7 +39,7 @@ Kagome has segmentation mode for search such as [Kuromoji](http://www.atilika.co
 |デジカメを買った|デジカメ　を　買っ　た|デジカメ　を　買っ　た|デ　ジ　カ　メ　を　買っ　た|
 
 
-# Usage
+# Programming 
 
 ```Go
 package main
