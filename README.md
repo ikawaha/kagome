@@ -1,7 +1,8 @@
 [![Build Status](https://travis-ci.org/ikawaha/kagome.svg?branch=v2)](https://travis-ci.org/ikawaha/kagome)
 [![Build status](https://ci.appveyor.com/api/projects/status/k4g4bpy1ijqoasbe/branch/v2?svg=true)](https://ci.appveyor.com/project/ikawaha/kagome/branch/v2)
 [![Coverage Status](https://coveralls.io/repos/github/ikawaha/kagome/badge.svg?branch=v2)](https://coveralls.io/github/ikawaha/kagome?branch=v2)
-
+[![deploy](https://img.shields.io/badge/heroku-deploy_to_heroku-blue.svg)](https://heroku.com/deploy?template=https://github.com/ikawaha/kagome/tree/v2)
+[![demo](https://img.shields.io/badge/demo-heroku_deployed-blue.svg)](https://kagome.herokuapp.com/)
 
 [Kagome](https://kagome.herokuapp.com/) v2
 ===
@@ -9,12 +10,34 @@
 Kagome is an open source Japanese morphological analyzer written in pure golang.
 The dictionary/statiscal models such as MeCab-IPADIC, UniDic (unidic-mecab), Korean MeCab and so on, be able to embedded in binaries.
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/ikawaha/kagome/tree/v2)
-
 ### Improvements from [v1](https://github.com/ikawaha/kagome/tree/master).
 
 * Dictionaries are maintained in a separate repository, and only the dictionaries you need are embedded in the binay.
 * Brushed up and added several APIs.
+
+# Dictionaris
+
+|dict| source | package |
+|:---|:---|:---|
+|MeCab IPADIC| mecab-ipadic-2.7.0-20070801 | [github.com/ikawaha/kagome-dict-ipa](https://github.com/ikawaha/kagome-dict-ipa)| 
+|UniDIC| unidic-mecab-2.1.2_src | [github.com/ikawaha/kagome-dict-uni](https://github.com/ikawaha/kagome-dict-uni) |
+|Korean MeCab|mecab-ko-dic-2.1.1-20180720 | [github.com/ikawaha/kagome-dict-ko](https://github.com/ikawaha/kagome-dict-ko)|
+
+## Segmentation mode for search
+
+Kagome has segmentation mode for search such as [Kuromoji](http://www.atilika.com/en/products/kuromoji.html).
+
+* Normal: Regular segmentation
+* Search: Use a heuristic to do additional segmentation useful for search
+* Extended: Similar to search mode, but also uni-gram unknown words
+
+|Untokenized|Normal|Search|Extended|
+|:-------|:---------|:---------|:---------|
+|関西国際空港|関西国際空港|関西　国際　空港|関西　国際　空港|
+|日本経済新聞|日本経済新聞|日本　経済　新聞|日本　経済　新聞|
+|シニアソフトウェアエンジニア|シニアソフトウェアエンジニア|シニア　ソフトウェア　エンジニア|シニア　ソフトウェア　エンジニア|
+|デジカメを買った|デジカメ　を　買っ　た|デジカメ　を　買っ　た|デ　ジ　カ　メ　を　買っ　た|
+
 
 # Usage
 
@@ -70,29 +93,6 @@ BOS
 うち	名詞,非自立,副詞可能,*,*,*,うち,ウチ,ウチ
 EOS
 ```
-
-# Dictionaris
-
-|dict| source | package |
-|:---|:---|:---|
-|MeCab IPADIC| mecab-ipadic-2.7.0-20070801 | [github.com/ikawaha/kagome-dict-ipa](https://github.com/ikawaha/kagome-dict-ipa)| 
-|UniDIC| unidic-mecab-2.1.2_src | [github.com/ikawaha/kagome-dict-uni](https://github.com/ikawaha/kagome-dict-uni) |
-|Korean MeCab|mecab-ko-dic-2.1.1-20180720 | [github.com/ikawaha/kagome-dict-ko](https://github.com/ikawaha/kagome-dict-ko)|
-
-## Segmentation mode for search
-
-Kagome has segmentation mode for search such as [Kuromoji](http://www.atilika.com/en/products/kuromoji.html).
-
-* Normal: Regular segmentation
-* Search: Use a heuristic to do additional segmentation useful for search
-* Extended: Similar to search mode, but also uni-gram unknown words
-
-|Untokenized|Normal|Search|Extended|
-|:-------|:---------|:---------|:---------|
-|関西国際空港|関西国際空港|関西　国際　空港|関西　国際　空港|
-|日本経済新聞|日本経済新聞|日本　経済　新聞|日本　経済　新聞|
-|シニアソフトウェアエンジニア|シニアソフトウェアエンジニア|シニア　ソフトウェア　エンジニア|シニア　ソフトウェア　エンジニア|
-|デジカメを買った|デジカメ　を　買っ　た|デジカメ　を　買っ　た|デ　ジ　カ　メ　を　買っ　た|
 
 # Commands
 
