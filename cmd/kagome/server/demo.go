@@ -97,13 +97,22 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 			if tok.ID == tokenizer.BosEosID {
 				continue
 			}
-			fmt.Println(tok.Features())
 			m := record{
 				Surface: tok.Surface,
-				POS:     strings.Join(tok.POS(), ","),
 			}
-			m.Reading, _ = tok.Reading()
-			m.Pronunciation, _ = tok.Pronunciation()
+			if m.POS = strings.Join(tok.POS(), ","); m.POS == "" {
+				m.POS = "*"
+			}
+			var ok bool
+			if m.Baseform, ok = tok.BaseForm(); !ok {
+				m.Baseform = "*"
+			}
+			if m.Reading, ok = tok.Reading(); !ok {
+				m.Reading = "*"
+			}
+			if m.Pronunciation, ok = tok.Pronunciation(); !ok {
+				m.Pronunciation = "*"
+			}
 			records = append(records, m)
 		}
 	}
@@ -321,12 +330,10 @@ function cb(data, status) {
       if(status == "success" && Array.isArray(data.tokens)){
         $("#morphs").empty();
         $.each(data.tokens, function(i, val) {
-console.log(val);
-          var pos = "*", base = "*", reading = "*", pronoun = "*";
-          pos = pos.length > 0 ? val.pos : "*"
-          base = val.base_form != "" ? val.bae_form : "*"
-          reading = val.reading != "" ? val.reading : "*"
-          pronoun = val.pronunciation!= "" ? val.pronunciation : "*"
+          pos = (val.pos == null) ? "*" : val.pos;
+          base = val.base_form != "" ? val.base_form : "*";
+          reading = val.reading != "" ? val.reading : "*";
+          pronoun = val.pronunciation!= "" ? val.pronunciation : "*";
           $("#morphs").append(
           "<tr>"+"<td>" + val.surface + "</td>" +
                  "<td>" + pos + "</td>"+
