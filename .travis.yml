@@ -4,6 +4,7 @@ go:
   - "1.14.x"
   - "1.15.x"
   - tip
+
 sudo: false
 
 git:
@@ -23,7 +24,7 @@ script:
 
 after_success:
   - |
-    if [[ $TRAVIS_GO_VERSION = 1.14.x ]]
+    if [[ $TRAVIS_GO_VERSION = 1.15.x ]]
     then
       /bin/sh ./go-coverall.sh
     else
