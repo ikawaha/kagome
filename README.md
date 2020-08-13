@@ -24,6 +24,12 @@ The dictionary/statiscal models such as MeCab-IPADIC, UniDic (unidic-mecab), Kor
 |:---|:---|:---|
 |MeCab IPADIC| mecab-ipadic-2.7.0-20070801 | [github.com/ikawaha/kagome-dict-ipa](https://github.com/ikawaha/kagome-dict-ipa)| 
 |UniDIC| unidic-mecab-2.1.2_src | [github.com/ikawaha/kagome-dict-uni](https://github.com/ikawaha/kagome-dict-uni) |
+
+**Experimental Features**
+
+|dict|source|package|
+|:---|:---|:---|
+|mecab-ipadic-NEologd|mecab-ipadic-neologd| [github.com/ikawaha/kagome-ipa-neologd](https://github.com/ikawaha/kagome-dict-ipa-neologd)|
 |Korean MeCab|mecab-ko-dic-2.1.1-20180720 | [github.com/ikawaha/kagome-dict-ko](https://github.com/ikawaha/kagome-dict-ko)|
 
 ## Segmentation mode for search
