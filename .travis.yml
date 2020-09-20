@@ -10,17 +10,14 @@ sudo: false
 git:
   depth: 1
 
-before_install:
-  - go env -w GO111MODULE=on
-  - go env
 install:
   - pip install --user codecov
-  - go get github.com/axw/gocov/gocov
-  - go get github.com/mattn/goveralls
-  - go get golang.org/x/tools/cmd/cover
+  - env GO111MODULE=on go get github.com/axw/gocov/gocov
+  - env GO111MODULE=on go get github.com/mattn/goveralls
+  - env GO111MODULE=on go get golang.org/x/tools/cmd/cover
 
 script:
-  - go test ./...
+  - env GO111MODULE=on go test ./...
   - cd tokenizer; go test -benchmem -bench .; cd ..
 
 after_success:
