@@ -11,12 +11,12 @@ git:
   depth: 1
 
 before_install:
+  - go env -w GO111MODULE=on
+install:
   - pip install --user codecov
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
-
-install:
 
 script:
   - go test ./...
