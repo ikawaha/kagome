@@ -12,6 +12,7 @@ git:
 
 before_install:
   - go env -w GO111MODULE=on
+  - go env
 install:
   - pip install --user codecov
   - go get github.com/axw/gocov/gocov
