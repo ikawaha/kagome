@@ -108,7 +108,7 @@ EOS
 ## Install
 
 ```shellsession
-go get -u github.com/ikawaha/kagome/v2/...
+go get -u github.com/ikawaha/kagome/...
 ```
 
 ## Usage
