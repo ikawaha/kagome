@@ -108,7 +108,7 @@ EOS
 ## Install
 
 ```shellsession
-env GO111MODULE=on go get -v github.com/ikawaha/kagome/v2/...
+env GO111MODULE=on go get -u github.com/ikawaha/kagome/v2/...
 ```
 
 ## Usage
