@@ -7,10 +7,9 @@ import (
 	"net/http"
 	"os"
 
-	ipa "github.com/ikawaha/kagome-dict-ipa"
-	ko "github.com/ikawaha/kagome-dict-ko"
-	uni "github.com/ikawaha/kagome-dict-uni"
-	"github.com/ikawaha/kagome/v2/dict"
+	"github.com/ikawaha/kagome-dict/dict"
+	"github.com/ikawaha/kagome-dict/ipa"
+	"github.com/ikawaha/kagome-dict/uni"
 	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
@@ -18,7 +17,7 @@ import (
 var (
 	CommandName  = "server"
 	Description  = `run tokenize server`
-	usageMessage = "%s [-http=:6060] [-userdict userdic_file] [-dict (ipa|uni|ko)]\n"
+	usageMessage = "%s [-http=:6060] [-userdict userdic_file] [-dict (ipa|uni)]\n"
 	ErrorWriter  = os.Stderr
 )
 
@@ -40,7 +39,7 @@ func newOption(eh flag.ErrorHandling) (o *option) {
 	// option settings
 	o.flagSet.StringVar(&o.http, "http", ":6060", "HTTP service address")
 	o.flagSet.StringVar(&o.udict, "userdict", "", "user dict")
-	o.flagSet.StringVar(&o.dict, "dict", "ipa", "system dict type (ipa|uni|ko)")
+	o.flagSet.StringVar(&o.dict, "dict", "ipa", "system dict type (ipa|uni)")
 	return
 }
 
@@ -52,7 +51,7 @@ func (o *option) parse(args []string) error {
 	if nonFlag := o.flagSet.Args(); len(nonFlag) != 0 {
 		return fmt.Errorf("invalid argument: %v", nonFlag)
 	}
-	if o.dict != "" && o.dict != "ipa" && o.dict != "uni" && o.dict != "ko" {
+	if o.dict != "" && o.dict != "ipa" && o.dict != "uni" {
 		return fmt.Errorf("invalid argument: -dict %v", o.dict)
 	}
 	return nil
@@ -73,8 +72,6 @@ func selectDict(name string) (*dict.Dict, error) {
 		return ipa.Dict(), nil
 	case "uni":
 		return uni.Dict(), nil
-	case "ko":
-		return ko.Dict(), nil
 	}
 	return nil, fmt.Errorf("unknown name type, %v", name)
 }

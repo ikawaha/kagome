@@ -9,10 +9,9 @@ import (
 	"os"
 	"strings"
 
-	ipa "github.com/ikawaha/kagome-dict-ipa"
-	ko "github.com/ikawaha/kagome-dict-ko"
-	uni "github.com/ikawaha/kagome-dict-uni"
-	"github.com/ikawaha/kagome/v2/dict"
+	"github.com/ikawaha/kagome-dict/dict"
+	"github.com/ikawaha/kagome-dict/ipa"
+	"github.com/ikawaha/kagome-dict/uni"
 	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
@@ -20,7 +19,7 @@ import (
 const (
 	CommandName  = "tokenize"
 	Description  = `command line tokenize`
-	usageMessage = "%s [-file input_file] [-dict dic_file] [-userdict userdic_file] [-sysdict (ipa|uni|ko)] [-simple false] [-mode (normal|search|extended)]\n"
+	usageMessage = "%s [-file input_file] [-dict dic_file] [-userdict userdic_file] [-sysdict (ipa|uni)] [-simple false] [-mode (normal|search|extended)]\n"
 )
 
 // ErrorWriter writes to stderr
@@ -51,7 +50,7 @@ func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	o.flagSet.StringVar(&o.file, "file", "", "input file")
 	o.flagSet.StringVar(&o.dict, "dict", "", "dict")
 	o.flagSet.StringVar(&o.udict, "udict", "", "user dict")
-	o.flagSet.StringVar(&o.sysdict, "sysdict", "ipa", "system dict type (ipa|uni|ko)")
+	o.flagSet.StringVar(&o.sysdict, "sysdict", "ipa", "system dict type (ipa|uni)")
 	o.flagSet.BoolVar(&o.simple, "simple", false, "display abbreviated dictionary contents")
 	o.flagSet.StringVar(&o.mode, "mode", "normal", "tokenize mode (normal|search|extended)")
 
@@ -69,7 +68,7 @@ func (o *option) parse(args []string) error {
 	if o.mode != "" && o.mode != "normal" && o.mode != "search" && o.mode != "extended" {
 		return fmt.Errorf("invalid argument: -mode %v", o.mode)
 	}
-	if o.sysdict != "" && o.sysdict != "ipa" && o.sysdict != "uni" && o.sysdict != "ko" {
+	if o.sysdict != "" && o.sysdict != "ipa" && o.sysdict != "uni" {
 		return fmt.Errorf("invalid argument: -sysdict %v", o.sysdict)
 	}
 	return nil
@@ -102,11 +101,6 @@ func selectDict(path, sysdict string, shurink bool) (*dict.Dict, error) {
 			return uni.DictShrink(), nil
 		}
 		return uni.Dict(), nil
-	case "ko":
-		if shurink {
-			return ko.DictShrink(), nil
-		}
-		return ko.Dict(), nil
 	}
 	return nil, fmt.Errorf("unknown dict type, %v", sysdict)
 }

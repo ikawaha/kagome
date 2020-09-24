@@ -11,7 +11,7 @@
 ===
 
 Kagome is an open source Japanese morphological analyzer written in pure golang.
-The dictionary/statiscal models such as MeCab-IPADIC, UniDic (unidic-mecab), Korean MeCab and so on, be able to embedded in binaries.
+The dictionary/statiscal models such as MeCab-IPADIC, UniDic (unidic-mecab) and so on, be able to embedded in binaries.
 
 ### Improvements from [v1](https://github.com/ikawaha/kagome/tree/master).
 
@@ -22,8 +22,8 @@ The dictionary/statiscal models such as MeCab-IPADIC, UniDic (unidic-mecab), Kor
 
 |dict| source | package |
 |:---|:---|:---|
-|MeCab IPADIC| mecab-ipadic-2.7.0-20070801 | [github.com/ikawaha/kagome-dict-ipa](https://github.com/ikawaha/kagome-dict-ipa)| 
-|UniDIC| unidic-mecab-2.1.2_src | [github.com/ikawaha/kagome-dict-uni](https://github.com/ikawaha/kagome-dict-uni) |
+|MeCab IPADIC| mecab-ipadic-2.7.0-20070801 | [github.com/ikawaha/kagome-dict/ipa](https://github.com/ikawaha/kagome-dict/tree/master/ipa)| 
+|UniDIC| unidic-mecab-2.1.2_src | [github.com/ikawaha/kagome-dict/uni](https://github.com/ikawaha/kagome-dict/tree/master/uni) |
 
 **Experimental Features**
 
@@ -57,7 +57,7 @@ import (
 	"fmt"
 	"strings"
 
-	ipa "github.com/ikawaha/kagome-dict-ipa"
+	"github.com/ikawaha/kagome-dict/ipa"
 	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
@@ -123,7 +123,7 @@ The commands are:
    lattice - lattice viewer
    version - show version
 
-tokenize [-file input_file] [-dict dic_file] [-userdict userdic_file] [-sysdict (ipa|uni|ko)] [-simple false] [-mode (normal|search|extended)]
+tokenize [-file input_file] [-dict dic_file] [-userdict userdic_file] [-sysdict (ipa|uni)] [-simple false] [-mode (normal|search|extended)]
   -dict string
     	dict
   -file string
@@ -133,7 +133,7 @@ tokenize [-file input_file] [-dict dic_file] [-userdict userdic_file] [-sysdict 
   -simple
     	display abbreviated dictionary contents
   -sysdict string
-    	system dict type (ipa|uni|ko) (default "ipa")
+    	system dict type (ipa|uni) (default "ipa")
   -udict string
     	user dict
 ```

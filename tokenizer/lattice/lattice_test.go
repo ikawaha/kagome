@@ -5,8 +5,8 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	ipa "github.com/ikawaha/kagome-dict-ipa"
-	"github.com/ikawaha/kagome/v2/dict"
+	"github.com/ikawaha/kagome-dict/dict"
+	"github.com/ikawaha/kagome-dict/ipa"
 )
 
 func Test_LatticeBuildEmptyInput(t *testing.T) {

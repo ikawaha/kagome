@@ -8,10 +8,9 @@ import (
 	"os"
 	"strings"
 
-	ipa "github.com/ikawaha/kagome-dict-ipa"
-	ko "github.com/ikawaha/kagome-dict-ko"
-	uni "github.com/ikawaha/kagome-dict-uni"
-	"github.com/ikawaha/kagome/v2/dict"
+	"github.com/ikawaha/kagome-dict/dict"
+	"github.com/ikawaha/kagome-dict/ipa"
+	"github.com/ikawaha/kagome-dict/uni"
 	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
@@ -19,7 +18,7 @@ import (
 var (
 	CommandName  = "lattice"
 	Description  = `lattice viewer`
-	UsageMessage = "%s [-userDict userdic_file] [-dict (ipa|uni|ko)] [-mode (normal|search|extended)] [-output output_file] [-v] sentence\n"
+	UsageMessage = "%s [-userDict userdic_file] [-dict (ipa|uni)] [-mode (normal|search|extended)] [-output output_file] [-v] sentence\n"
 	ErrorWriter  = os.Stderr
 )
 
@@ -43,7 +42,7 @@ func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	}
 	// option settings
 	o.flagSet.StringVar(&o.userDict, "userDict", "", "user dict")
-	o.flagSet.StringVar(&o.dict, "dict", "ipa", "dict type (ipa|uni|ko)")
+	o.flagSet.StringVar(&o.dict, "dict", "ipa", "dict type (ipa|uni)")
 	o.flagSet.StringVar(&o.mode, "mode", "normal", "tokenize mode (normal|search|extended)")
 	o.flagSet.StringVar(&o.output, "output", "", "output file")
 	o.flagSet.BoolVar(&o.verbose, "v", false, "verbose mode")
@@ -59,7 +58,7 @@ func (o *option) parse(args []string) error {
 	if o.flagSet.NArg() == 0 {
 		return fmt.Errorf("input is empty")
 	}
-	if o.dict != "" && o.dict != "ipa" && o.dict != "uni" && o.dict != "ko" {
+	if o.dict != "" && o.dict != "ipa" && o.dict != "uni" {
 		return fmt.Errorf("invalid argument: -dict %v", o.dict)
 	}
 	if o.mode != "" && o.mode != "normal" && o.mode != "search" && o.mode != "extended" {
@@ -84,8 +83,6 @@ func selectDict(name string) (*dict.Dict, error) {
 		return ipa.Dict(), nil
 	case "uni":
 		return uni.Dict(), nil
-	case "ko":
-		return ko.Dict(), nil
 	}
 	return nil, fmt.Errorf("unknown name type, %v", name)
 }

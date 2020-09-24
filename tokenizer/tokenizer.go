@@ -6,7 +6,7 @@ import (
 	"io"
 	"unicode/utf8"
 
-	"github.com/ikawaha/kagome/v2/dict"
+	"github.com/ikawaha/kagome-dict/dict"
 	"github.com/ikawaha/kagome/v2/tokenizer/lattice"
 )
 
