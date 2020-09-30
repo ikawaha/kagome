@@ -38,35 +38,15 @@ const (
 	Search
 	// Extended is the experimental tokenize mode.
 	Extended
-	// BosEosID means the beginning a sentence or the end of a sentence.
+	// BosEosID means the beginning a sentence (BOS) or the end of a sentence (EOS).
 	BosEosID = lattice.BosEosID
 )
 
-// Option represents an option for the tokenizer.
-type Option func(*Tokenizer) error
-
-// Nop represents a no operation option.
-func Nop() Option {
-	return func(t *Tokenizer) error {
-		return nil
-	}
-}
-
-// UserDict is a tokenizer option to sets a user dictionary.
-func UserDict(d *dict.UserDict) Option {
-	return func(t *Tokenizer) error {
-		if d == nil {
-			return errors.New("empty user dictionary")
-		}
-		t.userDict = d
-		return nil
-	}
-}
-
 // Tokenizer represents morphological analyzer.
 type Tokenizer struct {
-	dict     *dict.Dict     // system dictionary
-	userDict *dict.UserDict // user dictionary
+	dict       *dict.Dict     // system dictionary
+	userDict   *dict.UserDict // user dictionary
+	omitBosEos bool           // omit BOS/EOS
 }
 
 // New creates a tokenizer.
@@ -120,6 +100,9 @@ func (t Tokenizer) Analyze(input string, mode TokenizeMode) (tokens []Token) {
 	tokens = make([]Token, 0, size)
 	for i := range la.Output {
 		n := la.Output[size-1-i]
+		if t.omitBosEos && n.ID == BosEosID {
+			continue
+		}
 		tok := Token{
 			ID:      n.ID,
 			Class:   TokenClass(n.Class),
@@ -129,7 +112,7 @@ func (t Tokenizer) Analyze(input string, mode TokenizeMode) (tokens []Token) {
 			dict:    t.dict,
 			udict:   t.userDict,
 		}
-		if tok.ID == lattice.BosEosID {
+		if tok.ID == BosEosID {
 			if i == 0 {
 				tok.Surface = "BOS"
 			} else {

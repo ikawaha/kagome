@@ -62,7 +62,7 @@ import (
 )
 
 func main() {
-	t, err := tokenizer.New(ipa.Dict())
+	t, err := tokenizer.New(ipa.Dict(), tokenizer.OmitBosEos())
 	if err != nil {
 		panic(err)
 	}
@@ -75,11 +75,6 @@ func main() {
 	fmt.Println("---tokenize---")
 	tokens := t.Tokenize("すもももももももものうち")
 	for _, token := range tokens {
-		if token.Class == tokenizer.DUMMY {
-			// BOS: Begin Of Sentence, EOS: End Of Sentence.
-			fmt.Printf("%s\n", token.Surface)
-			continue
-		}
 		features := strings.Join(token.Features(), ",")
 		fmt.Printf("%s\t%v\n", token.Surface, features)
 	}
@@ -92,7 +87,6 @@ output:
 ---wakati---
 [すもも も もも も もも の うち]
 ---tokenize---
-BOS
 すもも	名詞,一般,*,*,*,*,すもも,スモモ,スモモ
 も	助詞,係助詞,*,*,*,*,も,モ,モ
 もも	名詞,一般,*,*,*,*,もも,モモ,モモ
@@ -100,7 +94,6 @@ BOS
 もも	名詞,一般,*,*,*,*,もも,モモ,モモ
 の	助詞,連体化,*,*,*,*,の,ノ,ノ
 うち	名詞,非自立,副詞可能,*,*,*,うち,ウチ,ウチ
-EOS
 ```
 
 # Commands
