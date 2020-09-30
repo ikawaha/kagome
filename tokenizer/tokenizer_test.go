@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	testDictPath     = "testdata/ipa.dict"
+	testDictPath     = "../testdata/ipa.dict"
 	testUserDictPath = "../_sample/userdict.txt"
 )
 
