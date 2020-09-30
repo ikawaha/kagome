@@ -136,6 +136,11 @@ func TestPOSFilter_PickUp(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("empty input test", func(t *testing.T) {
+		filter := filter.NewPOSFilter(nil)
+		filter.PickUp(nil)
+	})
 }
 
 func TestPOSFilter_Drop(t *testing.T) {
@@ -187,4 +192,9 @@ func TestPOSFilter_Drop(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("empty input test", func(t *testing.T) {
+		filter := filter.NewPOSFilter(nil)
+		filter.Drop(nil)
+	})
 }

@@ -61,6 +61,11 @@ func TestPickup(t *testing.T) {
 		})
 	}
 
+	t.Run("empty input test", func(t *testing.T) {
+		filter.PickUp(nil, func(t tokenizer.Token) bool {
+			return true
+		})
+	})
 }
 
 func TestDrop(t *testing.T) {
@@ -116,6 +121,12 @@ func TestDrop(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("empty input test", func(t *testing.T) {
+		filter.Drop(nil, func(t tokenizer.Token) bool {
+			return true
+		})
+	})
 }
 
 func Benchmark_TokenFilter_WordFilter(b *testing.B) {

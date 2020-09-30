@@ -102,6 +102,11 @@ func TestWordFilter_PickUp(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("empty input test", func(t *testing.T) {
+		filter := filter.NewWordFilter(nil)
+		filter.PickUp(nil)
+	})
 }
 
 func TestWordFilter_Drop(t *testing.T) {
@@ -151,4 +156,9 @@ func TestWordFilter_Drop(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("empty input test", func(t *testing.T) {
+		filter := filter.NewWordFilter(nil)
+		filter.Drop(nil)
+	})
 }
