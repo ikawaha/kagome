@@ -1,4 +1,4 @@
-package splitter
+package filter
 
 import (
 	"unicode"
@@ -14,18 +14,17 @@ type SentenceSplitter struct {
 	MaxRuneLen          int    // max sentence length
 }
 
-var (
-	// default sentence splitter
-	defaultSplitter = &SentenceSplitter{
-		Delim:               []rune{'。', '．', '！', '!', '？', '?'},
-		Follower:            []rune{'.', '｣', '」', '』', ')', '）', '｝', '}', '〉', '》'},
-		SkipWhiteSpace:      true,
-		DoubleLineFeedSplit: true,
-		MaxRuneLen:          256,
-	}
-)
+// default sentence splitter
+var defaultSplitter = &SentenceSplitter{
+	Delim:               []rune{'。', '．', '！', '!', '？', '?'},
+	Follower:            []rune{'.', '｣', '」', '』', ')', '）', '｝', '}', '〉', '》'},
+	SkipWhiteSpace:      true,
+	DoubleLineFeedSplit: true,
+	MaxRuneLen:          128,
+}
 
-// ScanSentences is a split function for a bufio.Scanner that returns each sentence of text.
+// ScanSentences implements SplitFunc interface of bufio.Scanner that returns each sentence of text.
+// see. https://pkg.go.dev/bufio#SplitFunc
 func ScanSentences(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	return defaultSplitter.ScanSentences(data, atEOF)
 }
