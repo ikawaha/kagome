@@ -40,13 +40,14 @@ func (c TokenClass) String() string {
 
 // Token represents a morph of a sentence.
 type Token struct {
-	ID      int
-	Class   TokenClass
-	Start   int
-	End     int
-	Surface string
-	dict    *dict.Dict
-	udict   *dict.UserDict
+	ID       int
+	Class    TokenClass
+	Position int // byte position
+	Start    int
+	End      int
+	Surface  string
+	dict     *dict.Dict
+	udict    *dict.UserDict
 }
 
 // Features returns contents of a token.
@@ -196,5 +197,14 @@ func (t Token) pickupFromFeatures(key string) (string, bool) {
 
 // String returns a string representation of a token.
 func (t Token) String() string {
-	return fmt.Sprintf("%v(%v, %v)%v[%v]", t.Surface, t.Start, t.End, t.Class, t.ID)
+	return fmt.Sprintf("%q (%d: %d, %d) %v [%d]", t.Surface, t.Position, t.Start, t.End, t.Class, t.ID)
+}
+
+func (t Token) Equal(v Token) bool {
+	return t.ID == v.ID &&
+		t.Class == v.Class &&
+		t.Position == v.Position &&
+		t.Start == v.Start &&
+		t.End == v.End &&
+		t.Surface == v.Surface
 }

@@ -54,7 +54,7 @@ func Test_LatticeBuild(t *testing.T) {
 		t.Errorf("got %v, expected %v", la.Input, inp)
 	}
 	bos := node{ID: -1}
-	eos := node{ID: -1, Start: 1}
+	eos := node{ID: -1, Position: len(inp), Start: 1}
 	if len(la.list) != 3 {
 		t.Errorf("lattice initialize error: got %v, expected has 2 eos/bos nodes", la.list)
 	} else if len(la.list[0]) != 1 || *la.list[0][0] != bos {
@@ -135,7 +135,7 @@ func Test_LatticeBuildUnknown(t *testing.T) {
 		t.Errorf("got %v, expected %v", la.Input, inp)
 	}
 	bos := node{ID: -1}
-	eos := node{ID: -1, Start: 3}
+	eos := node{ID: -1, Position: len(inp), Start: 3}
 	if len(la.list) != 5 {
 		t.Errorf("lattice initialize error: got %v, expected has 2 eos/bos nodes", la.list)
 	} else if len(la.list[0]) != 1 || *la.list[0][0] != bos {
@@ -223,7 +223,7 @@ func Test_LatticeBuildInvalidInput(t *testing.T) {
 		t.Errorf("got %v, expected %v", la.Input, inp)
 	}
 	bos := node{ID: -1}
-	eos := node{ID: -1, Start: 4}
+	eos := node{ID: -1, Position: len(inp), Start: 4}
 	if len(la.list) != 6 {
 		t.Errorf("lattice initialize error: got %v, expected has 2 eos/bos nodes", la.list)
 	} else if len(la.list[0]) != 1 || *la.list[0][0] != bos {

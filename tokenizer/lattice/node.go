@@ -32,15 +32,16 @@ func (nc NodeClass) String() string {
 }
 
 type node struct {
-	ID      int
-	Start   int
-	Class   NodeClass
-	Cost    int32
-	Left    int32
-	Right   int32
-	Weight  int32
-	Surface string
-	Prev    *node
+	ID       int
+	Position int // byte position
+	Start    int // rune position
+	Class    NodeClass
+	Cost     int32
+	Left     int32
+	Right    int32
+	Weight   int32
+	Surface  string
+	Prev     *node
 }
 
 var nodePool = sync.Pool{
