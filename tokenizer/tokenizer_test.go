@@ -93,25 +93,21 @@ func Test_Analyze(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error, %v", err)
 	}
-	tokens := tnz.Analyze("関西国際空港", Normal)
-	expected := []Token{
+	input := "関西国際空港"
+	tokens := tnz.Analyze(input, Normal)
+	want := []Token{
 		{ID: -1, Surface: "BOS"},
-		{ID: 372978, Surface: "関西国際空港", Start: 0, End: 6, Class: TokenClass(lattice.KNOWN)},
-		{ID: -1, Surface: "EOS", Start: 6, End: 6},
+		{ID: 372978, Surface: input, Position: 0, Start: 0, End: 6, Class: TokenClass(lattice.KNOWN)},
+		{ID: -1, Surface: "EOS", Position: len(input), Start: 6, End: 6},
 	}
-	if len(tokens) != len(expected) {
-		t.Fatalf("got %v, expected %v", tokens, expected)
+	if len(tokens) != len(want) {
+		t.Fatalf("got %v, want %v", tokens, want)
 	}
 	for i, tok := range tokens {
-		if tok.ID != expected[i].ID ||
-			tok.Class != expected[i].Class ||
-			tok.Start != expected[i].Start ||
-			tok.End != expected[i].End ||
-			tok.Surface != expected[i].Surface {
-			t.Errorf("got %v, expected %v", tok, expected[i])
+		if !tok.Equal(want[i]) {
+			t.Errorf("got %+v, want %+v", tok, want[i])
 		}
 	}
-
 }
 
 func Test_AnalyzeUnknown(t *testing.T) {

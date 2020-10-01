@@ -104,13 +104,14 @@ func (t Tokenizer) Analyze(input string, mode TokenizeMode) (tokens []Token) {
 			continue
 		}
 		tok := Token{
-			ID:      n.ID,
-			Class:   TokenClass(n.Class),
-			Start:   n.Start,
-			End:     n.Start + utf8.RuneCountInString(n.Surface),
-			Surface: n.Surface,
-			dict:    t.dict,
-			udict:   t.userDict,
+			ID:       n.ID,
+			Class:    TokenClass(n.Class),
+			Position: n.Position,
+			Start:    n.Start,
+			End:      n.Start + utf8.RuneCountInString(n.Surface),
+			Surface:  n.Surface,
+			dict:     t.dict,
+			udict:    t.userDict,
 		}
 		if tok.ID == BosEosID {
 			if i == 0 {

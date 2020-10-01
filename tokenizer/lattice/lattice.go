@@ -74,7 +74,7 @@ func (la *Lattice) Free() {
 	latticePool.Put(la)
 }
 
-func (la *Lattice) addNode(pos, id, start int, class NodeClass, surface string) {
+func (la *Lattice) addNode(pos, id, position, start int, class NodeClass, surface string) {
 	var m dict.Morph
 	switch class {
 	case DUMMY:
@@ -88,6 +88,7 @@ func (la *Lattice) addNode(pos, id, start int, class NodeClass, surface string) 
 	}
 	n := newNode()
 	n.ID = id
+	n.Position = position
 	n.Start = start
 	n.Class = class
 	n.Cost = 0
@@ -108,8 +109,8 @@ func (la *Lattice) Build(inp string) {
 	}
 	la.list = la.list[0 : rc+2]
 
-	la.addNode(0, BosEosID, 0, DUMMY, inp[0:0])
-	la.addNode(rc+1, BosEosID, rc, DUMMY, inp[rc:rc])
+	la.addNode(0, BosEosID, 0, 0, DUMMY, inp[0:0])
+	la.addNode(rc+1, BosEosID, len(inp), rc, DUMMY, inp[rc:rc])
 
 	runePos := -1
 	for pos, ch := range inp {
@@ -119,7 +120,7 @@ func (la *Lattice) Build(inp string) {
 		// (1) USER DIC
 		if la.udic != nil {
 			la.udic.Index.CommonPrefixSearchCallback(inp[pos:], func(id, l int) {
-				la.addNode(runePos, id, runePos, USER, inp[pos:pos+l])
+				la.addNode(runePos, id, pos, runePos, USER, inp[pos:pos+l])
 				if !anyMatches {
 					anyMatches = true
 				}
@@ -130,7 +131,7 @@ func (la *Lattice) Build(inp string) {
 		}
 		// (2) KNOWN DIC
 		la.dic.Index.CommonPrefixSearchCallback(inp[pos:], func(id, l int) {
-			la.addNode(runePos, id, runePos, KNOWN, inp[pos:pos+l])
+			la.addNode(runePos, id, pos, runePos, KNOWN, inp[pos:pos+l])
 			if !anyMatches {
 				anyMatches = true
 			}
@@ -165,7 +166,7 @@ func (la *Lattice) Build(inp string) {
 				end := i + w
 				dup := la.dic.UnkDict.IndexDup[int32(class)]
 				for x := 0; x < int(dup)+1; x++ {
-					la.addNode(runePos, int(id)+x, runePos, UNKNOWN, inp[pos:end])
+					la.addNode(runePos, int(id)+x, pos, runePos, UNKNOWN, inp[pos:end])
 				}
 			}
 		}
