@@ -90,7 +90,7 @@ func (t Token) FeatureAt(i int) (string, bool) {
 		pos := t.dict.POSTable.POSs[t.ID]
 		if i < len(pos) {
 			id := pos[i]
-			if id < 0 || int(id) > len(t.dict.POSTable.NameList) {
+			if int(id) > len(t.dict.POSTable.NameList) {
 				return "", false
 			}
 			return t.dict.POSTable.NameList[id], true

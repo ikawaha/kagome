@@ -4,8 +4,6 @@ import (
 	"testing"
 )
 
-const testDictPath = "../testdata/ipa.dic"
-
 func TestFilter_New(t *testing.T) {
 	f := NewFeaturesFilter(
 		Features{"hello", "world"},

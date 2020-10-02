@@ -9,7 +9,6 @@ import (
 )
 
 const (
-	dictPath       = "testdata/ipa.dict"
 	userDictSample = "../_sample/userdict.txt"
 )
 
