@@ -88,7 +88,6 @@ func Test_LatticeBuild(t *testing.T) {
 }
 
 func Test_LatticeBuildWithUserDict(t *testing.T) {
-
 	const udictPath = "../../_sample/userdict.txt"
 
 	udic, err := dict.NewUserDict(udictPath)
@@ -184,7 +183,6 @@ func Test_LatticeBuildUnknown(t *testing.T) {
 }
 
 func Test_LatticeBuildMaximumUnknownWordLength(t *testing.T) {
-
 	la := New(ipa.Dict(), nil)
 	if la == nil {
 		t.Fatal("cannot new a lattice")
@@ -210,7 +208,6 @@ func Test_LatticeBuildMaximumUnknownWordLength(t *testing.T) {
 }
 
 func Test_LatticeBuildInvalidInput(t *testing.T) {
-
 	la := New(ipa.Dict(), nil)
 	if la == nil {
 		t.Fatal("cannot new a lattice")

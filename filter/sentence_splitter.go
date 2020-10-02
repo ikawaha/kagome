@@ -54,7 +54,7 @@ func (s SentenceSplitter) ScanSentences(data []byte, atEOF bool) (advance int, t
 	}
 	var (
 		start, end, rcount int
-		head, nn           bool
+		head, nn           bool // nn indicates \n\n
 	)
 	head = true
 	for p := 0; p < len(data); {

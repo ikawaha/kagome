@@ -45,8 +45,8 @@ func TestPickup(t *testing.T) {
 			tokens := tnz.Tokenize(input)
 			var got []string
 			filter.PickUp(&tokens, func(t tokenizer.Token) bool {
-				for _, v := range v.wordList {
-					if v == t.Surface {
+				for _, w := range v.wordList {
+					if w == t.Surface {
 						return true
 					}
 				}

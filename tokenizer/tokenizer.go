@@ -81,7 +81,7 @@ func (t Tokenizer) Wakati(input string) []string {
 }
 
 // Analyze tokenizes a sentence in the specified mode.
-func (t Tokenizer) Analyze(input string, mode TokenizeMode) (tokens []Token) {
+func (t Tokenizer) Analyze(input string, mode TokenizeMode) []Token {
 	la := lattice.New(t.dict, t.userDict)
 	defer la.Free()
 	la.Build(input)
@@ -97,7 +97,7 @@ func (t Tokenizer) Analyze(input string, mode TokenizeMode) (tokens []Token) {
 	la.Forward(m)
 	la.Backward(m)
 	size := len(la.Output)
-	tokens = make([]Token, 0, size)
+	tokens := make([]Token, 0, size)
 	for i := range la.Output {
 		n := la.Output[size-1-i]
 		if t.omitBosEos && n.ID == BosEosID {
@@ -122,7 +122,7 @@ func (t Tokenizer) Analyze(input string, mode TokenizeMode) (tokens []Token) {
 		}
 		tokens = append(tokens, tok)
 	}
-	return
+	return tokens
 }
 
 // Dot returns morphs of a sentence and exports a lattice graph to dot format in standard tokenize mode.
@@ -131,7 +131,7 @@ func (t Tokenizer) Dot(w io.Writer, input string) (tokens []Token) {
 }
 
 // AnalyzeGraph returns morphs of a sentence and exports a lattice graph to dot format.
-func (t Tokenizer) AnalyzeGraph(w io.Writer, input string, mode TokenizeMode) (tokens []Token) {
+func (t Tokenizer) AnalyzeGraph(w io.Writer, input string, mode TokenizeMode) []Token {
 	la := lattice.New(t.dict, t.userDict)
 	defer la.Free()
 	la.Build(input)
@@ -147,7 +147,7 @@ func (t Tokenizer) AnalyzeGraph(w io.Writer, input string, mode TokenizeMode) (t
 	la.Forward(m)
 	la.Backward(m)
 	size := len(la.Output)
-	tokens = make([]Token, 0, size)
+	tokens := make([]Token, 0, size)
 	for i := range la.Output {
 		n := la.Output[size-1-i]
 		tok := Token{
@@ -169,5 +169,5 @@ func (t Tokenizer) AnalyzeGraph(w io.Writer, input string, mode TokenizeMode) (t
 		tokens = append(tokens, tok)
 	}
 	la.Dot(w)
-	return
+	return tokens
 }
