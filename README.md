@@ -11,14 +11,14 @@
 ===
 
 Kagome is an open source Japanese morphological analyzer written in pure golang.
-The dictionary/statiscal models such as MeCab-IPADIC, UniDic (unidic-mecab) and so on, be able to embedded in binaries.
+The dictionary/statistical models such as MeCab-IPADIC, UniDic (unidic-mecab) and so on, are able to be embedded in binaries.
 
 ### Improvements from [v1](https://github.com/ikawaha/kagome/tree/master).
 
-* Dictionaries are maintained in a separate repository, and only the dictionaries you need are embedded in the binay.
+* Dictionaries are maintained in a separate repository, and only the dictionaries you need are embedded in the binary.
 * Brushed up and added several APIs.
 
-# Dictionaris
+# Dictionaries
 
 |dict| source | package |
 |:---|:---|:---|
