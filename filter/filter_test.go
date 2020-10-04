@@ -9,7 +9,7 @@ import (
 	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
-func TestPickup(t *testing.T) {
+func TestKeep(t *testing.T) {
 	d, err := dict.LoadDictFile(testDictPath)
 	if err != nil {
 		panic(err)
@@ -44,7 +44,7 @@ func TestPickup(t *testing.T) {
 		t.Run(v.title, func(t *testing.T) {
 			tokens := tnz.Tokenize(input)
 			var got []string
-			filter.PickUp(&tokens, func(t tokenizer.Token) bool {
+			filter.Keep(&tokens, func(t tokenizer.Token) bool {
 				for _, w := range v.wordList {
 					if w == t.Surface {
 						return true
@@ -62,7 +62,7 @@ func TestPickup(t *testing.T) {
 	}
 
 	t.Run("empty input test", func(t *testing.T) {
-		filter.PickUp(nil, func(t tokenizer.Token) bool {
+		filter.Keep(nil, func(t tokenizer.Token) bool {
 			return true
 		})
 	})
@@ -147,7 +147,7 @@ func Benchmark_TokenFilter_WordFilter(b *testing.B) {
 		}
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
-			filter.PickUp(&tokens, func(t tokenizer.Token) bool {
+			filter.Keep(&tokens, func(t tokenizer.Token) bool {
 				_, ok := words[t.Surface]
 				return ok
 			})
@@ -159,7 +159,7 @@ func Benchmark_TokenFilter_WordFilter(b *testing.B) {
 		filter := filter.NewWordFilter(words)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
-			filter.PickUp(&tokens)
+			filter.Keep(&tokens)
 		}
 	})
 }

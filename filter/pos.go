@@ -29,8 +29,8 @@ func (f POSFilter) Drop(tokens *[]tokenizer.Token) {
 	f.apply(tokens, true)
 }
 
-// PickUp picks up a token if a filter matches token's POS.
-func (f POSFilter) PickUp(tokens *[]tokenizer.Token) {
+// Keep keeps a token if a filter matches token's POS.
+func (f POSFilter) Keep(tokens *[]tokenizer.Token) {
 	f.apply(tokens, false)
 }
 

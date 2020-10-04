@@ -9,8 +9,8 @@ func Drop(tokens *[]tokenizer.Token, match func(t tokenizer.Token) bool) {
 	applyFilter(match, tokens, true)
 }
 
-// PickUp picks up a token given the provided match function.
-func PickUp(tokens *[]tokenizer.Token, match func(t tokenizer.Token) bool) {
+// Keep keeps a token given the provided match function.
+func Keep(tokens *[]tokenizer.Token, match func(t tokenizer.Token) bool) {
 	applyFilter(match, tokens, false)
 }
 
