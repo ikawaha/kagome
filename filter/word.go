@@ -41,15 +41,11 @@ func (f WordFilter) apply(tokens *[]tokenizer.Token, drop bool) {
 	}
 	tail := 0
 	for i, v := range *tokens {
-		if f.Match(v.Surface) {
-			if drop {
-				continue
-			}
-		} else if !drop {
+		if f.Match(v.Surface) == drop {
 			continue
 		}
 		if i != tail {
-			(*tokens)[tail] = (*tokens)[i]
+			(*tokens)[tail] = v
 		}
 		tail++
 	}
