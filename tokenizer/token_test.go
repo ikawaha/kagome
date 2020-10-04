@@ -376,11 +376,11 @@ func Test_InflectionalType(t *testing.T) {
 	if want, got := 6, len(tokens); want != got {
 		t.Fatalf("token length: want %d, got %d", want, got)
 	}
-	//BOS
+	// BOS
 	if got, ok := tokens[0].InflectionalType(); ok {
 		t.Errorf("want !ok, got %q", got)
 	}
-	//食べ 動詞,自立,*,*,一段,連用形,食べる,タベ,タベ
+	// 食べ 動詞,自立,*,*,一段,連用形,食べる,タベ,タベ
 	if got, ok := tokens[3].InflectionalType(); !ok {
 		t.Error("want ok, but !ok")
 	} else if want := "一段"; want != got {
@@ -403,11 +403,11 @@ func Test_InflectionalForm(t *testing.T) {
 		if want, got := 6, len(tokens); want != got {
 			t.Fatalf("token length: want %d, got %d", want, got)
 		}
-		//BOS
+		// BOS
 		if got, ok := tokens[0].InflectionalForm(); ok {
 			t.Errorf("want !ok, got %q", got)
 		}
-		//食べ 動詞,自立,*,*,一段,連用形,食べる,タベ,タベ
+		// 食べ 動詞,自立,*,*,一段,連用形,食べる,タベ,タベ
 		if got, ok := tokens[3].InflectionalForm(); !ok {
 			t.Error("want ok, but !ok")
 		} else if want := "連用形"; want != got {
@@ -441,11 +441,11 @@ func Test_BaseForm(t *testing.T) {
 	if want, got := 6, len(tokens); want != got {
 		t.Fatalf("token length: want %d, got %d", want, got)
 	}
-	//BOS
+	// BOS
 	if got, ok := tokens[0].BaseForm(); ok {
 		t.Errorf("want !ok, got %q", got)
 	}
-	//食べ->食べる
+	// 食べ->食べる
 	if got, ok := tokens[3].BaseForm(); !ok {
 		t.Error("want ok, but !ok")
 	} else if want := "食べる"; want != got {
@@ -467,11 +467,11 @@ func Test_Reading(t *testing.T) {
 	if want, got := 5, len(tokens); want != got {
 		t.Fatalf("token length: want %d, got %d", want, got)
 	}
-	//BOS
+	// BOS
 	if got, ok := tokens[0].Reading(); ok {
 		t.Errorf("want !ok, got %q", got)
 	}
-	//公園->コウエン
+	// 公園->コウエン
 	if got, ok := tokens[1].Reading(); !ok {
 		t.Error("want ok, but !ok")
 	} else if want := "コウエン"; want != got {
@@ -493,11 +493,11 @@ func Test_Pronunciation(t *testing.T) {
 	if want, got := 5, len(tokens); want != got {
 		t.Fatalf("token length: want %d, got %d", want, got)
 	}
-	//BOS
+	// BOS
 	if got, ok := tokens[0].Pronunciation(); ok {
 		t.Errorf("want !ok, got %q", got)
 	}
-	//公園->コウエン
+	// 公園->コウエン
 	if got, ok := tokens[1].Pronunciation(); !ok {
 		t.Error("want ok, but !ok")
 	} else if want := "コーエン"; want != got {
@@ -520,11 +520,11 @@ func Test_POS(t *testing.T) {
 		if want, got := 5, len(tokens); want != got {
 			t.Fatalf("token length: want %d, got %d", want, got)
 		}
-		//BOS
+		// BOS
 		if got := tokens[0].POS(); len(got) > 0 {
 			t.Errorf("want empty, got %+v", got)
 		}
-		//行く
+		// 行く
 		if want, got := []string{"動詞", "自立", "*", "*"}, tokens[3].POS(); !reflect.DeepEqual(want, got) {
 			t.Fatalf("want %+v, got %+v", want, got)
 		}
@@ -535,7 +535,7 @@ func Test_POS(t *testing.T) {
 		if want, got := 3, len(tokens); want != got {
 			t.Fatalf("token length: want %d, got %d", want, got)
 		}
-		//BOS
+		// BOS
 		if got := tokens[0].POS(); len(got) > 0 {
 			t.Errorf("want empty, got %+v", got)
 		}
