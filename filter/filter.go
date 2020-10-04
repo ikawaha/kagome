@@ -20,15 +20,11 @@ func applyFilter(match func(t tokenizer.Token) bool, tokens *[]tokenizer.Token, 
 	}
 	tail := 0
 	for i, v := range *tokens {
-		if match(v) {
-			if drop {
-				continue
-			}
-		} else if !drop {
+		if match(v) == drop {
 			continue
 		}
 		if i != tail {
-			(*tokens)[tail] = (*tokens)[i]
+			(*tokens)[tail] = v
 		}
 		tail++
 	}
