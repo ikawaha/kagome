@@ -57,7 +57,7 @@ func New(d *dict.Dict, opts ...Option) (*Tokenizer, error) {
 	t := &Tokenizer{dict: d}
 	for _, opt := range opts {
 		if err := opt(t); err != nil {
-			return nil, fmt.Errorf("invalid option: %v", err)
+			return nil, err
 		}
 	}
 	return t, nil

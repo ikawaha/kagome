@@ -98,13 +98,13 @@ func (t Token) FeatureAt(i int) (string, bool) {
 		}
 		i -= len(pos)
 		c := t.dict.Contents[t.ID]
-		if i < 0 || i >= len(c) {
+		if i >= len(c) {
 			return "", false
 		}
 		return c[i], true
 	case UNKNOWN:
 		c := t.dict.UnkDict.Contents[t.ID]
-		if i < 0 || i >= len(c) {
+		if i >= len(c) {
 			return "", false
 		}
 		return c[i], true
