@@ -11,6 +11,17 @@ const (
 	testUserDictPath = "../_sample/userdict.txt"
 )
 
+func TestTokenizer_Analyze_Nop(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	_, err = New(d, Nop())
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+}
+
 func Test_AnalyzeWithUserDict(t *testing.T) {
 	d, err := dict.LoadDictFile(testDictPath)
 	if err != nil {
