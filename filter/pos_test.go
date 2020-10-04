@@ -89,7 +89,7 @@ func TestPOSFilter_Match(t *testing.T) {
 	}
 }
 
-func TestPOSFilter_PickUp(t *testing.T) {
+func TestPOSFilter_Keep(t *testing.T) {
 	d, err := dict.LoadDictFile(testDictPath)
 	if err != nil {
 		panic(err)
@@ -127,7 +127,7 @@ func TestPOSFilter_PickUp(t *testing.T) {
 			tokens := tnz.Tokenize(input)
 			filter := filter.NewPOSFilter(v.featuresList...)
 			var got []string
-			filter.PickUp(&tokens)
+			filter.Keep(&tokens)
 			for _, token := range tokens {
 				got = append(got, token.Surface)
 			}
@@ -139,7 +139,7 @@ func TestPOSFilter_PickUp(t *testing.T) {
 
 	t.Run("empty input test", func(t *testing.T) {
 		filter := filter.NewPOSFilter(nil)
-		filter.PickUp(nil)
+		filter.Keep(nil)
 	})
 }
 

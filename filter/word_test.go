@@ -57,7 +57,7 @@ func TestWordFilter_Match(t *testing.T) {
 	}
 }
 
-func TestWordFilter_PickUp(t *testing.T) {
+func TestWordFilter_Keep(t *testing.T) {
 	d, err := dict.LoadDictFile(testDictPath)
 	if err != nil {
 		panic(err)
@@ -93,7 +93,7 @@ func TestWordFilter_PickUp(t *testing.T) {
 			tokens := tnz.Tokenize(input)
 			filter := filter.NewWordFilter(v.wordList)
 			var got []string
-			filter.PickUp(&tokens)
+			filter.Keep(&tokens)
 			for _, token := range tokens {
 				got = append(got, token.Surface)
 			}
@@ -105,7 +105,7 @@ func TestWordFilter_PickUp(t *testing.T) {
 
 	t.Run("empty input test", func(t *testing.T) {
 		filter := filter.NewWordFilter(nil)
-		filter.PickUp(nil)
+		filter.Keep(nil)
 	})
 }
 
