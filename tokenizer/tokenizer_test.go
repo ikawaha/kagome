@@ -39,6 +39,14 @@ func Example_tokenize_mode() {
 	}
 }
 
+func Test_Tokenizer_New(t *testing.T) {
+	if _, err := New(nil); err == nil {
+		t.Errorf("expected empty dictionary error")
+	} else if err.Error() != "empty dictionary" {
+		t.Errorf("expected empty dictionary, got %v", err)
+	}
+}
+
 func Test_TokenizeModeString(t *testing.T) {
 	testdata := []struct {
 		mode       TokenizeMode
