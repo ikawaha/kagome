@@ -40,15 +40,11 @@ func (f POSFilter) apply(tokens *[]tokenizer.Token, drop bool) {
 	}
 	tail := 0
 	for i, v := range *tokens {
-		if f.Match(v.POS()) {
-			if drop {
-				continue
-			}
-		} else if !drop {
+		if f.Match(v.POS()) == drop {
 			continue
 		}
 		if i != tail {
-			(*tokens)[tail] = (*tokens)[i]
+			(*tokens)[tail] = v
 		}
 		tail++
 	}
