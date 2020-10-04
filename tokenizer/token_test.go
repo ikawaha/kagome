@@ -70,13 +70,24 @@ func Test_FeatureAtKnown(t *testing.T) {
 	if got := fs; !reflect.DeepEqual(want, got) {
 		t.Errorf("want %v, got %v", want, got)
 	}
-	for i, want := range want {
-		if got, ok := tok.FeatureAt(i); !ok {
-			t.Errorf("want ok, got !ok, %d", i)
-		} else if got != want {
-			t.Errorf("want %s, got %s", want, got)
+	t.Run("features at", func(t *testing.T) {
+		for i, want := range want {
+			if got, ok := tok.FeatureAt(i); !ok {
+				t.Errorf("want ok, got !ok, %d", i)
+			} else if got != want {
+				t.Errorf("want %s, got %s", want, got)
+			}
 		}
-	}
+	})
+
+	t.Run("index out of bound", func(t *testing.T) {
+		if f, ok := tok.FeatureAt(-1); f != "" || ok {
+			t.Errorf("index < 0: expected empty feature and false, got %q, %v", f, ok)
+		}
+		if f, ok := tok.FeatureAt(len(want)); f != "" || ok {
+			t.Errorf("index >= len(want): expected empty feature and false, got %q, %v", f, ok)
+		}
+	})
 }
 
 func Test_FeaturesUnknown(t *testing.T) {
@@ -95,12 +106,25 @@ func Test_FeaturesUnknown(t *testing.T) {
 
 	got := tok.Features()
 	want := []string{"名詞", "固有名詞", "地域", "一般", "*", "*", "*"}
-	if len(want) != len(got) {
-		t.Errorf("len: want %d, got %d", len(want), len(got))
-	}
-	if !reflect.DeepEqual(want, got) {
-		t.Errorf("pos: want %v, got %v", want, got)
-	}
+
+	t.Run("features at", func(t *testing.T) {
+		if len(want) != len(got) {
+			t.Errorf("len: want %d, got %d", len(want), len(got))
+		}
+		if !reflect.DeepEqual(want, got) {
+			t.Errorf("pos: want %v, got %v", want, got)
+		}
+	})
+
+	t.Run("index out of bound", func(t *testing.T) {
+		if f, ok := tok.FeatureAt(-1); f != "" || ok {
+			t.Errorf("index < 0: expected empty feature and false, got %q, %v", f, ok)
+		}
+		if f, ok := tok.FeatureAt(len(want)); f != "" || ok {
+			t.Errorf("index >= len(want): expected empty feature and false, got %q, %v", f, ok)
+		}
+	})
+
 }
 
 func Test_FeatureAtUnknown(t *testing.T) {
@@ -352,11 +376,11 @@ func Test_InflectionalType(t *testing.T) {
 	if want, got := 6, len(tokens); want != got {
 		t.Fatalf("token length: want %d, got %d", want, got)
 	}
-	//BOS
+	// BOS
 	if got, ok := tokens[0].InflectionalType(); ok {
 		t.Errorf("want !ok, got %q", got)
 	}
-	//食べ 動詞,自立,*,*,一段,連用形,食べる,タベ,タベ
+	// 食べ 動詞,自立,*,*,一段,連用形,食べる,タベ,タベ
 	if got, ok := tokens[3].InflectionalType(); !ok {
 		t.Error("want ok, but !ok")
 	} else if want := "一段"; want != got {
@@ -374,20 +398,33 @@ func Test_InflectionalForm(t *testing.T) {
 		t.Fatalf("unexpected error, %v", err)
 	}
 
-	tokens := tnz.Tokenize("寿司を食べたい")
-	if want, got := 6, len(tokens); want != got {
-		t.Fatalf("token length: want %d, got %d", want, got)
-	}
-	//BOS
-	if got, ok := tokens[0].InflectionalForm(); ok {
-		t.Errorf("want !ok, got %q", got)
-	}
-	//食べ 動詞,自立,*,*,一段,連用形,食べる,タベ,タベ
-	if got, ok := tokens[3].InflectionalForm(); !ok {
-		t.Error("want ok, but !ok")
-	} else if want := "連用形"; want != got {
-		t.Fatalf("want %s, got %s", want, got)
-	}
+	t.Run("known", func(t *testing.T) {
+		tokens := tnz.Tokenize("寿司を食べたい")
+		if want, got := 6, len(tokens); want != got {
+			t.Fatalf("token length: want %d, got %d", want, got)
+		}
+		// BOS
+		if got, ok := tokens[0].InflectionalForm(); ok {
+			t.Errorf("want !ok, got %q", got)
+		}
+		// 食べ 動詞,自立,*,*,一段,連用形,食べる,タベ,タベ
+		if got, ok := tokens[3].InflectionalForm(); !ok {
+			t.Error("want ok, but !ok")
+		} else if want := "連用形"; want != got {
+			t.Fatalf("want %s, got %s", want, got)
+		}
+	})
+
+	t.Run("unknown", func(t *testing.T) {
+		tokens := tnz.Tokenize("トトロ")
+		if want, got := 3, len(tokens); want != got {
+			t.Fatalf("token length: want %d, got %d", want, got)
+		}
+		// UNKNOWN
+		if _, ok := tokens[1].InflectionalForm(); ok {
+			t.Error("want !ok, but ok")
+		}
+	})
 }
 
 func Test_BaseForm(t *testing.T) {
@@ -404,11 +441,11 @@ func Test_BaseForm(t *testing.T) {
 	if want, got := 6, len(tokens); want != got {
 		t.Fatalf("token length: want %d, got %d", want, got)
 	}
-	//BOS
+	// BOS
 	if got, ok := tokens[0].BaseForm(); ok {
 		t.Errorf("want !ok, got %q", got)
 	}
-	//食べ->食べる
+	// 食べ->食べる
 	if got, ok := tokens[3].BaseForm(); !ok {
 		t.Error("want ok, but !ok")
 	} else if want := "食べる"; want != got {
@@ -430,11 +467,11 @@ func Test_Reading(t *testing.T) {
 	if want, got := 5, len(tokens); want != got {
 		t.Fatalf("token length: want %d, got %d", want, got)
 	}
-	//BOS
+	// BOS
 	if got, ok := tokens[0].Reading(); ok {
 		t.Errorf("want !ok, got %q", got)
 	}
-	//公園->コウエン
+	// 公園->コウエン
 	if got, ok := tokens[1].Reading(); !ok {
 		t.Error("want ok, but !ok")
 	} else if want := "コウエン"; want != got {
@@ -456,11 +493,11 @@ func Test_Pronunciation(t *testing.T) {
 	if want, got := 5, len(tokens); want != got {
 		t.Fatalf("token length: want %d, got %d", want, got)
 	}
-	//BOS
+	// BOS
 	if got, ok := tokens[0].Pronunciation(); ok {
 		t.Errorf("want !ok, got %q", got)
 	}
-	//公園->コウエン
+	// 公園->コウエン
 	if got, ok := tokens[1].Pronunciation(); !ok {
 		t.Error("want ok, but !ok")
 	} else if want := "コーエン"; want != got {
@@ -478,16 +515,33 @@ func Test_POS(t *testing.T) {
 		t.Fatalf("unexpected error, %v", err)
 	}
 
-	tokens := tnz.Tokenize("公園に行く")
-	if want, got := 5, len(tokens); want != got {
-		t.Fatalf("token length: want %d, got %d", want, got)
-	}
-	//BOS
-	if got := tokens[0].POS(); len(got) > 0 {
-		t.Errorf("want empty, got %+v", got)
-	}
-	//行く
-	if want, got := []string{"動詞", "自立", "*", "*"}, tokens[3].POS(); !reflect.DeepEqual(want, got) {
-		t.Fatalf("want %+v, got %+v", want, got)
-	}
+	t.Run("known", func(t *testing.T) {
+		tokens := tnz.Tokenize("公園に行く")
+		if want, got := 5, len(tokens); want != got {
+			t.Fatalf("token length: want %d, got %d", want, got)
+		}
+		// BOS
+		if got := tokens[0].POS(); len(got) > 0 {
+			t.Errorf("want empty, got %+v", got)
+		}
+		// 行く
+		if want, got := []string{"動詞", "自立", "*", "*"}, tokens[3].POS(); !reflect.DeepEqual(want, got) {
+			t.Fatalf("want %+v, got %+v", want, got)
+		}
+	})
+
+	t.Run("unknown", func(t *testing.T) {
+		tokens := tnz.Tokenize("トトロ")
+		if want, got := 3, len(tokens); want != got {
+			t.Fatalf("token length: want %d, got %d", want, got)
+		}
+		// BOS
+		if got := tokens[0].POS(); len(got) > 0 {
+			t.Errorf("want empty, got %+v", got)
+		}
+		// UNKNOWN
+		if want, got := []string{"名詞", "固有名詞", "組織", "*"}, tokens[1].POS(); !reflect.DeepEqual(want, got) {
+			t.Fatalf("want %+v, got %+v", want, got)
+		}
+	})
 }
