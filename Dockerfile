@@ -1,39 +1,38 @@
 # This is a Docker image of Kagome on Alpine Linux.
 # =================================================
-# Aimed to check the functionality of version command but the built image will
-# work as a single 'kagome' binary.
-# - USAGE:
-#   - To build the image, run:
-#     $ docker build --tag kagome:latest ./Dockerfile && docker image prune -f
-#   - To run the container, run:
-#     $ # This is equivalent to "kagome version"
-#     $ docker run --rm kagome:latest version
 
 # 1st stage: Build binary.
 # ------------------------
-FROM golang:alpine AS build-app
+FROM --platform=$BUILDPLATFORM golang:alpine AS build-app
+
+ARG BUILDPLATFORM
+ARG TARGETPLATFORM
+ARG GOOS=linux
+ARG GOARCH=amd64
+ARG GOARM=
 
 # Copy the current dir including .git dir for versioning.
 COPY . /go/src/github.com/ikawaha/kagome
 WORKDIR /go/src/github.com/ikawaha/kagome
 
 # Shell script to build the image (with the tag as version).
-RUN apk --no-cache add git && \
-    version_app=$(git describe --tag) && \
-    echo "- Current git tag: ${version_app}" && \
-    go version && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
-      -a \
-      -installsuffix cgo \
-      --ldflags "-w -s -extldflags \"-static\" -X 'main.version=${version_app}'" \
-      -o /go/bin/kagome \
-      ./cmd/kagome && \
-    echo '- Running tests ...' && \
-    /go/bin/kagome version
+RUN \
+  apk --no-cache add git && \
+  version_app=$(git describe --tag) && \
+  echo "- Running on ${BUILDPLATFORM}, building for ${TARGETPLATFORM}" && \
+  echo "- Current platform: $(uname -a)" && \
+  echo "- Current git tag: ${version_app}" && \
+  echo "- Current Go version: $(go version)" && \
+  echo "- Kagome version to be build:${version_app}" && \
+  GOOS=${GOOS} GOARCH=${GOARCH} GOARM=${GOARM} go build \
+    --ldflags "-w -s -extldflags \"-static\" -X 'main.version=${version_app}'" \
+    -o /go/bin/kagome \
+    /go/src/github.com/ikawaha/kagome/cmd/kagome && \
+  echo "- Smoke test (run kagome version command) ... $(/go/bin/kagome version)"
 
 # 2nd stage: Copy only the built binary to shrink the image size.
 # ---------------------------------------------------------------
-FROM alpine:latest
+FROM --platform=$BUILDPLATFORM alpine:latest
 
 COPY --from=build-app /go/bin/kagome /usr/local/bin/kagome
 
