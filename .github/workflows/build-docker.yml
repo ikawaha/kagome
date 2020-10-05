@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - v2
-      - feat-docker-arm-compatible
 
 env:
   NAME_IMAGE: "${{ secrets.DOCKER_USERNAME }}/kagome"
