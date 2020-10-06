@@ -1,5 +1,7 @@
 name: reviewdog
+
 on: [pull_request]
+
 jobs:
   # NOTE: golangci-lint doesn't report multiple errors on the same line from
   # different linters and just report one of the errors?
