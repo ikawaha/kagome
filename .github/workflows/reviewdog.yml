@@ -1,4 +1,4 @@
-name: reviewdog
+name: reviewdog with golangci-lint
 
 on: [pull_request]
 
