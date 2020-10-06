@@ -24,7 +24,7 @@ RUN \
   echo "- Current git tag: ${version_app}" && \
   echo "- Current Go version: $(go version)" && \
   echo "- Kagome version to be build:${version_app}" && \
-  GOOS=${GOOS} GOARCH=${GOARCH} GOARM=${GOARM} go build \
+  CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} GOARM=${GOARM} go build \
     --ldflags "-w -s -extldflags \"-static\" -X 'main.version=${version_app}'" \
     -o /go/bin/kagome \
     /go/src/github.com/ikawaha/kagome/cmd/kagome && \
