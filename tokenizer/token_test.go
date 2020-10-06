@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	userDictSample = "../_sample/userdict.txt"
+	userDictSample = "../sample/userdict.txt"
 )
 
 func Test_TokenClassString(t *testing.T) {
@@ -124,7 +124,6 @@ func Test_FeaturesUnknown(t *testing.T) {
 			t.Errorf("index >= len(want): expected empty feature and false, got %q, %v", f, ok)
 		}
 	})
-
 }
 
 func Test_FeatureAtUnknown(t *testing.T) {

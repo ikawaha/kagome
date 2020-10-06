@@ -88,7 +88,7 @@ func Test_LatticeBuild(t *testing.T) {
 }
 
 func Test_LatticeBuildWithUserDict(t *testing.T) {
-	const udictPath = "../../_sample/userdict.txt"
+	const udictPath = "../../sample/userdict.txt"
 
 	udic, err := dict.NewUserDict(udictPath)
 	if err != nil {

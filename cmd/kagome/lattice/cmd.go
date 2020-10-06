@@ -36,7 +36,7 @@ type option struct {
 // ContinueOnError ErrorHandling // Return a descriptive error.
 // ExitOnError                   // Call os.Exit(2).
 // PanicOnError                  // Call panic with a descriptive error.flag.ContinueOnError
-func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
+func newOption(_ io.Writer, eh flag.ErrorHandling) (o *option) {
 	o = &option{
 		flagSet: flag.NewFlagSet(CommandName, eh),
 	}
@@ -68,7 +68,7 @@ func (o *option) parse(args []string) error {
 	return nil
 }
 
-//OptionCheck receives a slice of args and returns an error if it was not successfully parsed
+// OptionCheck receives a slice of args and returns an error if it was not successfully parsed
 func OptionCheck(args []string) error {
 	opt := newOption(ioutil.Discard, flag.ContinueOnError)
 	if err := opt.parse(args); err != nil {
@@ -117,14 +117,16 @@ func command(opt *option) error {
 	if err != nil {
 		return err
 	}
-	var out = os.Stdout
+	out := os.Stdout
 	if opt.output != "" {
 		var err error
-		out, err = os.OpenFile(opt.output, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0666)
+		out, err = os.OpenFile(opt.output, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0o666)
 		if err != nil {
 			return err
 		}
-		defer out.Close()
+		defer func() {
+			_ = out.Close()
+		}()
 	}
 
 	mode := selectMode(opt.mode)
@@ -136,7 +138,6 @@ func command(opt *option) error {
 			if tok.Class == tokenizer.DUMMY {
 				fmt.Fprintf(ErrorWriter, "%s\n", tok.Surface)
 			} else {
-
 				fmt.Fprintf(ErrorWriter, "%s\t%v\n", tok.Surface, strings.Join(f, ","))
 			}
 		}

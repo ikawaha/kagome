@@ -5,7 +5,6 @@ import (
 )
 
 func Test_NodeClassString(t *testing.T) {
-
 	pairs := []struct {
 		in  NodeClass
 		out string

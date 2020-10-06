@@ -74,7 +74,7 @@ func (o *option) parse(args []string) error {
 	return nil
 }
 
-//OptionCheck receives a slice of args and returns an error if it was not successfully parsed
+// OptionCheck receives a slice of args and returns an error if it was not successfully parsed
 func OptionCheck(args []string) error {
 	opt := newOption(ioutil.Discard, flag.ContinueOnError)
 	if err := opt.parse(args); err != nil {
@@ -136,14 +136,16 @@ func command(opt *option) error {
 		return err
 	}
 
-	var fp = os.Stdin
+	fp := os.Stdin
 	if opt.file != "" {
 		var err error
 		fp, err = os.Open(opt.file)
 		if err != nil {
 			return err
 		}
-		defer fp.Close()
+		defer func() {
+			_ = fp.Close()
+		}()
 	}
 	mode := selectMode(opt.mode)
 	scanner := bufio.NewScanner(fp)
