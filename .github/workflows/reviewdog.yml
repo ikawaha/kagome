@@ -1,8 +1,9 @@
 name: reviewdog
-
 on: [pull_request]
-
 jobs:
+  # NOTE: golangci-lint doesn't report multiple errors on the same line from
+  # different linters and just report one of the errors?
+
   golangci-lint:
     name: runner / golangci-lint
     runs-on: ubuntu-latest
@@ -11,4 +12,7 @@ jobs:
         uses: actions/checkout@v1
       - name: golangci-lint
         uses: reviewdog/action-golangci-lint@v1
-        golangci_lint_flags: "--config=./.golangci.yml
+        with:
+          # Can pass --config flag to change golangci-lint behavior and target
+          # directory.
+          golangci_lint_flags: "--config=./.golangci.yml
