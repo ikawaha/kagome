@@ -100,3 +100,4 @@ jobs:
             docker manifest annotate ${{ env.NAME_IMAGE }}:${version_curr} ${{ env.NAME_IMAGE }}:arm32v7 --variant v7l && \
             docker manifest inspect ${{ env.NAME_IMAGE }}:${version_curr} && \
             docker manifest push ${{ env.NAME_IMAGE }}:${version_curr} --purge
+        if: contains(github.ref, 'tags/v')
