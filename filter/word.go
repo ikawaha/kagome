@@ -4,6 +4,7 @@ import (
 	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
+// WordFilter represents a word filter.
 type WordFilter struct {
 	words map[string]struct{}
 }
