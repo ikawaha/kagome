@@ -1,18 +1,21 @@
-name: reviewdog
-on: [pull_request]
-jobs:
-  # NOTE: golangci-lint doesn't report multiple errors on the same line from
-  # different linters and just report one of the errors?
+name: Pull Request Review
 
-  golangci-lint:
-    name: runner / golangci-lint
+on:
+  pull_request:
+    types: [opened,synchronize]
+
+jobs:
+  golangci-lint-github-pr-review:
+    name: runner / golangci-lint (github-pr-review)
     runs-on: ubuntu-latest
     steps:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
-      - name: golangci-lint
+      - name: golangci-lint w/ github-pr-review
         uses: reviewdog/action-golangci-lint@v1
         with:
-          # Can pass --config flag to change golangci-lint behavior and target
-          # directory.
-          golangci_lint_flags: "--config=./.golangci.yml
+          github_token: ${{ secrets.REVIEW_DOG_GITHUB_TOKEN }}
+          level: warning
+          golangci_lint_flags: "--config=.golangci.yml"
+          tool_name: "golangci-lint-github-pr-review"
+          reporter: "github-pr-review"
