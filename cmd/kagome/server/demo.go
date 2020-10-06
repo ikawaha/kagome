@@ -15,7 +15,7 @@ import (
 	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
-//TokenizeDemoHandler represents the tokenizer demo server struct
+// TokenizeDemoHandler represents the tokenizer demo server struct
 type TokenizeDemoHandler struct {
 	tokenizer *tokenizer.Tokenizer
 }
@@ -207,6 +207,7 @@ var graphHTML = `
 </body>
 </html>
 `
+
 var demoHTML = `
 <!DOCTYPE html>
 <html lang="ja">

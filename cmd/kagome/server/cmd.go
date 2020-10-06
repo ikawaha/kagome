@@ -57,7 +57,7 @@ func (o *option) parse(args []string) error {
 	return nil
 }
 
-//OptionCheck receives a slice of args and returns an error if it was not successfully parsed
+// OptionCheck receives a slice of args and returns an error if it was not successfully parsed
 func OptionCheck(args []string) error {
 	opt := newOption(flag.ContinueOnError)
 	if err := opt.parse(args); err != nil {

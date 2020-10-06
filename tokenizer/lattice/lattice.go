@@ -24,7 +24,7 @@ const (
 type TokenizeMode int
 
 const (
-	//Normal Mode
+	// Normal Mode
 	Normal TokenizeMode = iota + 1
 	// Search Mode
 	Search
@@ -78,7 +78,7 @@ func (la *Lattice) addNode(pos, id, position, start int, class NodeClass, surfac
 	var m dict.Morph
 	switch class {
 	case DUMMY:
-		//use default cost
+		// use default cost
 	case KNOWN:
 		m = la.dic.Morphs[id]
 	case UNKNOWN:

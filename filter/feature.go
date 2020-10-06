@@ -18,6 +18,7 @@ type filterEdge struct {
 	val Feature
 	to  *filterNode
 }
+
 type filterNode struct {
 	fanout []*filterEdge
 }

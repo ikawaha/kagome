@@ -145,7 +145,6 @@ func Test_AnalyzeUnknown(t *testing.T) {
 			t.Errorf("got %v, expected %v", tok, expected[i])
 		}
 	}
-
 }
 
 func Test_TokenizeSpecialCase(t *testing.T) {
@@ -244,7 +243,6 @@ func Test_AnalyzeWithSearchMode(t *testing.T) {
 			t.Errorf("got %v, expected %v", tok, expected[i])
 		}
 	}
-
 }
 
 func Test_AnalyzeWithSearchModeUnknown(t *testing.T) {
@@ -304,7 +302,6 @@ func Test_AnalyzeWithExtendedModeEmpty(t *testing.T) {
 			t.Errorf("got %v, expected %v", tok, expected[i])
 		}
 	}
-
 }
 
 func Test_AnalyzeWithExtendedMode(t *testing.T) {
@@ -336,7 +333,6 @@ func Test_AnalyzeWithExtendedMode(t *testing.T) {
 			t.Errorf("got %v, expected %v", tok, expected[i])
 		}
 	}
-
 }
 
 func Test_AnalyzeWithExtendedModeUnknown(t *testing.T) {
@@ -369,7 +365,6 @@ func Test_AnalyzeWithExtendedModeUnknown(t *testing.T) {
 			t.Errorf("got %v, expected %v", tok, expected[i])
 		}
 	}
-
 }
 
 func Test_TokenizerDot(t *testing.T) {

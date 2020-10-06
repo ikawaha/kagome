@@ -124,7 +124,6 @@ func Test_FeaturesUnknown(t *testing.T) {
 			t.Errorf("index >= len(want): expected empty feature and false, got %q, %v", f, ok)
 		}
 	})
-
 }
 
 func Test_FeatureAtUnknown(t *testing.T) {
