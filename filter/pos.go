@@ -5,14 +5,16 @@ import (
 )
 
 type (
+	// POS represents a part-of-speech that is a vector of features.
 	POS = []string
 )
 
+// POSFilter represents a part-of-speech filter.
 type POSFilter struct {
 	filter *FeaturesFilter
 }
 
-// NewPOSFilter returns a part of speech filter.
+// NewPOSFilter returns a part-of-speech filter.
 func NewPOSFilter(stops ...POS) *POSFilter {
 	return &POSFilter{
 		filter: NewFeaturesFilter(stops...),

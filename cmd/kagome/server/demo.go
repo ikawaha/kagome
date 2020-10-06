@@ -15,11 +15,12 @@ import (
 	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
-// TokenizeDemoHandler represents the tokenizer demo server struct
+// TokenizeDemoHandler represents the tokenizer demo server struct.
 type TokenizeDemoHandler struct {
 	tokenizer *tokenizer.Tokenizer
 }
 
+// ServeHTTP serves a tokenize demo server.
 func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	type record struct {
 		Surface       string

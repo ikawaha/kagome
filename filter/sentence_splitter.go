@@ -47,8 +47,8 @@ func (s SentenceSplitter) isFollower(r rune) bool {
 	return false
 }
 
-// nolint: gocyclo
 // ScanSentences is a split function for a Scanner that returns each sentence of text.
+// nolint: gocyclo
 func (s SentenceSplitter) ScanSentences(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if atEOF && len(data) == 0 {
 		return 0, nil, nil

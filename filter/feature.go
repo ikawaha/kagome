@@ -7,7 +7,9 @@ import (
 )
 
 type (
-	Feature  = string
+	// Feature represents a feature.
+	Feature = string
+	// Features represents a vector of features.
 	Features = []string
 )
 

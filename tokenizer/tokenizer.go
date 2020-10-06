@@ -11,6 +11,11 @@ import (
 )
 
 // TokenizeMode represents a mode of tokenize.
+//
+// Kagome has segmentation mode for search such as Kuromoji.
+//    Normal: Regular segmentation
+//    Search: Use a heuristic to do additional segmentation useful for search
+//    Extended: Similar to search mode, but also unigram unknown words
 type TokenizeMode int
 
 func (m TokenizeMode) String() string {
@@ -26,12 +31,6 @@ func (m TokenizeMode) String() string {
 }
 
 const (
-	// Segmentation mode for search
-	// Kagome has segmentation mode for search such as Kuromoji.
-	//    Normal: Regular segmentation
-	//    Search: Use a heuristic to do additional segmentation useful for search
-	//    Extended: Similar to search mode, but also unigram unknown words
-	//
 	// Normal is the normal tokenize mode.
 	Normal TokenizeMode = iota + 1
 	// Search is the tokenize mode for search.
