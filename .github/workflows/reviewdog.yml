@@ -14,7 +14,7 @@ jobs:
       - name: golangci-lint w/ github-pr-review
         uses: reviewdog/action-golangci-lint@v1
         with:
-          github_token: ${{ secrets.github_token }}
+          github_token: ${{ secrets.REVIEW_DOG_GITHUB_TOKEN }}
           golangci_lint_flags: "--config=.golangci.yml"
           tool_name: "golangci-lint-github-pr-review"
           reporter: "github-pr-review"
