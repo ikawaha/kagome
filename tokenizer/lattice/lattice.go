@@ -100,6 +100,7 @@ func (la *Lattice) addNode(pos, id, position, start int, class NodeClass, surfac
 }
 
 // Build builds a lattice from the inputs.
+// nolint: gocyclo
 func (la *Lattice) Build(inp string) {
 	rc := utf8.RuneCountInString(inp)
 	la.Input = inp
