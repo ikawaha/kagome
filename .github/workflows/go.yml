@@ -33,8 +33,9 @@ jobs:
 
       - name: Test
         run: |
-          GO111MODULE=on go test -v ./...
-          cd tokenizer; GO111MODULE=on go test -benchmem -bench .; cd ..
+          go test -v ./...
+          cd tokenizer; go test -benchmem -bench .; cd ..
+        working-directory: src/github.com/ikawaha/kagome
   coverage:
     needs: test
     runs-on: ubuntu-latest
