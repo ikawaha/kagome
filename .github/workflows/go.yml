@@ -45,12 +45,14 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: '1.x'
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+        with:
+          path: src/github.com/ikawaha/kagome
       - name: Install goveralls
-        run: go get github.com/mattn/goveralls
+        run: GOBIN=$(pwd) go get github.com/mattn/goveralls
       - name: Coverage
         run: |
           go test -v -coverprofile=profile.cov -covermode=atomic ./...
-          goveralls -coverprofile=profile.cov
+          goveralls -coverprofile=profile.cov -repotoken ${{ github.token}}
         working-directory: src/github.com/ikawaha/kagome
-        env:
-          COVERALLS_TOKEN: ${{ github.token }}
