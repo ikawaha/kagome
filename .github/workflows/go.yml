@@ -54,5 +54,7 @@ jobs:
       - name: Coverage
         run: |
           go test -v -coverprofile=profile.cov -covermode=atomic ./...
-          goveralls -coverprofile=profile.cov -repotoken ${{ github.token}}
+          goveralls -coverprofile=profile.cov -service=github
         working-directory: src/github.com/ikawaha/kagome
+        env:
+          COVERALLS_TOKEN: ${{ github.token }}
