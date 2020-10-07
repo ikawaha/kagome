@@ -1,0 +1,60 @@
+name: Go
+
+on:
+  push:
+    branches:
+      - v2
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        go: ['1.13.x', '1.14.x', '1.15.x']
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+        with:
+          path: src/github.com/ikawaha/kagome
+
+      - name: Build
+        run: go build -v ./...
+        working-directory: src/github.com/ikawaha/kagome
+
+      - name: Test
+        run: |
+          go test -v ./...
+          cd tokenizer; go test -benchmem -bench .; cd ..
+        working-directory: src/github.com/ikawaha/kagome
+
+  coverage:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.x'
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+        with:
+          path: src/github.com/ikawaha/kagome
+      - name: Install goveralls
+        run: go get github.com/mattn/goveralls
+      - name: Coverage
+        run: |
+          go test -v -coverprofile=profile.cov -covermode=atomic ./...
+          goveralls -coverprofile=profile.cov -service=github
+        working-directory: src/github.com/ikawaha/kagome
+        env:
+          COVERALLS_TOKEN: ${{ github.token }}

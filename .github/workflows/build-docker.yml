@@ -1,4 +1,4 @@
-name: Build Docker Images of Kagome Docker Hub Release
+name: Docker Images
 
 on:
   push:
@@ -9,7 +9,7 @@ env:
   NAME_IMAGE: "${{ secrets.DOCKER_USERNAME }}/kagome"
 
 jobs:
-  build:
+  docker:
     runs-on: ubuntu-latest
     steps:
       # Clone and checkout the repo. "fetch-depth" is needed in order to get the
