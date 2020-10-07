@@ -33,8 +33,8 @@ jobs:
 
       - name: Test
         run: |
-          go test -v ./...
-          cd tokenizer; go test -benchmem -bench .; cd ..
+          GO111MODULE=on go test -v ./...
+          cd tokenizer; GO111MODULE=on go test -benchmem -bench .; cd ..
   coverage:
     needs: test
     runs-on: ubuntu-latest
