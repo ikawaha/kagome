@@ -50,7 +50,7 @@ jobs:
         with:
           path: src/github.com/ikawaha/kagome
       - name: Install goveralls
-        run: GOBIN=$(pwd) go get github.com/mattn/goveralls
+        run: go get github.com/mattn/goveralls
       - name: Coverage
         run: |
           go test -v -coverprofile=profile.cov -covermode=atomic ./...
