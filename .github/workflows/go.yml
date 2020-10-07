@@ -46,3 +46,4 @@ jobs:
         shell: bash
         run: |
           sh ./go-coverall.sh
+        working-directory: src/github.com/ikawaha/kagome
