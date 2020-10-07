@@ -45,5 +45,5 @@ jobs:
       - name: Coverage
         shell: bash
         run: |
-          sh ./go-coverall.sh
+          /bin/bash ./go-coverall.sh
         working-directory: src/github.com/ikawaha/kagome
