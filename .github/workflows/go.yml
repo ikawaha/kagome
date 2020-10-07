@@ -36,6 +36,7 @@ jobs:
           go test -v ./...
           cd tokenizer; go test -benchmem -bench .; cd ..
         working-directory: src/github.com/ikawaha/kagome
+
   coverage:
     needs: test
     runs-on: ubuntu-latest
@@ -45,11 +46,10 @@ jobs:
         with:
           go-version: '1.x'
       - name: Install goveralls
-        run: GO111MODULE=on go get github.com/mattn/goveralls
+        run: go get github.com/mattn/goveralls
       - name: Coverage
-        shell: bash
         run: |
-          go test -v -coverprofile=profile.cov ./...
+          go test -v -coverprofile=profile.cov -covermode=atomic ./...
           goveralls -coverprofile=profile.cov
         working-directory: src/github.com/ikawaha/kagome
         env:
