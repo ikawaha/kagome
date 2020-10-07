@@ -17,4 +17,4 @@ jobs:
           github_token: ${{ github.token }}
           level: warning
           golangci_lint_flags: "--config=.golangci.yml"
-          reporter: re
+          reporter: github-pr-review
