@@ -305,7 +305,7 @@ func features(dict *dict.Dict, udict *dict.UserDict, n *node) []string {
 	return nil
 }
 
-// Dot outputs the lattice in the graphviz dot format.
+// Dot outputs a lattice in the graphviz dot format.
 func (la *Lattice) Dot(w io.Writer) {
 	bests := make(map[*node]struct{})
 	for _, n := range la.Output {

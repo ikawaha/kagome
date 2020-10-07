@@ -1,6 +1,0 @@
-linter:
-  golangci_lint:
-    config: .golangci.yml
-    no-config: false
-    tests: false
-    uniq-by-line: false
