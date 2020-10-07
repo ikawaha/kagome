@@ -13,7 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        go: ['1.14.x', '1.15.x', '1.x']
+        go: ['1.13.x', '1.14.x', '1.15.x']
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -40,10 +40,17 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.x'
       - name: Install goveralls
         run: GO111MODULE=on go get github.com/mattn/goveralls
       - name: Coverage
         shell: bash
         run: |
-          /bin/bash ./go-coverall.sh
+          go test -v -coverprofile=profile.cov ./...
+          goveralls -coverprofile=profile.cov
         working-directory: src/github.com/ikawaha/kagome
+        env:
+          COVERALLS_TOKEN: ${{ github.token }}
