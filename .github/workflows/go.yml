@@ -36,7 +36,8 @@ jobs:
           go test -v ./...
           cd tokenizer; go test -benchmem -bench .; cd ..
   coverage:
-    needs: [test]
+    needs: test
+    runs-on: ubuntu-latest
     steps:
       - name: Install goveralls
         run: GO111MODULE=on go get github.com/mattn/goveralls
