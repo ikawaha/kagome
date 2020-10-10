@@ -1,11 +1,9 @@
-github.com/ikawaha/kagome-dict v0.0.1 h1:hiZBAeqn4u6c0a1aiyl1tJi6gQGgU1GzMQiK2kNhTAI=
-github.com/ikawaha/kagome-dict v0.0.1/go.mod h1:pbeH4qwp/LVWKNePhU4Mh11w/l8uUSXKxfvNwRkj3NY=
-github.com/ikawaha/kagome-dict v1.0.0 h1:lEm8wtySVklq7YboPQ8oxorGmi2tDTtoQ6FvndDK0iY=
-github.com/ikawaha/kagome-dict v1.0.0/go.mod h1:pbeH4qwp/LVWKNePhU4Mh11w/l8uUSXKxfvNwRkj3NY=
-github.com/ikawaha/kagome-dict/ipa v1.0.0 h1:lba8YN1I5Re+gsbZlbholc8m3uvPPsXE42UGv3F+1sE=
-github.com/ikawaha/kagome-dict/ipa v1.0.0/go.mod h1:mqE9C9OxRA1ezgMNpqXxmwktbxmSFl77F69D44iwEOs=
-github.com/ikawaha/kagome-dict/uni v1.0.0 h1:5/7aCm4E+VcF1XzFunfQHmAplp/cICljaQzYiEZsJN8=
-github.com/ikawaha/kagome-dict/uni v1.0.0/go.mod h1:8oJiibyuTyZ/XmqAaikks0jgvJljtN6MHfwac2TxK+4=
+github.com/ikawaha/kagome-dict v1.0.1 h1:CdGx80JEz+nBUP0+m+47pubzOhURYPRX+zXLRrgOD6Y=
+github.com/ikawaha/kagome-dict v1.0.1/go.mod h1:pbeH4qwp/LVWKNePhU4Mh11w/l8uUSXKxfvNwRkj3NY=
+github.com/ikawaha/kagome-dict/ipa v1.0.1 h1:pE98DI+3e8kqUSL50M7/QE5BDk/o63/o9fDanNtgkN0=
+github.com/ikawaha/kagome-dict/ipa v1.0.1/go.mod h1:6KbSbFnEwIlR65gYAowfwOkbze3bnFH1BILpOEGBkvY=
+github.com/ikawaha/kagome-dict/uni v1.0.1 h1:0HfqEmpHyoRroR8whDsn/pu3LgMljpvURrACxJlk6hs=
+github.com/ikawaha/kagome-dict/uni v1.0.1/go.mod h1:nij0TsdXZ/WauqM9X0XW7VpOx/JkiSkiGicN1bJpx2Q=
 golang.org/x/text v0.3.3 h1:cokOdA+Jmi5PJGXLlLllQSgYigAEfHXJAERHVMaCc2k=
 golang.org/x/text v0.3.3/go.mod h1:5Zoc/QRtKVWzQhOtBMvqHzDpF6irO9z98xDceosuGiQ=
 golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
