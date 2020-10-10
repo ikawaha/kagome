@@ -1,4 +1,4 @@
-name: Docker Images
+name: Docker Build Release
 
 on:
   workflow_dispatch:
