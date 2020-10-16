@@ -3,7 +3,7 @@
     "description": "Kagome Japanese Morphological Analyzer",
     "env": {
         "GOVERSION": "go1.14",
-        "GO_INSTALL_PACKAGE_SPEC": "./cmd/kagome"
+        "GO_INSTALL_PACKAGE_SPEC": "."
     },
     "buildpacks": [
         {
