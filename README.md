@@ -99,8 +99,14 @@ output:
 
 ## Install
 
+**Go**
 ```shellsession
 env GO111MODULE=on go get -u github.com/ikawaha/kagome/v2
+```
+
+**Homebrew tap**
+```shellsession
+brew install ikawaha/kagome/kagome
 ```
 
 ## Usage
