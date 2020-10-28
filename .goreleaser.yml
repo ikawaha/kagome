@@ -21,14 +21,16 @@ builds:
     ldflags:
       - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }} -X main.builtBy=goreleaser
 brews:
-  - github:
-      owner: ikawaha
+  - tap:
+      owner: {{ github.repository_owner }}
       name: homebrew-kagome
+      token: "{{ secrets.GO_RELEASER_TOKEN }}"
+    folder: Formula
     commit_author:
       name: goreleaserbot
       email: goreleaser@carlosbecker.com
     description: "Self-contained Japanese Morphological Analyzer written in pure Go."
-    homepage: "https://github.com/ikawaha/kagome"
+    homepage: "https://github.com/{{ GITHUB_REPOSITORY }}"
     dependencies:
       - go
     install: |

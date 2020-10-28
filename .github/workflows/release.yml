@@ -24,4 +24,13 @@ jobs:
           version: latest
           args: release --rm-dist --config .goreleaser.yml
         env:
-          GITHUB_TOKEN: ${{ secrets.GO_RELEASER_TOKEN }}
+          # Secret access token of this repo provided automatically from GitHub to release.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Personal access token to push the formula into homebrew_kagome repo in
+          # your GitHub account. You need to generate one at:
+          #   - https://github.com/settings/tokens
+          # It is preferred to generete specific one for this action with minimum
+          # scopes such as "repo" and no other scopes.
+          # Then set the "GO_RELEASER_TOKEN" secreat env variables in the
+          # repo's settings: [Settings]-[Secrets] in advance.
+          GO_RELEASER_TOKEN: ${{ secrets.GO_RELEASER_TOKEN }}
