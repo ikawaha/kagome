@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - 'v'
+      - 'v*'
 
 env:
   NAME_IMAGE: "${{ secrets.DOCKER_USERNAME }}/kagome"
