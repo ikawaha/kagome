@@ -32,6 +32,6 @@ brews:
     dependencies:
       - go
     install: |
-      bin.install Dir['kagome']
+      bin.install "kagome"
     test: |
       system "#{bin}/kagome"
