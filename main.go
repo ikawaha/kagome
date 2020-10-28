@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ikawaha/kagome/v2/cmd/kagome/lattice"
-	"github.com/ikawaha/kagome/v2/cmd/kagome/server"
-	"github.com/ikawaha/kagome/v2/cmd/kagome/tokenize"
+	"github.com/ikawaha/kagome/v2/cmd/lattice"
+	"github.com/ikawaha/kagome/v2/cmd/server"
+	"github.com/ikawaha/kagome/v2/cmd/tokenize"
 )
 
 type subcommand struct {

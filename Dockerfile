@@ -27,7 +27,7 @@ RUN \
   CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} GOARM=${GOARM} go build \
     --ldflags "-w -s -extldflags \"-static\" -X 'main.version=${version_app}'" \
     -o /go/bin/kagome \
-    /go/src/github.com/ikawaha/kagome/cmd/kagome && \
+    /go/src/github.com/ikawaha/kagome && \
   echo "- Smoke test (run kagome version command) ... $(/go/bin/kagome version)"
 
 # 2nd stage: Copy only the built binary to shrink the image size.
