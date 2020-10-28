@@ -30,8 +30,6 @@ brews:
     description: "Self-contained Japanese Morphological Analyzer written in pure Go."
     homepage: "https://github.com/ikawaha/kagome"
     folder: Formula
-    dependencies:
-      - go
     install: |
       bin.install "kagome"
     test: |
