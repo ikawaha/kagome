@@ -1,0 +1,38 @@
+env:
+  - GO111MODULE=on
+before:
+  hooks:
+    - go mod download
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - 386
+      - amd64
+      - arm
+      - arm64
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }} -X main.builtBy=goreleaser
+brews:
+  -
+    tap:
+      owner: ikawaha
+      name: homebrew-kagome
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@carlosbecker.com
+    description: "Self-contained Japanese Morphological Analyzer written in pure Go."
+    homepage: "https://github.com/ikawaha/kagome"
+    dependencies:
+      - go
+    install: |
+      bin.install Dir['kagome']
+    test: |
+      system "#{bin}/kagome"
