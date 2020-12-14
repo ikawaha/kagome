@@ -18,19 +18,19 @@ import (
 var (
 	CommandName  = "lattice"
 	Description  = `lattice viewer`
-	UsageMessage = "%s [-userDict userdic_file] [-dict (ipa|uni)] [-mode (normal|search|extended)] [-output output_file] [-v] sentence\n"
+	UsageMessage = "%s [-udict userdict_file] [-dict (ipa|uni)] [-mode (normal|search|extended)] [-output output_file] [-v] sentence\n"
 	ErrorWriter  = os.Stderr
 )
 
 // options
 type option struct {
-	userDict string
-	dict     string
-	mode     string
-	output   string
-	verbose  bool
-	input    string
-	flagSet  *flag.FlagSet
+	udict   string
+	dict    string
+	mode    string
+	output  string
+	verbose bool
+	input   string
+	flagSet *flag.FlagSet
 }
 
 // ContinueOnError ErrorHandling // Return a descriptive error.
@@ -41,7 +41,7 @@ func newOption(_ io.Writer, eh flag.ErrorHandling) (o *option) {
 		flagSet: flag.NewFlagSet(CommandName, eh),
 	}
 	// option settings
-	o.flagSet.StringVar(&o.userDict, "userDict", "", "user dict")
+	o.flagSet.StringVar(&o.udict, "udict", "", "user dict")
 	o.flagSet.StringVar(&o.dict, "dict", "ipa", "dict type (ipa|uni)")
 	o.flagSet.StringVar(&o.mode, "mode", "normal", "tokenize mode (normal|search|extended)")
 	o.flagSet.StringVar(&o.output, "output", "", "output file")
@@ -106,8 +106,8 @@ func command(opt *option) error {
 		return err
 	}
 	udict := tokenizer.Nop()
-	if opt.userDict != "" {
-		d, err := dict.NewUserDict(opt.userDict)
+	if opt.udict != "" {
+		d, err := dict.NewUserDict(opt.udict)
 		if err != nil {
 			return err
 		}
