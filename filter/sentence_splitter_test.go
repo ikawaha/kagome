@@ -1,4 +1,4 @@
-package filter
+package filter_test
 
 import (
 	"bufio"
@@ -6,6 +6,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/ikawaha/kagome/v2/filter"
 )
 
 func Test_DefaultSplitter(t *testing.T) {
@@ -49,7 +51,7 @@ func Test_DefaultSplitter(t *testing.T) {
 
 	for _, d := range testdata {
 		scanner := bufio.NewScanner(strings.NewReader(d.input))
-		scanner.Split(ScanSentences)
+		scanner.Split(filter.ScanSentences)
 		r := make([]string, 0, len(d.expect))
 		for scanner.Scan() {
 			r = append(r, scanner.Text())
@@ -87,7 +89,7 @@ func Test_DelimWhiteSpace(t *testing.T) {
 		},
 	}
 
-	s := SentenceSplitter{
+	s := filter.SentenceSplitter{
 		Delim:               []rune{' ', '　'}, // white spaces
 		Follower:            []rune{'.', '｣', '」', '』', ')', '）', '｝', '}', '〉', '》'},
 		SkipWhiteSpace:      true,
@@ -119,7 +121,7 @@ func Test_ScanSentences(t *testing.T) {
 		{atEnd: false, data: []byte{}, advance: 0, token: []byte{}, err: nil},
 	}
 	for _, d := range testdata {
-		advance, token, err := ScanSentences(d.data, d.atEnd)
+		advance, token, err := filter.ScanSentences(d.data, d.atEnd)
 		if err != nil {
 			t.Errorf("got err=%+v, expected nil", d.err)
 		}
@@ -132,7 +134,7 @@ func Test_ScanSentences(t *testing.T) {
 	}
 }
 
-func Example() {
+func Example_ScanSentences() {
 	sampleText := `　人魚は、南の方の海にばかり棲んでいるのではあ
                          りません。北の海にも棲んでいたのであります。
                          　北方の海うみの色は、青うございました。ある
@@ -142,7 +144,7 @@ func Example() {
                          小川未明作 赤い蝋燭と人魚より`
 
 	scanner := bufio.NewScanner(strings.NewReader(sampleText))
-	scanner.Split(ScanSentences)
+	scanner.Split(filter.ScanSentences)
 	for scanner.Scan() {
 		fmt.Println(scanner.Text())
 	}
