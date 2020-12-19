@@ -1,6 +1,7 @@
 package filter_test
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -161,4 +162,26 @@ func TestWordFilter_Drop(t *testing.T) {
 		filter := filter.NewWordFilter(nil)
 		filter.Drop(nil)
 	})
+}
+
+func Example_WordFilter() {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		panic(err)
+	}
+	t, err := tokenizer.New(d, tokenizer.OmitBosEos())
+	if err != nil {
+		panic(err)
+	}
+	stopWords := filter.NewWordFilter([]string{"私", "は", "が", "の", "。"})
+	tokens := t.Tokenize("私の猫の名前はアプロです。")
+	stopWords.Drop(&tokens)
+	for _, v := range tokens {
+		fmt.Println(v.Surface)
+	}
+	// Output:
+	// 猫
+	// 名前
+	// アプロ
+	// です
 }

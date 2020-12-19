@@ -1,6 +1,7 @@
 package filter_test
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -197,4 +198,28 @@ func TestPOSFilter_Drop(t *testing.T) {
 		filter := filter.NewPOSFilter(nil)
 		filter.Drop(nil)
 	})
+}
+
+func Example_POSFilter() {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		panic(err)
+	}
+	t, err := tokenizer.New(d, tokenizer.OmitBosEos())
+	if err != nil {
+		panic(err)
+	}
+	posFilter := filter.NewPOSFilter([]filter.POS{
+		{"名詞", filter.Any, "人名"},
+		{"形容詞"},
+	}...)
+	tokens := t.Tokenize("赤い蝋燭と人魚。小川未明")
+	posFilter.Keep(&tokens)
+	for _, v := range tokens {
+		fmt.Println(v.Surface, v.POS())
+	}
+	// Output:
+	// 赤い [形容詞 自立 * *]
+	// 小川 [名詞 固有名詞 人名 姓]
+	// 未明 [名詞 固有名詞 人名 名]
 }
