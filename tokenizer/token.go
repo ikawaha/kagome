@@ -97,18 +97,27 @@ func (t Token) FeatureAt(i int) (string, bool) {
 			return t.dict.POSTable.NameList[id], true
 		}
 		i -= len(pos)
+		if len(t.dict.Contents) <= t.ID {
+			return "", false
+		}
 		c := t.dict.Contents[t.ID]
 		if i >= len(c) {
 			return "", false
 		}
 		return c[i], true
 	case UNKNOWN:
+		if len(t.dict.UnkDict.Contents) <= t.ID {
+			return "", false
+		}
 		c := t.dict.UnkDict.Contents[t.ID]
 		if i >= len(c) {
 			return "", false
 		}
 		return c[i], true
 	case USER:
+		if len(t.udict.Contents) <= t.ID {
+			return "", false
+		}
 		switch i {
 		case 0:
 			return t.udict.Contents[t.ID].Pos, true
