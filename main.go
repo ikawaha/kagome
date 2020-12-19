@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime/debug"
+	"strings"
 
 	"github.com/ikawaha/kagome/v2/cmd/lattice"
 	"github.com/ikawaha/kagome/v2/cmd/server"
@@ -20,58 +22,72 @@ type subcommand struct {
 	PrintDefaults func(flag.ErrorHandling)
 }
 
-var subcommands = []subcommand{
-	{
-		Name:          tokenize.CommandName,
-		Description:   tokenize.Description,
-		Run:           tokenize.Run,
-		Usage:         tokenize.Usage,
-		OptionCheck:   tokenize.OptionCheck,
-		PrintDefaults: tokenize.PrintDefaults,
-	},
-	{
-		Name:          server.CommandName,
-		Description:   server.Description,
-		Run:           server.Run,
-		Usage:         server.Usage,
-		OptionCheck:   server.OptionCheck,
-		PrintDefaults: server.PrintDefaults,
-	},
-	{
-		Name:          lattice.CommandName,
-		Description:   lattice.Description,
-		Run:           lattice.Run,
-		Usage:         lattice.Usage,
-		OptionCheck:   lattice.OptionCheck,
-		PrintDefaults: lattice.PrintDefaults,
-	},
-	{
-		Name:        "version",
-		Description: "show version",
-		Run: func([]string) error {
-			fmt.Fprintf(os.Stderr, "%s\n", version)
-			return nil
-		},
-		Usage:         func() {},
-		OptionCheck:   func([]string) error { return nil },
-		PrintDefaults: func(flag.ErrorHandling) {},
-	},
-}
-
 var (
-	// version is the app version.
-	version = `!!version undefined!!
-This must be specified by -X option during the go build. Such like:
-	$ go build --ldflags "-X 'main.version=$(git describe --tag)'"`
-
-	errorWriter       = os.Stderr
+	version     string // eg. go build --ldflags "-X 'main.version=$(git describe --tag)'"
+	errorWriter = os.Stderr
+	subcommands = []subcommand{
+		{
+			Name:          tokenize.CommandName,
+			Description:   tokenize.Description,
+			Run:           tokenize.Run,
+			Usage:         tokenize.Usage,
+			OptionCheck:   tokenize.OptionCheck,
+			PrintDefaults: tokenize.PrintDefaults,
+		},
+		{
+			Name:          server.CommandName,
+			Description:   server.Description,
+			Run:           server.Run,
+			Usage:         server.Usage,
+			OptionCheck:   server.OptionCheck,
+			PrintDefaults: server.PrintDefaults,
+		},
+		{
+			Name:          lattice.CommandName,
+			Description:   lattice.Description,
+			Run:           lattice.Run,
+			Usage:         lattice.Usage,
+			OptionCheck:   lattice.OptionCheck,
+			PrintDefaults: lattice.PrintDefaults,
+		},
+		{
+			Name:        "version",
+			Description: "show version",
+			Run: func([]string) error {
+				ShowVersion()
+				return nil
+			},
+			Usage:         func() {},
+			OptionCheck:   func([]string) error { return nil },
+			PrintDefaults: func(flag.ErrorHandling) {},
+		},
+	}
 	defaultSubcommand = subcommands[0]
 )
 
-// Usage prints to stdout information about the tool
+// Usage prints information about the tool
 func Usage() {
 	fmt.Fprintf(errorWriter, "Japanese Morphological Analyzer -- github.com/ikawaha/kagome/v2\n")
 	fmt.Fprintf(errorWriter, "usage: %s <command>\n", filepath.Base(os.Args[0]))
+}
+
+// ShowVersion prints the version about the tool.
+func ShowVersion() {
+	info, ok := debug.ReadBuildInfo()
+	if version != "" {
+		fmt.Fprintln(errorWriter, version)
+	} else {
+		fmt.Fprintln(errorWriter, info.Main.Version)
+	}
+	if !ok {
+		return
+	}
+	const prefix = "github.com/ikawaha/kagome-dict/"
+	for _, v := range info.Deps {
+		if strings.HasPrefix(v.Path, prefix) {
+			fmt.Fprintln(errorWriter, "  ", v.Path[len(prefix):], v.Version)
+		}
+	}
 }
 
 // PrintDefaults prints out the default flags
