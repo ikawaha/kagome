@@ -74,11 +74,13 @@ func Usage() {
 // ShowVersion prints the version about the tool.
 func ShowVersion() {
 	info, ok := debug.ReadBuildInfo()
-	if version != "" {
-		fmt.Fprintln(errorWriter, version)
-	} else {
-		fmt.Fprintln(errorWriter, info.Main.Version)
+	if ok && version == "" {
+		version = info.Main.Version
 	}
+	if version == "" {
+		version = "(devel)"
+	}
+	fmt.Fprintln(errorWriter, version)
 	if !ok {
 		return
 	}
