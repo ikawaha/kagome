@@ -82,11 +82,7 @@ func Test_AnalyzeEmptyInput(t *testing.T) {
 		t.Fatalf("got %v, expected %v", tokens, expected)
 	}
 	for i, tok := range tokens {
-		if tok.ID != expected[i].ID ||
-			tok.Class != expected[i].Class ||
-			tok.Start != expected[i].Start ||
-			tok.End != expected[i].End ||
-			tok.Surface != expected[i].Surface {
+		if !tok.Equal(expected[i]) {
 			t.Errorf("got %v, expected %v", tok, expected[i])
 		}
 	}
@@ -131,17 +127,13 @@ func Test_AnalyzeUnknown(t *testing.T) {
 	expected := []Token{
 		{ID: -1, Surface: "BOS"},
 		{ID: 34, Surface: "ポポピ", Start: 0, End: 3, Class: TokenClass(lattice.UNKNOWN)},
-		{ID: -1, Surface: "EOS", Start: 3, End: 3},
+		{ID: -1, Surface: "EOS", Start: 3, End: 3, Position: 9},
 	}
 	if len(tokens) != len(expected) {
 		t.Fatalf("got %v, expected %v", tokens, expected)
 	}
 	for i, tok := range tokens {
-		if tok.ID != expected[i].ID ||
-			tok.Class != expected[i].Class ||
-			tok.Start != expected[i].Start ||
-			tok.End != expected[i].End ||
-			tok.Surface != expected[i].Surface {
+		if !tok.Equal(expected[i]) {
 			t.Errorf("got %v, expected %v", tok, expected[i])
 		}
 	}
@@ -204,11 +196,7 @@ func Test_AnalyzeWithSearchModeEmptyInput(t *testing.T) {
 		t.Fatalf("got %v, expected %v", tokens, expected)
 	}
 	for i, tok := range tokens {
-		if tok.ID != expected[i].ID ||
-			tok.Class != expected[i].Class ||
-			tok.Start != expected[i].Start ||
-			tok.End != expected[i].End ||
-			tok.Surface != expected[i].Surface {
+		if !tok.Equal(expected[i]) {
 			t.Errorf("got %v, expected %v", tok, expected[i])
 		}
 	}
