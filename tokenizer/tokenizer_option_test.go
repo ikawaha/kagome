@@ -46,15 +46,15 @@ func Test_AnalyzeWithUserDict(t *testing.T) {
 		}
 		tokens := tnz.Analyze("関西国際空港", Normal)
 		expected := []Token{
-			{ID: -1, Surface: "BOS"},
-			{ID: 2, Surface: "関西国際空港", Start: 0, End: 6, Class: TokenClass(lattice.USER)},
-			{ID: -1, Surface: "EOS", Start: 6, End: 6, Position: len("関西国際空港")},
+			{Index: 0, ID: -1, Surface: "BOS"},
+			{Index: 1, ID: 2, Surface: "関西国際空港", Start: 0, End: 6, Class: TokenClass(lattice.USER)},
+			{Index: 2, ID: -1, Surface: "EOS", Start: 6, End: 6, Position: len("関西国際空港")},
 		}
 		if len(tokens) != len(expected) {
 			t.Fatalf("got %v, expected %v", tokens, expected)
 		}
 		for i, tok := range tokens {
-			if !tok.Equal(expected[i]) {
+			if !equalTokens(tok, expected[i]) {
 				t.Errorf("%dth token, expected %v, got %v", i, expected[i], tok)
 			}
 		}
@@ -86,15 +86,15 @@ func Test_AnalyzeWithSearchModeWithUserDict(t *testing.T) {
 
 		tokens := tnz.Analyze("関西国際空港", Search)
 		expected := []Token{
-			{ID: -1, Surface: "BOS"},
-			{ID: 2, Surface: "関西国際空港", Start: 0, End: 6, Class: TokenClass(lattice.USER)},
-			{ID: -1, Surface: "EOS", Start: 6, End: 6, Position: len("関西国際空港")},
+			{Index: 0, ID: -1, Surface: "BOS"},
+			{Index: 1, ID: 2, Surface: "関西国際空港", Start: 0, End: 6, Class: TokenClass(lattice.USER)},
+			{Index: 2, ID: -1, Surface: "EOS", Start: 6, End: 6, Position: len("関西国際空港")},
 		}
 		if len(tokens) != len(expected) {
 			t.Fatalf("expected %v, got %v", expected, tokens)
 		}
 		for i, tok := range tokens {
-			if !tok.Equal(expected[i]) {
+			if !equalTokens(tok, expected[i]) {
 				t.Errorf("%dth token, expected %v, got %v", i, expected[i], tok)
 			}
 		}
@@ -126,15 +126,15 @@ func Test_AnalyzeWithExtendedModeWithUserDict(t *testing.T) {
 
 		tokens := tnz.Analyze("関西国際空港", Extended)
 		expected := []Token{
-			{ID: -1, Surface: "BOS"},
-			{ID: 2, Surface: "関西国際空港", Start: 0, End: 6, Class: TokenClass(lattice.USER)},
-			{ID: -1, Surface: "EOS", Start: 6, End: 6, Position: len("関西国際空港")},
+			{Index: 0, ID: -1, Surface: "BOS"},
+			{Index: 1, ID: 2, Surface: "関西国際空港", Start: 0, End: 6, Class: TokenClass(lattice.USER)},
+			{Index: 2, ID: -1, Surface: "EOS", Start: 6, End: 6, Position: len("関西国際空港")},
 		}
 		if len(tokens) != len(expected) {
 			t.Fatalf("expected %v, got %v", expected, tokens)
 		}
 		for i, tok := range tokens {
-			if !tok.Equal(expected[i]) {
+			if !equalTokens(tok, expected[i]) {
 				t.Errorf("%dth token, expected %v, got %v", i, expected[i], tok)
 			}
 		}
@@ -158,7 +158,7 @@ func TestTokenizer_Analyze_OmitBOSEOS(t *testing.T) {
 		t.Fatalf("got %v, expected %v", tokens, expected)
 	}
 	for i, tok := range tokens {
-		if !tok.Equal(expected[i]) {
+		if !equalTokens(tok, expected[i]) {
 			t.Errorf("%dth token, expected %v, got %v", i, expected[i], tok)
 		}
 	}

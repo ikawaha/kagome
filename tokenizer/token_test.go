@@ -354,7 +354,7 @@ func Test_TokenString(t *testing.T) {
 		End:     1,
 		Surface: "テスト",
 	}
-	want := `"テスト" (0: 0, 1) DUMMY [123]`
+	want := `0:"テスト" (0: 0, 1) DUMMY [123]`
 	got := fmt.Sprintf("%v", tok)
 	if got != want {
 		t.Errorf("want %v, got %v", want, got)
