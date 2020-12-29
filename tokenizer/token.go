@@ -207,15 +207,12 @@ func (t Token) pickupFromFeatures(key string) (string, bool) {
 
 // String returns a string representation of a token.
 func (t Token) String() string {
-	return fmt.Sprintf("%q (%d: %d, %d) %v [%d]", t.Surface, t.Position, t.Start, t.End, t.Class, t.ID)
+	return fmt.Sprintf("%d:%q (%d: %d, %d) %v [%d]", t.Index, t.Surface, t.Position, t.Start, t.End, t.Class, t.ID)
 }
 
-// Equal returns true if tokens are equal. This function compares values other than the `Index` field.
+// Equal returns true if tokens are equal.
 func (t Token) Equal(v Token) bool {
 	return t.ID == v.ID &&
 		t.Class == v.Class &&
-		t.Position == v.Position &&
-		t.Start == v.Start &&
-		t.End == v.End &&
 		t.Surface == v.Surface
 }
