@@ -258,12 +258,13 @@ func (la *Lattice) Backward(m TokenizeMode) {
 		runeLen := utf8.RuneCountInString(p.Surface)
 		stack := make([]*node, 0, runeLen)
 		i := 0
-		for _, r := range p.Surface {
+		for k, r := range p.Surface {
 			stack = append(stack, &node{
-				ID:      p.ID,
-				Start:   p.Start + i,
-				Class:   DUMMY,
-				Surface: string(r),
+				ID:       p.ID,
+				Start:    p.Start + i,
+				Class:    DUMMY,
+				Surface:  string(r),
+				Position: p.Position + k,
 			})
 			i++
 		}

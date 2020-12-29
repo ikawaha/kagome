@@ -225,21 +225,18 @@ func Test_AnalyzeWithSearchMode(t *testing.T) {
 	}
 	tokens := tnz.Analyze("関西国際空港", Search)
 	expected := []Token{
-		{ID: -1, Surface: "BOS"},
-		{ID: 372968, Surface: "関西", Start: 0, End: 2, Class: TokenClass(lattice.KNOWN)},
-		{ID: 168541, Surface: "国際", Start: 2, End: 4, Class: TokenClass(lattice.KNOWN)},
-		{ID: 307133, Surface: "空港", Start: 4, End: 6, Class: TokenClass(lattice.KNOWN)},
-		{ID: -1, Surface: "EOS", Start: 6, End: 6},
+		{Index: 0, ID: -1, Surface: "BOS"},
+		{Index: 1, ID: 372967, Surface: "関西", Start: 0, End: 2, Position: 0, Class: TokenClass(lattice.KNOWN)},
+		{Index: 2, ID: 168542, Surface: "国際", Start: 2, End: 4, Position: 6, Class: TokenClass(lattice.KNOWN)},
+		{Index: 3, ID: 307134, Surface: "空港", Start: 4, End: 6, Position: 12, Class: TokenClass(lattice.KNOWN)},
+		{Index: 4, ID: -1, Surface: "EOS", Start: 6, End: 6, Position: 18},
 	}
 
 	if len(tokens) != len(expected) {
 		t.Fatalf("got %v, expected %v", tokens, expected)
 	}
 	for i, tok := range tokens {
-		if tok.Class != expected[i].Class ||
-			tok.Start != expected[i].Start ||
-			tok.End != expected[i].End ||
-			tok.Surface != expected[i].Surface {
+		if tok.Index != expected[i].Index || !tok.Equal(expected[i]) {
 			t.Errorf("got %v, expected %v", tok, expected[i])
 		}
 	}
@@ -257,19 +254,15 @@ func Test_AnalyzeWithSearchModeUnknown(t *testing.T) {
 
 	tokens := tnz.Analyze("ポポピ", Search)
 	expected := []Token{
-		{ID: -1, Surface: "BOS"},
-		{ID: 34, Surface: "ポポピ", Start: 0, End: 3, Class: TokenClass(lattice.UNKNOWN)},
-		{ID: -1, Surface: "EOS", Start: 3, End: 3},
+		{Index: 0, ID: -1, Surface: "BOS"},
+		{Index: 1, ID: 34, Surface: "ポポピ", Start: 0, End: 3, Class: TokenClass(lattice.UNKNOWN)},
+		{Index: 2, ID: -1, Surface: "EOS", Start: 3, End: 3, Position: 9},
 	}
 	if len(tokens) != len(expected) {
 		t.Fatalf("got %v, expected %v", tokens, expected)
 	}
 	for i, tok := range tokens {
-		if tok.ID != expected[i].ID ||
-			tok.Class != expected[i].Class ||
-			tok.Start != expected[i].Start ||
-			tok.End != expected[i].End ||
-			tok.Surface != expected[i].Surface {
+		if tok.Index != expected[i].Index || !tok.Equal(expected[i]) {
 			t.Errorf("got %v, expected %v", tok, expected[i])
 		}
 	}
@@ -287,18 +280,14 @@ func Test_AnalyzeWithExtendedModeEmpty(t *testing.T) {
 
 	tokens := tnz.Analyze("", Extended)
 	expected := []Token{
-		{ID: -1, Surface: "BOS"},
-		{ID: -1, Surface: "EOS"},
+		{Index: 0, ID: -1, Surface: "BOS"},
+		{Index: 1, ID: -1, Surface: "EOS"},
 	}
 	if len(tokens) != len(expected) {
 		t.Fatalf("got %v, expected %v", tokens, expected)
 	}
 	for i, tok := range tokens {
-		if tok.ID != expected[i].ID ||
-			tok.Class != expected[i].Class ||
-			tok.Start != expected[i].Start ||
-			tok.End != expected[i].End ||
-			tok.Surface != expected[i].Surface {
+		if tok.Index != expected[i].Index || !tok.Equal(expected[i]) {
 			t.Errorf("got %v, expected %v", tok, expected[i])
 		}
 	}
@@ -316,20 +305,17 @@ func Test_AnalyzeWithExtendedMode(t *testing.T) {
 
 	tokens := tnz.Analyze("関西国際空港", Extended)
 	expected := []Token{
-		{ID: -1, Surface: "BOS"},
-		{ID: 372968, Surface: "関西", Start: 0, End: 2, Class: TokenClass(lattice.KNOWN)},
-		{ID: 168541, Surface: "国際", Start: 2, End: 4, Class: TokenClass(lattice.KNOWN)},
-		{ID: 307133, Surface: "空港", Start: 4, End: 6, Class: TokenClass(lattice.KNOWN)},
-		{ID: -1, Surface: "EOS", Start: 6, End: 6},
+		{Index: 0, ID: -1, Surface: "BOS"},
+		{Index: 1, ID: 372967, Surface: "関西", Start: 0, End: 2, Position: 0, Class: TokenClass(lattice.KNOWN)},
+		{Index: 2, ID: 168542, Surface: "国際", Start: 2, End: 4, Position: 6, Class: TokenClass(lattice.KNOWN)},
+		{Index: 3, ID: 307134, Surface: "空港", Start: 4, End: 6, Position: 12, Class: TokenClass(lattice.KNOWN)},
+		{Index: 4, ID: -1, Surface: "EOS", Start: 6, End: 6, Position: 18},
 	}
 	if len(tokens) != len(expected) {
 		t.Fatalf("got %v, expected %v", tokens, expected)
 	}
 	for i, tok := range tokens {
-		if tok.Class != expected[i].Class ||
-			tok.Start != expected[i].Start ||
-			tok.End != expected[i].End ||
-			tok.Surface != expected[i].Surface {
+		if tok.Index != expected[i].Index || !tok.Equal(expected[i]) {
 			t.Errorf("got %v, expected %v", tok, expected[i])
 		}
 	}
@@ -347,21 +333,17 @@ func Test_AnalyzeWithExtendedModeUnknown(t *testing.T) {
 
 	tokens := tnz.Analyze("ポポピ", Extended)
 	expected := []Token{
-		{ID: -1, Surface: "BOS"},
-		{ID: 34, Surface: "ポ", Start: 0, End: 1, Class: TokenClass(lattice.DUMMY)},
-		{ID: 34, Surface: "ポ", Start: 1, End: 2, Class: TokenClass(lattice.DUMMY)},
-		{ID: 34, Surface: "ピ", Start: 2, End: 3, Class: TokenClass(lattice.DUMMY)},
-		{ID: -1, Surface: "EOS", Start: 3, End: 3},
+		{Index: 0, ID: -1, Surface: "BOS"},
+		{Index: 1, ID: 34, Surface: "ポ", Start: 0, End: 1, Position: 0, Class: TokenClass(lattice.DUMMY)},
+		{Index: 2, ID: 34, Surface: "ポ", Start: 1, End: 2, Position: 3, Class: TokenClass(lattice.DUMMY)},
+		{Index: 3, ID: 34, Surface: "ピ", Start: 2, End: 3, Position: 6, Class: TokenClass(lattice.DUMMY)},
+		{Index: 4, ID: -1, Surface: "EOS", Start: 3, End: 3, Position: 9},
 	}
 	if len(tokens) != len(expected) {
 		t.Fatalf("got %v, expected %v", tokens, expected)
 	}
 	for i, tok := range tokens {
-		if tok.ID != expected[i].ID ||
-			tok.Class != expected[i].Class ||
-			tok.Start != expected[i].Start ||
-			tok.End != expected[i].End ||
-			tok.Surface != expected[i].Surface {
+		if tok.Index != expected[i].Index || !tok.Equal(expected[i]) {
 			t.Errorf("got %v, expected %v", tok, expected[i])
 		}
 	}

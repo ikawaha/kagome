@@ -103,6 +103,7 @@ func (t Tokenizer) Analyze(input string, mode TokenizeMode) []Token {
 			continue
 		}
 		tok := Token{
+			Index:    len(tokens),
 			ID:       n.ID,
 			Class:    TokenClass(n.Class),
 			Position: n.Position,
