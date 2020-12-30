@@ -62,19 +62,22 @@ func (s SentenceSplitter) ScanSentences(data []byte, atEOF bool) (advance int, t
 		r, size := utf8.DecodeRune(data[p:])
 		if s.SkipWhiteSpace && unicode.IsSpace(r) {
 			p += size
-			if head {
+			switch {
+			case head:
 				start, end = p, p
-			} else if s.isDelim(r) {
+			case s.isDelim(r):
 				return p, data[start:end], nil
-			} else if s.DoubleLineFeedSplit && r == '\n' {
+			case s.DoubleLineFeedSplit && r == '\n':
 				if nn {
 					return p, data[start:end], nil
 				}
 				nn = true
+			case nn:
+				nn = false
 			}
 			continue
 		}
-		head, nn = false, false // clear flags
+		head = false
 		if end != p {
 			for i := 0; i < size; i++ {
 				data[end+i] = data[p+i]
@@ -83,6 +86,12 @@ func (s SentenceSplitter) ScanSentences(data []byte, atEOF bool) (advance int, t
 		p += size
 		end += size
 		rcount++
+		if s.DoubleLineFeedSplit && r == '\n' {
+			if nn {
+				return p, data[start:end], nil
+			}
+			nn = true
+		}
 		if !s.isDelim(r) && rcount < s.MaxRuneLen {
 			continue
 		}
