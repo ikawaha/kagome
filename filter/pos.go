@@ -15,9 +15,9 @@ type POSFilter struct {
 }
 
 // NewPOSFilter returns a part-of-speech filter.
-func NewPOSFilter(stops ...POS) *POSFilter {
+func NewPOSFilter(p ...POS) *POSFilter {
 	return &POSFilter{
-		filter: NewFeaturesFilter(stops...),
+		filter: NewFeaturesFilter(p...),
 	}
 }
 
