@@ -109,6 +109,122 @@ func Test_DelimWhiteSpace(t *testing.T) {
 	}
 }
 
+func Test_DisableSkipWhiteSpace(t *testing.T) {
+	testdata := []struct {
+		input  string
+		expect []string
+	}{
+		{
+			input:  "",
+			expect: []string{},
+		},
+		{
+			input:  "あああ",
+			expect: []string{"あああ"},
+		},
+		{
+			input:  "   ",
+			expect: []string{"   "},
+		},
+		{
+			input:  " x x x ",
+			expect: []string{" ", "x ", "x ", "x "},
+		},
+		{
+			input:  "こんにちはは「さようなら 」　\U0001f363が好き",
+			expect: []string{"こんにちはは「さようなら 」　", "\U0001f363が好き"},
+		},
+		{
+			input:  "こんにちは \t\tさようなら　おはよう おやすみ   ",
+			expect: []string{"こんにちは ", "\t\tさようなら　", "おはよう ", "おやすみ   "},
+		},
+		{
+			input:  "すももも\t\n\n \tももも\n\nもものうち\n\n",
+			expect: []string{"すももも\t\n\n", " ", "\tももも\n\n", "もものうち\n\n"},
+		},
+	}
+
+	s := filter.SentenceSplitter{
+		Delim:               []rune{' ', '　'}, // white spaces
+		Follower:            []rune{'.', '｣', '」', '』', ')', '）', '｝', '}', '〉', '》'},
+		SkipWhiteSpace:      false,
+		DoubleLineFeedSplit: true,
+		MaxRuneLen:          256,
+	}
+	for _, d := range testdata {
+		scanner := bufio.NewScanner(strings.NewReader(d.input))
+		scanner.Split(s.ScanSentences)
+		r := make([]string, 0, len(d.expect))
+		for scanner.Scan() {
+			r = append(r, scanner.Text())
+		}
+		if !reflect.DeepEqual(r, d.expect) {
+			t.Errorf("input %q, got %#v, expected %#v", d.input, r, d.expect)
+		}
+		if got := strings.Join(r, ""); got != d.input {
+			t.Errorf("got len=%d %q, input len=%d %q", len(got), got, len(d.input), d.input)
+		}
+	}
+}
+
+func Test_DisableSkipWhiteSpaceAndDoubleLineFeedSplit(t *testing.T) {
+	testdata := []struct {
+		input  string
+		expect []string
+	}{
+		{
+			input:  "",
+			expect: []string{},
+		},
+		{
+			input:  "あああ",
+			expect: []string{"あああ"},
+		},
+		{
+			input:  "   ",
+			expect: []string{"   "},
+		},
+		{
+			input:  " x x x ",
+			expect: []string{" ", "x ", "x ", "x "},
+		},
+		{
+			input:  "こんにちはは「さようなら 」　\U0001f363が好き",
+			expect: []string{"こんにちはは「さようなら 」　", "\U0001f363が好き"},
+		},
+		{
+			input:  "こんにちは \t\tさようなら　おはよう おやすみ   ",
+			expect: []string{"こんにちは ", "\t\tさようなら　", "おはよう ", "おやすみ   "},
+		},
+		{
+			input:  "すももも\t\n\n \tももも\n\nもものうち\n\n",
+			expect: []string{"すももも\t\n\n ", "\tももも\n\nもものうち\n\n"},
+		},
+	}
+
+	s := filter.SentenceSplitter{
+		Delim:               []rune{' ', '　'}, // white spaces
+		Follower:            []rune{'.', '｣', '」', '』', ')', '）', '｝', '}', '〉', '》'},
+		SkipWhiteSpace:      false,
+		DoubleLineFeedSplit: false,
+		MaxRuneLen:          256,
+	}
+	for _, d := range testdata {
+		scanner := bufio.NewScanner(strings.NewReader(d.input))
+		scanner.Split(s.ScanSentences)
+		r := make([]string, 0, len(d.expect))
+		for scanner.Scan() {
+			r = append(r, scanner.Text())
+		}
+		if !reflect.DeepEqual(r, d.expect) {
+			t.Errorf("input %q, got %#v, expected %#v", d.input, r, d.expect)
+		}
+		if got := strings.Join(r, ""); got != d.input {
+			t.Errorf("got len=%d %q, input len=%d %q", len(got), got, len(d.input), d.input)
+		}
+	}
+}
+
 func Test_ScanSentences(t *testing.T) {
 	testdata := []struct {
 		atEnd   bool
