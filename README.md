@@ -95,6 +95,11 @@ output:
 うち	名詞,非自立,副詞可能,*,*,*,うち,ウチ,ウチ
 ```
 
+## Reference
+
+[![実践：形態素解析 kagome v2](https://user-images.githubusercontent.com/4232165/102152682-e281e400-3eb8-11eb-91f7-13e08a8977d9.png)](https://zenn.dev/ikawaha/books/kagome-v2-japanese-tokenizer)
+
+
 # Commands
 
 ## Install
