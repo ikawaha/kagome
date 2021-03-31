@@ -194,6 +194,11 @@ A debug tool of tokenize process outputs a lattice in graphviz dot format.
 
 [![](https://images.microbadger.com/badges/image/ikawaha/kagome.svg)](https://microbadger.com/images/ikawaha/kagome "View image info on microbadger.com")
 
+# Building to WebAssembly
+
+You can see how kagome wasm works in [demo site.](http://ikawaha.github.io/kagome/)
+The source code can be found in `./sample/wasm`. 
+
 # Licence
 
 MIT
