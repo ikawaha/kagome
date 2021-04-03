@@ -105,6 +105,13 @@ output:
 ## Install
 
 **Go**
+
+Go 1.16 or later.
+```shellsession
+go install github.com/ikawaha/kagome/v2@latest
+```
+
+Or use `go get`.
 ```shellsession
 env GO111MODULE=on go get -u github.com/ikawaha/kagome/v2
 ```
