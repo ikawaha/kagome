@@ -1,8 +1,8 @@
 github.com/ikawaha/kagome-dict v1.0.2/go.mod h1:JCwHr4WOrGRsC2cJU3751mJvL1hIAAZVeIrkl8n3jkk=
 github.com/ikawaha/kagome-dict v1.0.3 h1:x9i49EDy3tx7HPgQ9+l0AqTB5rEkKPoSTD6NyIe9nF8=
 github.com/ikawaha/kagome-dict v1.0.3/go.mod h1:8Ma5E21J2kyaak6KumYLWGLKxm1kaAkCCWKWnrc5o/o=
-github.com/ikawaha/kagome-dict/ipa v1.0.2 h1:vBT1bXZbJpf1Ogw07GDlJmKQ5JyexeeIUJ5DkqcMNwo=
-github.com/ikawaha/kagome-dict/ipa v1.0.2/go.mod h1:CmdUPFC1ISLK+ycFo8J6jYFVngDMuXhWtcdz39jni3A=
+github.com/ikawaha/kagome-dict/ipa v1.0.3 h1:jt2toGpRha7PPD5mqKEOabmAssichf1IwJykpstgN0s=
+github.com/ikawaha/kagome-dict/ipa v1.0.3/go.mod h1:zpMcAFSLDYEq+UI3GnF3IcZE5a0rKB2J0rrKGY6HYW8=
 github.com/ikawaha/kagome-dict/uni v1.1.1 h1:18Zc8D1XC5mSUDm02/dksxc6lfG26LC7c43j7ebZzLU=
 github.com/ikawaha/kagome-dict/uni v1.1.1/go.mod h1:iipUtdM9UhHIfaY7Hq1ITLVix5OBZf/FgxMYZpGe5fg=
 golang.org/x/text v0.3.4/go.mod h1:5Zoc/QRtKVWzQhOtBMvqHzDpF6irO9z98xDceosuGiQ=
