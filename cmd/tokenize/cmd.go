@@ -12,6 +12,7 @@ import (
 	"github.com/ikawaha/kagome-dict/dict"
 	"github.com/ikawaha/kagome-dict/ipa"
 	"github.com/ikawaha/kagome-dict/uni"
+	"github.com/ikawaha/kagome/v2/filter"
 	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
@@ -19,7 +20,7 @@ import (
 const (
 	CommandName  = "tokenize"
 	Description  = `command line tokenize`
-	usageMessage = "%s [-file input_file] [-dict dic_file] [-userdict userdic_file] [-sysdict (ipa|uni)] [-simple false] [-mode (normal|search|extended)]\n"
+	usageMessage = "%s [-file input_file] [-dict dic_file] [-userdict userdic_file] [-sysdict (ipa|uni)] [-simple false] [-mode (normal|search|extended)] [-split]\n"
 )
 
 // ErrorWriter writes to stderr
@@ -35,6 +36,7 @@ type option struct {
 	sysdict string
 	simple  bool
 	mode    string
+	split   bool
 	flagSet *flag.FlagSet
 }
 
@@ -53,6 +55,7 @@ func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	o.flagSet.StringVar(&o.sysdict, "sysdict", "ipa", "system dict type (ipa|uni)")
 	o.flagSet.BoolVar(&o.simple, "simple", false, "display abbreviated dictionary contents")
 	o.flagSet.StringVar(&o.mode, "mode", "normal", "tokenize mode (normal|search|extended)")
+	o.flagSet.BoolVar(&o.split, "split", false, "use tiny sentence splitter")
 
 	return
 }
@@ -78,7 +81,7 @@ func (o *option) parse(args []string) error {
 func OptionCheck(args []string) error {
 	opt := newOption(ioutil.Discard, flag.ContinueOnError)
 	if err := opt.parse(args); err != nil {
-		return fmt.Errorf("%v, %v", CommandName, err)
+		return fmt.Errorf("%v, %w", CommandName, err)
 	}
 	return nil
 }
@@ -148,10 +151,13 @@ func command(opt *option) error {
 		}()
 	}
 	mode := selectMode(opt.mode)
-	scanner := bufio.NewScanner(fp)
-	for scanner.Scan() {
-		line := scanner.Text()
-		tokens := t.Analyze(line, mode)
+	s := bufio.NewScanner(fp)
+	if opt.split {
+		s.Split(filter.ScanSentences)
+	}
+	for s.Scan() {
+		sen := s.Text()
+		tokens := t.Analyze(sen, mode)
 		for i, size := 1, len(tokens); i < size; i++ {
 			tok := tokens[i]
 			c := tok.Features()
@@ -162,7 +168,7 @@ func command(opt *option) error {
 			}
 		}
 	}
-	return scanner.Err()
+	return s.Err()
 }
 
 // Run receives the slice of args and executes the tokenize tool
@@ -171,7 +177,7 @@ func Run(args []string) error {
 	if err := opt.parse(args); err != nil {
 		Usage()
 		PrintDefaults(flag.ExitOnError)
-		return fmt.Errorf("%v, %v", CommandName, err)
+		return fmt.Errorf("%v, %w", CommandName, err)
 	}
 	return command(opt)
 }
