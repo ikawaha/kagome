@@ -81,7 +81,7 @@ func (o *option) parse(args []string) error {
 func OptionCheck(args []string) error {
 	opt := newOption(ioutil.Discard, flag.ContinueOnError)
 	if err := opt.parse(args); err != nil {
-		return fmt.Errorf("%v, %v", CommandName, err)
+		return fmt.Errorf("%v, %w", CommandName, err)
 	}
 	return nil
 }
@@ -177,7 +177,7 @@ func Run(args []string) error {
 	if err := opt.parse(args); err != nil {
 		Usage()
 		PrintDefaults(flag.ExitOnError)
-		return fmt.Errorf("%v, %v", CommandName, err)
+		return fmt.Errorf("%v, %w", CommandName, err)
 	}
 	return command(opt)
 }

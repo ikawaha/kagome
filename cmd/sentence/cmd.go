@@ -85,7 +85,7 @@ func Run(args []string) error {
 	if err := opt.parse(args); err != nil {
 		Usage()
 		PrintDefaults(flag.ExitOnError)
-		return fmt.Errorf("%v, %v", CommandName, err)
+		return fmt.Errorf("%v, %w", CommandName, err)
 	}
 	return command(opt)
 }

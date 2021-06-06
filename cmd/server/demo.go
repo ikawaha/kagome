@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"html/template"
 	"io"
@@ -81,13 +82,10 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		if err := w0.Close(); err != nil {
 			log.Printf("pipe close error, %v", err)
 		}
-
 		if err := cmd.Wait(); err != nil {
-			switch err {
-			case context.DeadlineExceeded:
+			cmdErr = fmt.Sprintf("Error: process done with error, %v", err)
+			if errors.Is(err, context.DeadlineExceeded) {
 				cmdErr = "Error: Graphviz time out"
-			default:
-				cmdErr = fmt.Sprintf("Error: process done with error, %v", err)
 			}
 		}
 		svg = buf.String()
