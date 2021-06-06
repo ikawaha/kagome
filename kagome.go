@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/ikawaha/kagome/v2/cmd/lattice"
+	"github.com/ikawaha/kagome/v2/cmd/sentence"
 	"github.com/ikawaha/kagome/v2/cmd/server"
 	"github.com/ikawaha/kagome/v2/cmd/tokenize"
 )
@@ -49,6 +50,14 @@ var (
 			Usage:         lattice.Usage,
 			OptionCheck:   lattice.OptionCheck,
 			PrintDefaults: lattice.PrintDefaults,
+		},
+		{
+			Name:          sentence.CommandName,
+			Description:   sentence.Description,
+			Run:           sentence.Run,
+			Usage:         sentence.Usage,
+			OptionCheck:   sentence.OptionCheck,
+			PrintDefaults: sentence.PrintDefaults,
 		},
 		{
 			Name:        "version",
