@@ -43,10 +43,7 @@ func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 }
 
 func (o *option) parse(args []string) error {
-	if err := o.flagSet.Parse(args); err != nil {
-		return err
-	}
-	return nil
+	return o.flagSet.Parse(args)
 }
 
 // OptionCheck receives a slice of args and returns an error if it was not successfully parsed
