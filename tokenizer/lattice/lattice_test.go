@@ -143,16 +143,13 @@ func Test_LatticeBuildUnknown(t *testing.T) {
 		t.Errorf("lattice initialize error: got %v, expected %v", *la.list[len(la.list)-1][0], eos)
 	}
 
-	expected := 7
-	if len(la.list[1]) != expected {
+	expected := 18
+	if len(la.list[3]) != expected {
 		t.Fatalf("lattice initialize error: got %v, expected %v", len(la.list[1]), expected)
 	}
-	l := la.list[1]
+	l := la.list[3]
 	var known, unknown, undef int
 	for _, v := range l {
-		if v.Surface != string([]rune(inp)[0:1]) {
-			t.Errorf("lattice initialize error: got %+v, expected surface %c", v, []rune(inp)[0])
-		}
 		switch v.Class {
 		case KNOWN:
 			known++
@@ -162,11 +159,11 @@ func Test_LatticeBuildUnknown(t *testing.T) {
 			undef++
 		}
 	}
-	if known != 1 {
-		t.Errorf("lattice initialize error: got KNOWN %d, expected 1, %+v", known, l)
+	if known != 0 {
+		t.Errorf("lattice initialize error: got KNOWN %d, expected 0, %+v", known, l)
 	}
-	if unknown != 6 {
-		t.Errorf("lattice initialize error: got UNKNOWN %d, expected 6, %+v", unknown, l)
+	if unknown != 18 {
+		t.Errorf("lattice initialize error: got UNKNOWN %d, expected 18, %+v", unknown, l)
 	}
 	if undef != 0 {
 		t.Errorf("lattice initialize error: got unexpected class %d, %+v", undef, l)
