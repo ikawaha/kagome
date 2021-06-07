@@ -307,6 +307,7 @@ func features(dict *dict.Dict, udict *dict.UserDict, n *node) []string {
 }
 
 // Dot outputs a lattice in the graphviz dot format.
+//nolint:gocyclo
 func (la *Lattice) Dot(w io.Writer) {
 	bests := make(map[*node]struct{})
 	for _, n := range la.Output {
