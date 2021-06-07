@@ -200,7 +200,7 @@ func TestPOSFilter_Drop(t *testing.T) {
 	})
 }
 
-func Example_POSFilter() {
+func ExamplePOSFilter() {
 	d, err := dict.LoadDictFile(testDictPath)
 	if err != nil {
 		panic(err)

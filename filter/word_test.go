@@ -164,7 +164,7 @@ func TestWordFilter_Drop(t *testing.T) {
 	})
 }
 
-func Example_WordFilter() {
+func ExampleWordFilter() {
 	d, err := dict.LoadDictFile(testDictPath)
 	if err != nil {
 		panic(err)
