@@ -250,7 +250,7 @@ func Test_ScanSentences(t *testing.T) {
 	}
 }
 
-func Example_ScanSentences() {
+func ExampleScanSentences() {
 	sampleText := `　人魚は、南の方の海にばかり棲んでいるのではあ
                          りません。北の海にも棲んでいたのであります。
                          　北方の海うみの色は、青うございました。ある

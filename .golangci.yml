@@ -12,7 +12,7 @@ linters:
     - gocyclo
     - staticcheck
     - govet
-    - golint
+    - revive
   disable:
     - maligned
     - exhaustive
@@ -30,3 +30,5 @@ linters:
 linters-settings:
   gocyclo:
     min-complexity: 15
+  errcheck:
+    ignore: fmt:.*,io/ioutil:^Read,^Close|^Write|^Shutdown

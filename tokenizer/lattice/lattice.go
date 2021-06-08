@@ -161,14 +161,19 @@ func (la *Lattice) Build(inp string) {
 					}
 				}
 			}
+
+			prev := pos
+			if c, size := utf8.DecodeLastRuneInString(inp[pos:endPos]); c != utf8.RuneError {
+				prev = endPos - size
+			}
 			id := la.dic.UnkDict.Index[int32(class)]
-			for i, w := pos, 0; i < endPos; i += w {
-				_, w = utf8.DecodeRuneInString(inp[i:])
-				end := i + w
-				dup := la.dic.UnkDict.IndexDup[int32(class)]
-				for x := 0; x < int(dup)+1; x++ {
-					la.addNode(runePos, int(id)+x, pos, runePos, UNKNOWN, inp[pos:end])
+			dup := la.dic.UnkDict.IndexDup[int32(class)]
+			for x := 0; x < int(dup)+1; x++ {
+				if pos < prev {
+					// add the string with one character truncated at the end.
+					la.addNode(runePos, int(id)+x, pos, runePos, UNKNOWN, inp[pos:prev])
 				}
+				la.addNode(runePos, int(id)+x, pos, runePos, UNKNOWN, inp[pos:endPos])
 			}
 		}
 	}
@@ -307,6 +312,7 @@ func features(dict *dict.Dict, udict *dict.UserDict, n *node) []string {
 }
 
 // Dot outputs a lattice in the graphviz dot format.
+//nolint:gocyclo
 func (la *Lattice) Dot(w io.Writer) {
 	bests := make(map[*node]struct{})
 	for _, n := range la.Output {
