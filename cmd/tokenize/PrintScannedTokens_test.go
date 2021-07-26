@@ -28,12 +28,14 @@ func TestPrintScannedTokens_Default(t *testing.T) {
 	defer funcDefer()
 
 	// Run
-	tokenize.Run(userArgs)
+	err := tokenize.Run(userArgs)
+	if err != nil {
+		t.Fatalf("Failed to execute tokenize.Run.\n%v", err)
+	}
 
 	// Assert
-	expect := "私	名詞,代名詞,一般,*,*,*,私,ワタシ,ワタシ\nEOS\n"
 	actual := capturedSTDOUT
-
+	expect := "私	名詞,代名詞,一般,*,*,*,私,ワタシ,ワタシ\nEOS\n"
 	if expect != actual {
 		t.Errorf("Expect: %v\nActual: %v", expect, actual)
 	}
@@ -56,15 +58,18 @@ func TestPrintScannedTokens_JSON(t *testing.T) {
 	defer funcDefer()
 
 	// Run
-	tokenize.Run(userArgs)
+	err := tokenize.Run(userArgs)
+	if err != nil {
+		t.Fatalf("Failed to execute tokenize.Run.\n%v", err)
+	}
 
 	// Assert
+	actual := capturedSTDOUT
 	expect := "[\n{\"id\":304999,\"start\":0,\"end\":1,\"surface\":\"私\"," +
 		"\"class\":\"KNOWN\",\"pos\":[\"名詞\",\"代名詞\",\"一般\",\"*\"]," +
 		"\"base_form\":\"私\",\"reading\":\"ワタシ\",\"pronunciation\":\"ワタシ\"," +
 		"\"features\":[\"名詞\",\"代名詞\",\"一般\",\"*\",\"*\",\"*\",\"私\",\"ワタシ\"," +
 		"\"ワタシ\"]}\n]\n"
-	actual := capturedSTDOUT
 
 	if expect != actual {
 		t.Errorf("Expect: %v\nActual: %v", expect, actual)
@@ -88,20 +93,23 @@ func TestPrintScannedTokens_parse_fail(t *testing.T) {
 
 	defer funcDefer()
 
-	// Backup JsonMarshal and restore
-	oldJsonMarshal := tokenize.JsonMarshal
+	// Backup JSONMarshal and restore
+	oldJSONMarshal := tokenize.JSONMarshal
 	defer func() {
-		tokenize.JsonMarshal = oldJsonMarshal
+		tokenize.JSONMarshal = oldJSONMarshal
 	}()
 
-	// Mock JsonMarshal
+	// Mock JSONMarshal
 	msgError := "forced fail"
-	tokenize.JsonMarshal = func(v interface{}) ([]byte, error) {
+	tokenize.JSONMarshal = func(v interface{}) ([]byte, error) {
 		return nil, errors.New(msgError)
 	}
 
 	// Run
 	err := tokenize.Run(userArgs)
+	if err == nil {
+		t.Fatalf("failure test failed. The tokenize.Run should return an error")
+	}
 
 	// Assert
 	expect := msgError
@@ -139,7 +147,6 @@ func mockStdin(t *testing.T, dummyInput string) (funcDefer func(), err error) {
 
 	oldOsStdin := os.Stdin
 	tmpfile, err := ioutil.TempFile(t.TempDir(), t.Name())
-
 	if err != nil {
 		return nil, err
 	}
@@ -160,6 +167,9 @@ func mockStdin(t *testing.T, dummyInput string) (funcDefer func(), err error) {
 	return func() {
 		// clean up
 		os.Stdin = oldOsStdin
-		os.Remove(tmpfile.Name())
+		err := os.Remove(tmpfile.Name())
+		if err != nil {
+			t.Fatalf("failed to remove temp file during test.\n%v", err)
+		}
 	}, nil
 }

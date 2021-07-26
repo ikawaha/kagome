@@ -9,7 +9,8 @@ import (
 	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
-type TokenedJSON struct {
+// tokenedJSON is a struct to output the tokens as JSON format.
+type tokenedJSON struct {
 	ID            int      `json:"id"`
 	Start         int      `json:"start"`
 	End           int      `json:"end"`
@@ -22,15 +23,19 @@ type TokenedJSON struct {
 	Features      []string `json:"features"`
 }
 
-// Variables for dependency injection or mocking for testing
+// Variable for dependency injection and/or mocking for testing
 var (
-	JsonMarshal = json.Marshal
+	JSONMarshal = json.Marshal
 	FmtPrintF   = fmt.Printf
 )
 
+func fmtPrintF(format string, a ...interface{}) {
+	_, _ = FmtPrintF(format, a...)
+}
+
 // parseTokenToJSON parses the token to JSON in the same format as the server mode response does.
 func parseTokenToJSON(tok tokenizer.Token) ([]byte, error) {
-	j := TokenedJSON{
+	j := tokenedJSON{
 		ID:       tok.ID,
 		Start:    tok.Start,
 		End:      tok.End,
@@ -44,7 +49,7 @@ func parseTokenToJSON(tok tokenizer.Token) ([]byte, error) {
 	j.Reading, _ = tok.Reading()
 	j.Pronunciation, _ = tok.Pronunciation()
 
-	return JsonMarshal(j)
+	return JSONMarshal(j)
 }
 
 // printTokensAsDefault prints the tokenized text in the default format.
@@ -58,9 +63,9 @@ func printTokensAsDefault(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokeniz
 			tok := tokens[i]
 			c := tok.Features()
 			if tok.Class == tokenizer.DUMMY {
-				FmtPrintF("%s\n", tok.Surface)
+				fmtPrintF("%s\n", tok.Surface)
 			} else {
-				FmtPrintF("%s\t%v\n", tok.Surface, strings.Join(c, ","))
+				fmtPrintF("%s\t%v\n", tok.Surface, strings.Join(c, ","))
 			}
 		}
 	}
@@ -72,7 +77,7 @@ func printTokensAsDefault(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokeniz
 func printTokensInJSON(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokenizer.TokenizeMode) (err error) {
 	var buff []byte
 
-	FmtPrintF("[\n") // Begin array bracket
+	fmtPrintF("[\n") // Begin array bracket
 
 	for s.Scan() {
 		sen := s.Text()
@@ -84,7 +89,7 @@ func printTokensInJSON(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokenizer.
 			}
 
 			if len(buff) > 0 {
-				FmtPrintF("%s,\n", buff) // Print array element (JSON with comma)
+				fmtPrintF("%s,\n", buff) // Print array element (JSON with comma)
 			}
 
 			if buff, err = parseTokenToJSON(tok); err != nil {
@@ -94,13 +99,14 @@ func printTokensInJSON(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokenizer.
 	}
 
 	if s.Err() == nil {
-		FmtPrintF("%s\n", buff) // Spit out the last buffer without comma to close the array
-		FmtPrintF("]\n")        // End array bracket
+		fmtPrintF("%s\n", buff) // Spit out the last buffer without comma to close the array
+		fmtPrintF("]\n")        // End array bracket
 	}
 
 	return s.Err()
 }
 
+// PrintScannedTokens scans and analizes to tokenize the input and print out.
 func PrintScannedTokens(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokenizer.TokenizeMode, opt *option) error {
 	if opt.json {
 		return printTokensInJSON(s, t, mode)
