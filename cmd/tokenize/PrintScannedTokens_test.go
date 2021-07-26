@@ -146,7 +146,7 @@ func mockStdin(t *testing.T, dummyInput string) (funcDefer func(), err error) {
 	t.Helper()
 
 	oldOsStdin := os.Stdin
-	tmpfile, err := ioutil.TempFile(t.TempDir(), t.Name())
+	tmpfile, err := ioutil.TempFile(os.TempDir(), t.Name())
 	if err != nil {
 		return nil, err
 	}
