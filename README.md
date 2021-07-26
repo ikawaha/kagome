@@ -21,7 +21,7 @@ The dictionary/statistical models such as MeCab-IPADIC, UniDic (unidic-mecab) an
 
 |dict| source | package |
 |:---|:---|:---|
-|MeCab IPADIC| mecab-ipadic-2.7.0-20070801 | [github.com/ikawaha/kagome-dict/ipa](https://github.com/ikawaha/kagome-dict/tree/master/ipa)| 
+|MeCab IPADIC| mecab-ipadic-2.7.0-20070801 | [github.com/ikawaha/kagome-dict/ipa](https://github.com/ikawaha/kagome-dict/tree/master/ipa)|
 |UniDIC| unidic-mecab-2.1.2_src | [github.com/ikawaha/kagome-dict/uni](https://github.com/ikawaha/kagome-dict/tree/master/uni) |
 
 **Experimental Features**
@@ -131,26 +131,32 @@ The commands are:
    [tokenize] - command line tokenize (*default)
    server - run tokenize server
    lattice - lattice viewer
+   sentence - tiny sentence splitter
    version - show version
 
-tokenize [-file input_file] [-dict dic_file] [-userdict userdic_file] [-sysdict (ipa|uni)] [-simple false] [-mode (normal|search|extended)]
+tokenize [-file input_file] [-dict dic_file] [-userdict userdic_file] [-sysdict (ipa|uni)] [-simple false] [-mode (normal|search|extended)] [-split] [-json]
   -dict string
-    	dict
+        dict
   -file string
-    	input file
+        input file
+  -json
+        outputs in JSON format
   -mode string
-    	tokenize mode (normal|search|extended) (default "normal")
+        tokenize mode (normal|search|extended) (default "normal")
   -simple
-    	display abbreviated dictionary contents
+        display abbreviated dictionary contents
+  -split
+        use tiny sentence splitter
   -sysdict string
-    	system dict type (ipa|uni) (default "ipa")
+        system dict type (ipa|uni) (default "ipa")
   -udict string
-    	user dict
+        user dict
 ```
 
 ### Tokenize command
 
 ```shellsession
+% # interactive mode
 % kagome
 すもももももももものうち
 すもも	名詞,一般,*,*,*,*,すもも,スモモ,スモモ
@@ -163,6 +169,64 @@ tokenize [-file input_file] [-dict dic_file] [-userdict userdic_file] [-sysdict 
 EOS
 ```
 
+```shellsession
+% # piped stdin
+echo "すもももももももものうち" | go run .
+すもも  名詞,一般,*,*,*,*,すもも,スモモ,スモモ
+も      助詞,係助詞,*,*,*,*,も,モ,モ
+もも    名詞,一般,*,*,*,*,もも,モモ,モモ
+も      助詞,係助詞,*,*,*,*,も,モ,モ
+もも    名詞,一般,*,*,*,*,もも,モモ,モモ
+の      助詞,連体化,*,*,*,*,の,ノ,ノ
+うち    名詞,非自立,副詞可能,*,*,*,うち,ウチ,ウチ
+EOS
+```
+
+```shellsession
+% # JSON output
+% echo "猫" | kagome -json | jq .
+[
+  {
+    "id": 286994,
+    "start": 0,
+    "end": 1,
+    "surface": "猫",
+    "class": "KNOWN",
+    "pos": [
+      "名詞",
+      "一般",
+      "*",
+      "*"
+    ],
+    "base_form": "猫",
+    "reading": "ネコ",
+    "pronunciation": "ネコ",
+    "features": [
+      "名詞",
+      "一般",
+      "*",
+      "*",
+      "*",
+      "*",
+      "猫",
+      "ネコ",
+      "ネコ"
+    ]
+  }
+]
+```
+
+```shellsession
+echo "私ははにわよわわわんわん" | kagome -json | jq -r '.[].pronunciation'
+ワタシ
+ワ
+ハニワ
+ヨ
+ワ
+ワ
+ワンワン
+```
+
 ### Server command
 
 **API**
@@ -171,15 +235,15 @@ Start a server and try to access the "/tokenize" endpoint.
 
 ```shellsession
 % kagome server &
-% curl -XPUT localhost:6060/tokenize -d'{"sentence":"すもももももももものうち", "mode":"normal"}' | jq . 
+% curl -XPUT localhost:6060/tokenize -d'{"sentence":"すもももももももものうち", "mode":"normal"}' | jq .
 ```
 
-**Web App** 
+**Web App**
 
 [![demo](https://img.shields.io/badge/demo-heroku_deployed-blue.svg)](https://kagome.herokuapp.com/)
 
 
-Start a server and access `http://localhost:6060`. 
+Start a server and access `http://localhost:6060`.
 (To draw a lattice, demo application uses graphviz . You need graphviz installed.)
 
 ```shellsession
@@ -204,7 +268,7 @@ A debug tool of tokenize process outputs a lattice in graphviz dot format.
 # Building to WebAssembly
 
 You can see how kagome wasm works in [demo site.](http://ikawaha.github.io/kagome/)
-The source code can be found in `./sample/wasm`. 
+The source code can be found in `./sample/wasm`.
 
 # Licence
 
