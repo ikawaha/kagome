@@ -1,6 +1,7 @@
 package tokenize_test
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -64,6 +65,47 @@ func TestPrintScannedTokens_JSON(t *testing.T) {
 		"\"features\":[\"名詞\",\"代名詞\",\"一般\",\"*\",\"*\",\"*\",\"私\",\"ワタシ\"," +
 		"\"ワタシ\"]}\n]\n"
 	actual := capturedSTDOUT
+
+	if expect != actual {
+		t.Errorf("Expect: %v\nActual: %v", expect, actual)
+	}
+}
+
+// TestPrintScannedTokens_parse_fail covers the json.Marshal failure.
+func TestPrintScannedTokens_parse_fail(t *testing.T) {
+	userInput := "私"
+	userArgs := []string{"-json"}
+
+	if funcDefer, err := mockStdin(t, userInput); err != nil {
+		t.Fatal(err)
+	} else {
+		defer funcDefer()
+	}
+
+	// Caputre output
+	capturedSTDOUT := ""
+	funcDefer := setCapturer(t, &capturedSTDOUT)
+
+	defer funcDefer()
+
+	// Backup JsonMarshal and restore
+	oldJsonMarshal := tokenize.JsonMarshal
+	defer func() {
+		tokenize.JsonMarshal = oldJsonMarshal
+	}()
+
+	// Mock JsonMarshal
+	msgError := "forced fail"
+	tokenize.JsonMarshal = func(v interface{}) ([]byte, error) {
+		return nil, errors.New(msgError)
+	}
+
+	// Run
+	err := tokenize.Run(userArgs)
+
+	// Assert
+	expect := msgError
+	actual := err.Error()
 
 	if expect != actual {
 		t.Errorf("Expect: %v\nActual: %v", expect, actual)
