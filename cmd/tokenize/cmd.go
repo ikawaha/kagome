@@ -7,7 +7,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"strings"
 
 	"github.com/ikawaha/kagome-dict/dict"
 	"github.com/ikawaha/kagome-dict/ipa"
@@ -20,7 +19,8 @@ import (
 const (
 	CommandName  = "tokenize"
 	Description  = `command line tokenize`
-	usageMessage = "%s [-file input_file] [-dict dic_file] [-userdict userdic_file] [-sysdict (ipa|uni)] [-simple false] [-mode (normal|search|extended)] [-split]\n"
+	usageMessage = "%s [-file input_file] [-dict dic_file] [-userdict userdic_file]" +
+		" [-sysdict (ipa|uni)] [-simple false] [-mode (normal|search|extended)] [-split] [-json]\n"
 )
 
 // ErrorWriter writes to stderr
@@ -37,6 +37,7 @@ type option struct {
 	simple  bool
 	mode    string
 	split   bool
+	json    bool
 	flagSet *flag.FlagSet
 }
 
@@ -56,6 +57,7 @@ func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	o.flagSet.BoolVar(&o.simple, "simple", false, "display abbreviated dictionary contents")
 	o.flagSet.StringVar(&o.mode, "mode", "normal", "tokenize mode (normal|search|extended)")
 	o.flagSet.BoolVar(&o.split, "split", false, "use tiny sentence splitter")
+	o.flagSet.BoolVar(&o.json, "json", false, "outputs in JSON format")
 
 	return
 }
@@ -155,20 +157,8 @@ func command(opt *option) error {
 	if opt.split {
 		s.Split(filter.ScanSentences)
 	}
-	for s.Scan() {
-		sen := s.Text()
-		tokens := t.Analyze(sen, mode)
-		for i, size := 1, len(tokens); i < size; i++ {
-			tok := tokens[i]
-			c := tok.Features()
-			if tok.Class == tokenizer.DUMMY {
-				fmt.Printf("%s\n", tok.Surface)
-			} else {
-				fmt.Printf("%s\t%v\n", tok.Surface, strings.Join(c, ","))
-			}
-		}
-	}
-	return s.Err()
+
+	return PrintScannedTokens(s, t, mode, opt)
 }
 
 // Run receives the slice of args and executes the tokenize tool
