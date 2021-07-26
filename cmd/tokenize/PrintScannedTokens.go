@@ -41,6 +41,8 @@ func ParseTokenToJSON(tok tokenizer.Token) ([]byte, error) {
 	return json.Marshal(j)
 }
 
+// PrintTokensAsDefault prints the tokenized text in the default format.
+// The default format is: [Surface]\t[Features in CSV]\n
 func PrintTokensAsDefault(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokenizer.TokenizeMode) error {
 	for s.Scan() {
 		sen := s.Text()
@@ -60,10 +62,11 @@ func PrintTokensAsDefault(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokeniz
 	return s.Err()
 }
 
+// PrintTokensInJSON prints the tokenized text in JSON format.
 func PrintTokensInJSON(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokenizer.TokenizeMode) (err error) {
 	var buff []byte
 
-	fmt.Println("[") // Begin bracket
+	fmt.Println("[") // Begin array bracket
 
 	for s.Scan() {
 		sen := s.Text()
@@ -75,7 +78,7 @@ func PrintTokensInJSON(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokenizer.
 			}
 
 			if len(buff) > 0 {
-				fmt.Printf("%s,\n", buff) // Print with comma
+				fmt.Printf("%s,\n", buff) // Print array element (JSON with comma)
 			}
 
 			if buff, err = ParseTokenToJSON(tok); err != nil {
@@ -85,18 +88,17 @@ func PrintTokensInJSON(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokenizer.
 	}
 
 	if s.Err() == nil {
-		fmt.Printf("%s\n", buff) // Spit the last buffer w/no comma
-		fmt.Println("]")         // End bracket
+		fmt.Printf("%s\n", buff) // Spit out the last buffer without comma to close the array
+		fmt.Println("]")         // End array bracket
 	}
 
 	return s.Err()
-
 }
 
-func PrintScannedTokens(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokenizer.TokenizeMode, jsonOut bool) error {
-	if !jsonOut {
-		return PrintTokensAsDefault(s, t, mode)
+func PrintScannedTokens(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokenizer.TokenizeMode, opt *option) error {
+	if opt.json {
+		return PrintTokensInJSON(s, t, mode)
 	}
 
-	return PrintTokensInJSON(s, t, mode)
+	return PrintTokensAsDefault(s, t, mode)
 }
