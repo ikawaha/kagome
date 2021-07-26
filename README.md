@@ -170,8 +170,8 @@ EOS
 ```
 
 ```shellsession
-% # piped stdin
-echo "すもももももももものうち" | go run .
+% # piped standard input
+echo "すもももももももものうち" | kagome
 すもも  名詞,一般,*,*,*,*,すもも,スモモ,スモモ
 も      助詞,係助詞,*,*,*,*,も,モ,モ
 もも    名詞,一般,*,*,*,*,もも,モモ,モモ
