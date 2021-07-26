@@ -106,7 +106,7 @@ func printTokensInJSON(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokenizer.
 	return s.Err()
 }
 
-// PrintScannedTokens scans and analizes to tokenize the input and print out.
+// PrintScannedTokens scans and analyzes to tokenize the input and print out.
 func PrintScannedTokens(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokenizer.TokenizeMode, opt *option) error {
 	if opt.json {
 		return printTokensInJSON(s, t, mode)

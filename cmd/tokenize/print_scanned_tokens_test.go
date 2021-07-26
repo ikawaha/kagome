@@ -21,7 +21,7 @@ func TestPrintScannedTokens_Default(t *testing.T) {
 		defer funcDefer()
 	}
 
-	// Caputre output
+	// Capture output
 	capturedSTDOUT := ""
 	funcDefer := setCapturer(t, &capturedSTDOUT)
 
@@ -51,7 +51,7 @@ func TestPrintScannedTokens_JSON(t *testing.T) {
 		defer funcDefer()
 	}
 
-	// Caputre output
+	// Capture output
 	capturedSTDOUT := ""
 	funcDefer := setCapturer(t, &capturedSTDOUT)
 
@@ -87,7 +87,7 @@ func TestPrintScannedTokens_parse_fail(t *testing.T) {
 		defer funcDefer()
 	}
 
-	// Caputre output
+	// Capture output
 	capturedSTDOUT := ""
 	funcDefer := setCapturer(t, &capturedSTDOUT)
 
