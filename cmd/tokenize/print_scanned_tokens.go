@@ -73,13 +73,13 @@ func printTokensAsDefault(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokeniz
 	return s.Err()
 }
 
-// printTokensInJSON prints the tokenized text in JSON format.
+// printTokensInJSON prints the tokenized text in JSON array format.
 func printTokensInJSON(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokenizer.TokenizeMode) (err error) {
 	var buff []byte
 
-	fmtPrintF("[\n") // Begin array bracket
-
 	for s.Scan() {
+		fmtPrintF("[\n") // Begin array bracket
+
 		sen := s.Text()
 		tokens := t.Analyze(sen, mode)
 
@@ -96,9 +96,7 @@ func printTokensInJSON(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokenizer.
 				return err
 			}
 		}
-	}
 
-	if s.Err() == nil {
 		fmtPrintF("%s\n", buff) // Spit out the last buffer without comma to close the array
 		fmtPrintF("]\n")        // End array bracket
 	}
