@@ -82,6 +82,7 @@ func printTokensInJSON(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokenizer.
 
 		sen := s.Text()
 		tokens := t.Analyze(sen, mode)
+		buff = nil
 
 		for _, tok := range tokens {
 			if tok.ID == tokenizer.BosEosID {
@@ -92,7 +93,8 @@ func printTokensInJSON(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokenizer.
 				fmtPrintF("%s,\n", buff) // Print array element (JSON with comma)
 			}
 
-			if buff, err = parseTokenToJSON(tok); err != nil {
+			buff, err = parseTokenToJSON(tok)
+			if err != nil {
 				return err
 			}
 		}
