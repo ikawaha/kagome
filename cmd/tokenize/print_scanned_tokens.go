@@ -29,6 +29,8 @@ var (
 	FmtPrintF   = fmt.Printf
 )
 
+// fmtPrintF is a wrapper of FmtPrintF without return.
+// Since fmt.Printf has a return value, it is too redundunt to check on every call.
 func fmtPrintF(format string, a ...interface{}) {
 	_, _ = FmtPrintF(format, a...)
 }
