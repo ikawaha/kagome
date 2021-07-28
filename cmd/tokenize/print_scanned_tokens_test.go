@@ -41,6 +41,54 @@ func TestPrintScannedTokens_Default(t *testing.T) {
 	}
 }
 
+func TestPrintScannedTokens_issue249(t *testing.T) {
+	userInput := "すもももももももものうち\n私は鰻\n猫\n"
+	userArgs := []string{"-json"}
+
+	if funcDefer, err := mockStdin(t, userInput); err != nil {
+		t.Fatal(err)
+	} else {
+		defer funcDefer()
+	}
+
+	// Capture output
+	capturedSTDOUT := ""
+	funcDefer := setCapturer(t, &capturedSTDOUT)
+
+	defer funcDefer()
+
+	// Run
+	err := tokenize.Run(userArgs)
+	if err != nil {
+		t.Fatalf("Failed to execute tokenize.Run.\n%v", err)
+	}
+
+	// Assert
+	actual := capturedSTDOUT
+	expect := `[
+{"id":36163,"start":0,"end":3,"surface":"すもも","class":"KNOWN","pos":["名詞","一般","*","*"],"base_form":"すもも","reading":"スモモ","pronunciation":"スモモ","features":["名詞","一般","*","*","*","*","すもも","スモモ","スモモ"]},
+{"id":73244,"start":3,"end":4,"surface":"も","class":"KNOWN","pos":["助詞","係助詞","*","*"],"base_form":"も","reading":"モ","pronunciation":"モ","features":["助詞","係助詞","*","*","*","*","も","モ","モ"]},
+{"id":74988,"start":4,"end":6,"surface":"もも","class":"KNOWN","pos":["名詞","一般","*","*"],"base_form":"もも","reading":"モモ","pronunciation":"モモ","features":["名詞","一般","*","*","*","*","もも","モモ","モモ"]},
+{"id":73244,"start":6,"end":7,"surface":"も","class":"KNOWN","pos":["助詞","係助詞","*","*"],"base_form":"も","reading":"モ","pronunciation":"モ","features":["助詞","係助詞","*","*","*","*","も","モ","モ"]},
+{"id":74988,"start":7,"end":9,"surface":"もも","class":"KNOWN","pos":["名詞","一般","*","*"],"base_form":"もも","reading":"モモ","pronunciation":"モモ","features":["名詞","一般","*","*","*","*","もも","モモ","モモ"]},
+{"id":55829,"start":9,"end":10,"surface":"の","class":"KNOWN","pos":["助詞","連体化","*","*"],"base_form":"の","reading":"ノ","pronunciation":"ノ","features":["助詞","連体化","*","*","*","*","の","ノ","ノ"]},
+{"id":8027,"start":10,"end":12,"surface":"うち","class":"KNOWN","pos":["名詞","非自立","副詞可能","*"],"base_form":"うち","reading":"ウチ","pronunciation":"ウチ","features":["名詞","非自立","副詞可能","*","*","*","うち","ウチ","ウチ"]}
+]
+[
+{"id":304999,"start":0,"end":1,"surface":"私","class":"KNOWN","pos":["名詞","代名詞","一般","*"],"base_form":"私","reading":"ワタシ","pronunciation":"ワタシ","features":["名詞","代名詞","一般","*","*","*","私","ワタシ","ワタシ"]},
+{"id":57061,"start":1,"end":2,"surface":"は","class":"KNOWN","pos":["助詞","係助詞","*","*"],"base_form":"は","reading":"ハ","pronunciation":"ワ","features":["助詞","係助詞","*","*","*","*","は","ハ","ワ"]},
+{"id":387420,"start":2,"end":3,"surface":"鰻","class":"KNOWN","pos":["名詞","一般","*","*"],"base_form":"鰻","reading":"ウナギ","pronunciation":"ウナギ","features":["名詞","一般","*","*","*","*","鰻","ウナギ","ウナギ"]}
+]
+[
+{"id":286994,"start":0,"end":1,"surface":"猫","class":"KNOWN","pos":["名詞","一般","*","*"],"base_form":"猫","reading":"ネコ","pronunciation":"ネコ","features":["名詞","一般","*","*","*","*","猫","ネコ","ネコ"]}
+]
+`
+
+	if expect != actual {
+		t.Errorf("Expect: %v\nActual: %v", expect, actual)
+	}
+}
+
 func TestPrintScannedTokens_JSON(t *testing.T) {
 	userInput := "私"
 	userArgs := []string{"-json"}
