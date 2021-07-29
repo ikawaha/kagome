@@ -29,6 +29,8 @@ var (
 	FmtPrintF   = fmt.Printf
 )
 
+// fmtPrintF is a wrapper of FmtPrintF without return.
+// Since fmt.Printf has a return value, it is too redundunt to check on every call.
 func fmtPrintF(format string, a ...interface{}) {
 	_, _ = FmtPrintF(format, a...)
 }
@@ -73,15 +75,16 @@ func printTokensAsDefault(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokeniz
 	return s.Err()
 }
 
-// printTokensInJSON prints the tokenized text in JSON format.
+// printTokensInJSON prints the tokenized text in JSON array format.
 func printTokensInJSON(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokenizer.TokenizeMode) (err error) {
 	var buff []byte
 
-	fmtPrintF("[\n") // Begin array bracket
-
 	for s.Scan() {
+		fmtPrintF("[\n") // Begin array bracket
+
 		sen := s.Text()
 		tokens := t.Analyze(sen, mode)
+		buff = nil
 
 		for _, tok := range tokens {
 			if tok.ID == tokenizer.BosEosID {
@@ -92,13 +95,12 @@ func printTokensInJSON(s *bufio.Scanner, t *tokenizer.Tokenizer, mode tokenizer.
 				fmtPrintF("%s,\n", buff) // Print array element (JSON with comma)
 			}
 
-			if buff, err = parseTokenToJSON(tok); err != nil {
+			buff, err = parseTokenToJSON(tok)
+			if err != nil {
 				return err
 			}
 		}
-	}
 
-	if s.Err() == nil {
 		fmtPrintF("%s\n", buff) // Spit out the last buffer without comma to close the array
 		fmtPrintF("]\n")        // End array bracket
 	}
