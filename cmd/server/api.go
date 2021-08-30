@@ -14,6 +14,16 @@ type TokenizeHandler struct {
 	tokenizer *tokenizer.Tokenizer
 }
 
+type TokenizerRequestBody struct {
+	Input string `json:"sentence"`
+	Mode  string `json:"mode,omitempty"`
+}
+
+type TokenizerResponseBody struct {
+	Status bool                  `json:"status"`
+	Tokens []tokenizer.TokenData `json:"tokens"`
+}
+
 func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	type record struct {
@@ -29,11 +39,8 @@ func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Features      []string `json:"features"`
 	}
 
-	var body struct {
-		Input string `json:"sentence"`
-		Mode  string `json:"mode,omitempty"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+	var req TokenizerRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		msg := fmt.Sprintf("{\"status\":false,\"error\":\"%v\"}\n", err)
 		if _, err := fmt.Fprint(w, msg); err != nil {
@@ -41,7 +48,7 @@ func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	if body.Input == "" {
+	if req.Input == "" {
 		msg := "{\"status\":true,\"tokens\":[]}\n"
 		if _, err := fmt.Fprint(w, msg); err != nil {
 			log.Fatalf("write error, %s, %v", msg, err)
@@ -49,38 +56,23 @@ func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	mode := tokenizer.Normal
-	switch body.Mode {
+	switch req.Mode {
 	case "Search":
 		mode = tokenizer.Search
 	case "Extended":
 		mode = tokenizer.Extended
 	}
-	tokens := h.tokenizer.Analyze(body.Input, mode)
-	var rsp []record
-	for _, tok := range tokens {
-		if tok.ID == tokenizer.BosEosID {
+	tokens := h.tokenizer.Analyze(req.Input, mode)
+	var tokenData []tokenizer.TokenData
+	for _, v := range tokens {
+		if v.ID == tokenizer.BosEosID {
 			continue
 		}
-		m := record{
-			ID:       tok.ID,
-			Start:    tok.Start,
-			End:      tok.End,
-			Surface:  tok.Surface,
-			Class:    fmt.Sprintf("%v", tok.Class),
-			POS:      tok.POS(),
-			Features: tok.Features(),
-		}
-		m.BaseForm, _ = tok.BaseForm()
-		m.Reading, _ = tok.Reading()
-		m.Pronunciation, _ = tok.Pronunciation()
-		rsp = append(rsp, m)
+		tokenData = append(tokenData, tokenizer.NewTokenData(v))
 	}
-	j, err := json.Marshal(struct {
-		Status bool     `json:"status"`
-		Tokens []record `json:"tokens"`
-	}{
+	resp, err := json.Marshal(TokenizerResponseBody{
 		Status: true,
-		Tokens: rsp,
+		Tokens: tokenData,
 	})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -90,8 +82,8 @@ func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	if _, err := w.Write(j); err != nil {
-		log.Printf("write response json error, %v, %+v", err, body.Input)
+	if _, err := w.Write(resp); err != nil {
+		log.Printf("write response json error, %v, %+v", err, req.Input)
 		return
 	}
 }
