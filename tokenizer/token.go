@@ -231,6 +231,7 @@ type TokenData struct {
 	Features      []string `json:"features"`
 }
 
+// NewTokenData returns a data which has with all the contents of the token.
 func NewTokenData(t Token) TokenData {
 	ret := TokenData{
 		ID:       t.ID,
