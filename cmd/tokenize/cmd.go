@@ -2,11 +2,14 @@ package tokenize
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/ikawaha/kagome-dict/dict"
 	"github.com/ikawaha/kagome-dict/ipa"
@@ -19,7 +22,7 @@ import (
 const (
 	CommandName  = "tokenize"
 	Description  = `command line tokenize`
-	usageMessage = "%s [-file input_file] [-dict dic_file] [-userdict userdic_file]" +
+	usageMessage = "%s [-file input_file] [-dict dic_file] [-userdict user_dic_file]" +
 		" [-sysdict (ipa|uni)] [-simple false] [-mode (normal|search|extended)] [-split] [-json]\n"
 )
 
@@ -157,8 +160,60 @@ func command(opt *option) error {
 	if opt.split {
 		s.Split(filter.ScanSentences)
 	}
+	for s.Scan() {
+		tokens := t.Analyze(s.Text(), mode)
+		if !opt.json {
+			printTokens(tokens)
+			continue
+		}
+		if err := printTokensJSON(tokens); err != nil {
+			return err
+		}
+	}
+	return s.Err()
+}
 
-	return PrintScannedTokens(s, t, mode, opt)
+func printTokens(tokens []tokenizer.Token) {
+	w := bufio.NewWriter(os.Stdout)
+	defer w.Flush()
+	for _, v := range tokens {
+		if v.ID == tokenizer.BosEosID {
+			continue
+		}
+		w.WriteString(v.Surface)
+		if v.Class != tokenizer.DUMMY {
+			w.WriteString("\t")
+			w.WriteString(strings.Join(v.Features(), ","))
+		}
+		w.WriteString("\n")
+	}
+	w.WriteString("EOS\n")
+}
+
+func printTokensJSON(tokens []tokenizer.Token) error {
+	w := bufio.NewWriter(os.Stdout)
+	defer w.Flush()
+
+	if len(tokens) > 0 {
+		w.WriteString("[\n")
+	}
+	var array [][]byte
+	for _, v := range tokens {
+		if v.Class == tokenizer.DUMMY {
+			continue
+		}
+		r := tokenizer.NewTokenData(v)
+		obj, err := json.Marshal(r)
+		if err != nil {
+			return err
+		}
+		array = append(array, obj)
+	}
+	w.Write(bytes.Join(array, []byte(",\n")))
+	if len(tokens) > 0 {
+		w.WriteString("\n]\n")
+	}
+	return nil
 }
 
 // Run receives the slice of args and executes the tokenize tool
