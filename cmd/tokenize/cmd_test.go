@@ -47,7 +47,9 @@ func TestCommand_NormalOutput(t *testing.T) {
 	w.Close()
 
 	var b bytes.Buffer
-	io.Copy(&b, r)
+	if _, err := io.Copy(&b, r); err != nil {
+		t.Fatalf("unexpected error, copy failed, %v", err)
+	}
 	want := `ねこ	名詞,一般,*,*,*,*,ねこ,ネコ,ネコ
 です	助動詞,*,*,*,特殊・デス,基本形,です,デス,デス
 EOS
@@ -96,7 +98,9 @@ func TestCommand_JSONOutput(t *testing.T) {
 
 	// check output
 	var b bytes.Buffer
-	io.Copy(&b, r)
+	if _, err := io.Copy(&b, r); err != nil {
+		t.Fatalf("unexpected error, copy failed, %v", err)
+	}
 	want := `[
 {"id":54873,"start":0,"end":2,"surface":"ねこ","class":"KNOWN","pos":["名詞","一般","*","*"],"base_form":"ねこ","reading":"ネコ","pronunciation":"ネコ","features":["名詞","一般","*","*","*","*","ねこ","ネコ","ネコ"]},
 {"id":47492,"start":2,"end":4,"surface":"です","class":"KNOWN","pos":["助動詞","*","*","*"],"base_form":"です","reading":"デス","pronunciation":"デス","features":["助動詞","*","*","*","特殊・デス","基本形","です","デス","デス"]}
@@ -153,7 +157,9 @@ func TestCommand_JSONOutput_issue249(t *testing.T) {
 
 	// check output
 	var b bytes.Buffer
-	io.Copy(&b, r)
+	if _, err := io.Copy(&b, r); err != nil {
+		t.Fatalf("unexpected error, copy failed, %v", err)
+	}
 	want := `[
 {"id":36163,"start":0,"end":3,"surface":"すもも","class":"KNOWN","pos":["名詞","一般","*","*"],"base_form":"すもも","reading":"スモモ","pronunciation":"スモモ","features":["名詞","一般","*","*","*","*","すもも","スモモ","スモモ"]},
 {"id":73244,"start":3,"end":4,"surface":"も","class":"KNOWN","pos":["助詞","係助詞","*","*"],"base_form":"も","reading":"モ","pronunciation":"モ","features":["助詞","係助詞","*","*","*","*","も","モ","モ"]},
