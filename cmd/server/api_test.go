@@ -34,6 +34,8 @@ func TestTokenizerAPI(t *testing.T) {
 	(&TokenizeHandler{tokenizer: tnz}).ServeHTTP(w, req)
 
 	resp := w.Result()
+	defer resp.Body.Close()
+
 	if got, want := resp.StatusCode, http.StatusOK; got != want {
 		t.Errorf("http status code got %d(%s), want %d", got, resp.Status, want)
 	}
