@@ -14,6 +14,7 @@ type TokenizeHandler struct {
 	tokenizer *tokenizer.Tokenizer
 }
 
+// TokenizerRequestBody is the type of the "tokenize" endpoint HTTP request body.
 type TokenizerRequestBody struct {
 	Input string `json:"sentence"`
 	Mode  string `json:"mode,omitempty"`
