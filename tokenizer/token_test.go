@@ -544,3 +544,116 @@ func Test_POS(t *testing.T) {
 		}
 	})
 }
+
+func TestNewTokenData(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+
+	t.Run("DUMMY/UNKNOWN", func(t *testing.T) {
+		tokens := tnz.Tokenize("トトロ")
+		if want, got := 3, len(tokens); want != got {
+			t.Fatalf("token length: want %d, got %d", want, got)
+		}
+		// BOS
+		data0 := NewTokenData(tokens[0])
+		if want, got := []string{}, data0.POS; !reflect.DeepEqual(got, want) {
+			t.Errorf("want empty, got %+v", got)
+		}
+		if want, got := []string{}, data0.Features; !reflect.DeepEqual(got, want) {
+			t.Errorf("want empty, got %+v", got)
+		}
+		if want, got := DUMMY.String(), data0.Class; got != want {
+			t.Errorf("want %v, got %v", want, got)
+		}
+		// UNKNOWN
+		data1 := NewTokenData(tokens[1])
+		if want, got := "トトロ", data1.Surface; want != got {
+			t.Errorf("want %v, got %v", want, got)
+		}
+		if want, got := []string{"名詞", "固有名詞", "組織", "*"}, data1.POS; !reflect.DeepEqual(want, got) {
+			t.Errorf("want %v, got %v", want, got)
+		}
+		if want, got := []string{"名詞", "固有名詞", "組織", "*", "*", "*", "*"}, data1.Features; !reflect.DeepEqual(want, got) {
+			t.Errorf("want %v, got %v", want, got)
+		}
+		if want, got := UNKNOWN.String(), data1.Class; got != want {
+			t.Errorf("want %v, got %v", want, got)
+		}
+	})
+
+	t.Run("known token", func(t *testing.T) {
+		tokens := tnz.Tokenize("行か")
+		if want, got := 3, len(tokens); want != got {
+			t.Fatalf("token length: want %d, got %d", want, got)
+		}
+		data := NewTokenData(tokens[1])
+		tok := tokens[1] // 行か
+		if want, got := "行か", tok.Surface; want != got {
+			t.Errorf("want %v, got %v", want, got)
+		}
+		if got, want := data.POS, tok.POS(); !reflect.DeepEqual(got, want) {
+			t.Errorf("want %v, got %v", want, got)
+		}
+		if got, want := data.Features, tok.Features(); !reflect.DeepEqual(got, want) {
+			t.Errorf("want %v, got %v", want, got)
+		}
+		if got, want := data.BaseForm, "行く"; !reflect.DeepEqual(got, want) {
+			t.Errorf("want %v, got %v", want, got)
+		}
+		if got, want := data.Reading, "イカ"; !reflect.DeepEqual(got, want) {
+			t.Errorf("want %v, got %v", want, got)
+		}
+		if got, want := data.Pronunciation, "イカ"; !reflect.DeepEqual(got, want) {
+			t.Errorf("want %v, got %v", want, got)
+		}
+	})
+}
+
+func TestEqual(t *testing.T) {
+	testdata := []struct {
+		ID      int
+		Surface string
+		Class   TokenClass
+		Want    bool
+	}{
+		{
+			ID:      1,
+			Surface: "ねこ",
+			Class:   KNOWN,
+			Want:    true,
+		},
+		{
+			ID:      1,
+			Surface: "いぬ",
+			Class:   KNOWN,
+			Want:    false,
+		},
+	}
+	for i, v := range testdata {
+		if got := (Token{
+			ID:       v.ID,
+			Class:    v.Class,
+			Surface:  v.Surface,
+			Index:    111,
+			Position: 456,
+			Start:    3,
+			End:      4,
+		}).Equal(Token{
+			ID:       1,
+			Class:    KNOWN,
+			Surface:  "ねこ",
+			Index:    1234, // ↓ ignored fields
+			Position: 5,
+			Start:    56,
+			End:      58,
+		}); got != v.Want {
+			t.Errorf("#%d: want %t, got %t", i, v.Want, got)
+		}
+	}
+}
