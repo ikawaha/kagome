@@ -27,6 +27,9 @@ jobs:
         with:
           path: src/github.com/ikawaha/kagome
 
+      - name: Set up Graphviz
+        uses: ts-graphviz/setup-graphviz@v1
+
       - name: Build
         run: go build -v ./...
         working-directory: src/github.com/ikawaha/kagome
