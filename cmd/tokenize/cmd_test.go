@@ -2,6 +2,7 @@ package tokenize
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -33,13 +34,13 @@ func TestCommand_NormalOutput(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected pipe error, %v", err)
 	}
-	stdout := os.Stdout
-	os.Stdout = w
+	stdout := Stdout
+	Stdout = w
 	defer func() {
-		os.Stdout = stdout
+		Stdout = stdout
 	}()
 
-	if err := command(&option{
+	if err := command(context.TODO(), &option{
 		dict: "../../testdata/ipa.dict",
 	}); err != nil {
 		t.Errorf("unexpected error, command failed, %v", err)
@@ -82,13 +83,13 @@ func TestCommand_JSONOutput(t *testing.T) {
 		t.Fatalf("unexpected pipe error, %v", err)
 	}
 	stdout := os.Stdout
-	os.Stdout = w
+	Stdout = w
 	defer func() {
-		os.Stdout = stdout
+		Stdout = stdout
 	}()
 
 	// test
-	if err := command(&option{
+	if err := command(context.TODO(), &option{
 		dict: "../../testdata/ipa.dict",
 		json: true,
 	}); err != nil {
@@ -140,14 +141,14 @@ func TestCommand_JSONOutput_issue249(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected pipe error, %v", err)
 	}
-	stdout := os.Stdout
-	os.Stdout = w
+	stdout := Stdout
+	Stdout = w
 	defer func() {
-		os.Stdout = stdout
+		Stdout = stdout
 	}()
 
 	// test
-	if err := command(&option{
+	if err := command(context.TODO(), &option{
 		dict: "../../testdata/ipa.dict",
 		json: true,
 	}); err != nil {
@@ -180,5 +181,101 @@ func TestCommand_JSONOutput_issue249(t *testing.T) {
 `
 	if got := b.String(); got != want {
 		t.Errorf("got %s, want %s", got, want)
+	}
+}
+
+func TestOptionCheck(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    []string
+		wantErr bool
+	}{
+		{
+			name:    "empty",
+			args:    []string{},
+			wantErr: false,
+		},
+		{
+			name:    "unknown mode",
+			args:    []string{"-mode", "zzz"},
+			wantErr: true,
+		},
+		{
+			name:    "unknown system dictionary type",
+			args:    []string{"-sysdict", "ko"},
+			wantErr: true,
+		},
+		{
+			name:    "non flag option",
+			args:    []string{"opt"},
+			wantErr: true,
+		},
+		{
+			name: "all options",
+			args: []string{
+				"-file", "<file>",
+				"-dict", "<dict>",
+				"-udict", "<udict>",
+				"-sysdict", "uni",
+				"-simple",
+				"-mode", "search",
+				"-split",
+				"-json",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := OptionCheck(tt.args); (err != nil) != tt.wantErr {
+				t.Errorf("OptionCheck() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestRun(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    []string
+		wantErr bool
+	}{
+		{
+			name:    "help option",
+			args:    []string{"-help"},
+			wantErr: true,
+		},
+		{
+			name:    "unknown option",
+			args:    []string{"piyo"},
+			wantErr: true,
+		},
+		{
+			name:    "normal operation w/o options",
+			args:    nil,
+			wantErr: false,
+		},
+		{
+			name: "normal operation w/ options",
+			args: []string{
+				"-udict", "../../sample/userdict.txt",
+				"-file", "../../testdata/nekodearu.txt",
+				"-split",
+			},
+			wantErr: false,
+		},
+	}
+	//Stdout = os.NewFile(0, os.DevNull)
+	//Stderr = Stdout
+	defer func() {
+		//Stdout = os.Stdout
+		//Stderr = os.Stderr
+	}()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := Run(context.Background(), tt.args); (err != nil) != tt.wantErr {
+				t.Errorf("Run() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
 	}
 }

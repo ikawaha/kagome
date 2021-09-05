@@ -2,10 +2,10 @@ package sentence
 
 import (
 	"bufio"
+	"context"
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 
 	"github.com/ikawaha/kagome/v2/filter"
@@ -15,12 +15,13 @@ import (
 const (
 	CommandName  = "sentence"
 	Description  = `tiny sentence splitter`
-	usageMessage = "%s\n"
+	usageMessage = "%s [-file filename]"
 )
 
-// ErrorWriter writes to stderr
+// Stderr writes to stderr
 var (
-	ErrorWriter = os.Stderr
+	Stdout io.Writer = os.Stdout
+	Stderr io.Writer = os.Stderr
 )
 
 // options
@@ -43,12 +44,19 @@ func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 }
 
 func (o *option) parse(args []string) error {
-	return o.flagSet.Parse(args)
+	if err := o.flagSet.Parse(args); err != nil {
+		return err
+	}
+	// validations
+	if nonFlag := o.flagSet.Args(); len(nonFlag) != 0 {
+		return fmt.Errorf("invalid argument: %v", nonFlag)
+	}
+	return nil
 }
 
 // OptionCheck receives a slice of args and returns an error if it was not successfully parsed
 func OptionCheck(args []string) error {
-	opt := newOption(ioutil.Discard, flag.ContinueOnError)
+	opt := newOption(io.Discard, flag.ContinueOnError)
 	if err := opt.parse(args); err != nil {
 		return fmt.Errorf("%v, %w", CommandName, err)
 	}
@@ -56,7 +64,7 @@ func OptionCheck(args []string) error {
 }
 
 // command main
-func command(opt *option) error {
+func command(_ context.Context, w io.Writer, opt *option) error {
 	fp := os.Stdin
 	if opt.file != "" {
 		var err error
@@ -71,29 +79,29 @@ func command(opt *option) error {
 	scanner := bufio.NewScanner(fp)
 	scanner.Split(filter.ScanSentences)
 	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+		fmt.Fprintln(w, scanner.Text())
 	}
 	return scanner.Err()
 }
 
 // Run receives the slice of args and executes the tokenize tool
-func Run(args []string) error {
-	opt := newOption(ErrorWriter, flag.ExitOnError)
+func Run(ctx context.Context, args []string) error {
+	opt := newOption(io.Discard, flag.ContinueOnError)
 	if err := opt.parse(args); err != nil {
 		Usage()
-		PrintDefaults(flag.ExitOnError)
+		PrintDefaults(flag.ContinueOnError)
 		return fmt.Errorf("%v, %w", CommandName, err)
 	}
-	return command(opt)
+	return command(ctx, Stdout, opt)
 }
 
 // Usage provides information on the use of the tokenize tool
 func Usage() {
-	fmt.Fprintf(ErrorWriter, usageMessage, CommandName)
+	fmt.Fprintf(Stderr, usageMessage+"\n", CommandName)
 }
 
 // PrintDefaults prints out the default flags
 func PrintDefaults(eh flag.ErrorHandling) {
-	o := newOption(ErrorWriter, eh)
+	o := newOption(Stderr, eh)
 	o.flagSet.PrintDefaults()
 }

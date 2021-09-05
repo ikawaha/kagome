@@ -20,13 +20,15 @@ import (
 var (
 	//go:embed asset/graph.html
 	graphHTML string
+	graphT    = template.Must(template.New("graph").Parse(graphHTML))
 
 	//go:embed asset/demo.html
 	demoHTML string
+	demoT    = template.Must(template.New("demo").Parse(demoHTML))
 )
 
 const (
-	graphvizCmd = "circo" // "dot"
+	graphvizCmd = "dot"
 	cmdTimeout  = 25 * time.Second
 )
 
@@ -38,23 +40,57 @@ type TokenizeDemoHandler struct {
 type record struct {
 	Surface       string
 	POS           string
-	Baseform      string
+	BaseForm      string
 	Reading       string
 	Pronunciation string
 }
 
-func (h *TokenizeDemoHandler) analyze(sen string, mode tokenizer.TokenizeMode) (rec []record, svg string, err error) {
+func newRecord(t tokenizer.Token) record {
+	ret := record{
+		Surface:       t.Surface,
+		POS:           "*",
+		BaseForm:      "*",
+		Reading:       "*",
+		Pronunciation: "*",
+	}
+	if v := strings.Join(t.POS(), ","); v != "" {
+		ret.POS = v
+	}
+	if v, ok := t.BaseForm(); ok {
+		ret.BaseForm = v
+	}
+	if v, ok := t.Reading(); ok {
+		ret.Reading = v
+	}
+	if v, ok := t.Pronunciation(); ok {
+		ret.Pronunciation = v
+	}
+	return ret
+}
+
+func toRecords(tokens []tokenizer.Token) []record {
+	ret := make([]record, 0, len(tokens))
+	for _, t := range tokens {
+		if t.ID == tokenizer.BosEosID {
+			continue
+		}
+		ret = append(ret, newRecord(t))
+	}
+	return ret
+}
+
+func (h *TokenizeDemoHandler) analyzeGraph(ctx context.Context, sen string, mode tokenizer.TokenizeMode) (records []record, svg string, err error) {
 	if _, err := exec.LookPath(graphvizCmd); err != nil {
 		return nil, "", errors.New("circo/graphviz is not installed in your $PATH")
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), cmdTimeout)
+	ctx, cancel := context.WithTimeout(ctx, cmdTimeout)
 	defer cancel()
 	var b bytes.Buffer
-	cmd := exec.CommandContext(ctx, "dot", "-Tsvg")
+	cmd := exec.CommandContext(ctx, graphvizCmd, "-Tsvg")
 	r0, w0 := io.Pipe()
 	cmd.Stdin = r0
 	cmd.Stdout = &b
-	cmd.Stderr = ErrorWriter
+	cmd.Stderr = Stderr
 	if err := cmd.Start(); err != nil {
 		return nil, "", fmt.Errorf("process done with error, %w", err)
 	}
@@ -69,29 +105,7 @@ func (h *TokenizeDemoHandler) analyze(sen string, mode tokenizer.TokenizeMode) (
 	if pos := strings.Index(svg, "<svg"); pos > 0 {
 		svg = svg[pos:]
 	}
-	records := make([]record, 0, len(tokens))
-	for _, tok := range tokens {
-		if tok.ID == tokenizer.BosEosID {
-			continue
-		}
-		m := record{
-			Surface: tok.Surface,
-		}
-		if m.POS = strings.Join(tok.POS(), ","); m.POS == "" {
-			m.POS = "*"
-		}
-		var ok bool
-		if m.Baseform, ok = tok.BaseForm(); !ok {
-			m.Baseform = "*"
-		}
-		if m.Reading, ok = tok.Reading(); !ok {
-			m.Reading = "*"
-		}
-		if m.Pronunciation, ok = tok.Pronunciation(); !ok {
-			m.Pronunciation = "*"
-		}
-		records = append(records, m)
-	}
+	records = toRecords(tokens)
 	return records, svg, nil
 }
 
@@ -101,15 +115,13 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	mode := r.FormValue("r")
 	lattice := r.FormValue("lattice")
 	if lattice == "" {
-		d := struct {
+		if err := demoT.Execute(w, struct {
 			Sentence string
 			RadioOpt string
 		}{
 			Sentence: sen,
 			RadioOpt: mode,
-		}
-		t := template.Must(template.New("top").Parse(demoHTML))
-		if err := t.Execute(w, d); err != nil {
+		}); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 		return
@@ -121,28 +133,26 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		m = tokenizer.Search
 	}
 	var cmdErr string
-	records, svg, err := h.analyze(sen, m)
+	records, svg, err := h.analyzeGraph(r.Context(), sen, m)
 	if err != nil {
 		cmdErr = "Error: " + err.Error()
 		if errors.Is(err, context.DeadlineExceeded) {
 			cmdErr = "Error: graphviz time out"
 		}
 	}
-	d := struct {
+	if err := graphT.Execute(w, struct {
 		Sentence string
 		Tokens   []record
 		CmdErr   string
-		GraphSvg template.HTML
+		GraphSVG template.HTML
 		Mode     string
 	}{
 		Sentence: sen,
 		Tokens:   records,
 		CmdErr:   cmdErr,
-		GraphSvg: template.HTML(svg),
+		GraphSVG: template.HTML(svg),
 		Mode:     mode,
-	}
-	t := template.Must(template.New("top").Parse(graphHTML))
-	if err := t.Execute(w, d); err != nil {
+	}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
