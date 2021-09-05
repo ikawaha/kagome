@@ -60,6 +60,9 @@ func TestTokenizeDemoHandler_ServeHTTP(t *testing.T) {
 	})
 
 	t.Run("w/ lattice", func(t *testing.T) {
+		if _, err := exec.LookPath(graphvizCmd); err != nil {
+			t.Skipf("graphviz command not found, %v", err)
+		}
 		req := httptest.NewRequest(http.MethodPost, `/?s=ねこです&r=Search&lattice=true`, nil)
 		w := httptest.NewRecorder()
 		(&TokenizeDemoHandler{tokenizer: tnz}).ServeHTTP(w, req)
