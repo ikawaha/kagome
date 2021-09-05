@@ -1,10 +1,11 @@
 package lattice
 
 import (
+	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -16,10 +17,11 @@ import (
 
 // subcommand property
 var (
-	CommandName  = "lattice"
-	Description  = `lattice viewer`
-	UsageMessage = "%s [-udict userdict_file] [-dict (ipa|uni)] [-mode (normal|search|extended)] [-output output_file] [-v] sentence\n"
-	ErrorWriter  = os.Stderr
+	CommandName            = "lattice"
+	Description            = `lattice viewer`
+	UsageMessage           = "%s [-udict userdict_file] [-dict (ipa|uni)] [-mode (normal|search|extended)] [-output output_file] [-v] sentence"
+	Stdout       io.Writer = os.Stdout
+	Stderr       io.Writer = os.Stderr
 )
 
 // options
@@ -36,11 +38,12 @@ type option struct {
 // ContinueOnError ErrorHandling // Return a descriptive error.
 // ExitOnError                   // Call os.Exit(2).
 // PanicOnError                  // Call panic with a descriptive error.flag.ContinueOnError
-func newOption(_ io.Writer, eh flag.ErrorHandling) (o *option) {
+func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	o = &option{
 		flagSet: flag.NewFlagSet(CommandName, eh),
 	}
 	// option settings
+	o.flagSet.SetOutput(w)
 	o.flagSet.StringVar(&o.udict, "udict", "", "user dict")
 	o.flagSet.StringVar(&o.dict, "dict", "ipa", "dict type (ipa|uni)")
 	o.flagSet.StringVar(&o.mode, "mode", "normal", "tokenize mode (normal|search|extended)")
@@ -70,7 +73,7 @@ func (o *option) parse(args []string) error {
 
 // OptionCheck receives a slice of args and returns an error if it was not successfully parsed
 func OptionCheck(args []string) error {
-	opt := newOption(ioutil.Discard, flag.ContinueOnError)
+	opt := newOption(io.Discard, flag.ContinueOnError)
 	if err := opt.parse(args); err != nil {
 		return fmt.Errorf("%v, %w", CommandName, err)
 	}
@@ -99,8 +102,7 @@ func selectMode(mode string) tokenizer.TokenizeMode {
 	return tokenizer.Normal
 }
 
-// command main
-func command(opt *option) error {
+func command(_ context.Context, opt *option) error {
 	d, err := selectDict(opt.dict)
 	if err != nil {
 		return err
@@ -117,16 +119,16 @@ func command(opt *option) error {
 	if err != nil {
 		return err
 	}
-	out := os.Stdout
+	out := Stdout
 	if opt.output != "" {
-		var err error
-		out, err = os.OpenFile(opt.output, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0o666)
+		f, err := os.OpenFile(opt.output, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0o666)
 		if err != nil {
 			return err
 		}
 		defer func() {
-			_ = out.Close()
+			f.Close()
 		}()
+		out = f
 	}
 
 	mode := selectMode(opt.mode)
@@ -136,9 +138,9 @@ func command(opt *option) error {
 			tok := tokens[i]
 			f := tok.Features()
 			if tok.Class == tokenizer.DUMMY {
-				fmt.Fprintf(ErrorWriter, "%s\n", tok.Surface)
+				fmt.Fprintf(Stderr, "%s\n", tok.Surface)
 			} else {
-				fmt.Fprintf(ErrorWriter, "%s\t%v\n", tok.Surface, strings.Join(f, ","))
+				fmt.Fprintf(Stderr, "%s\t%v\n", tok.Surface, strings.Join(f, ","))
 			}
 		}
 	}
@@ -146,23 +148,23 @@ func command(opt *option) error {
 }
 
 // Run receives the slice of args and executes the lattice tool
-func Run(args []string) error {
-	opt := newOption(ErrorWriter, flag.ExitOnError)
+func Run(ctx context.Context, args []string) error {
+	opt := newOption(Stderr, flag.ContinueOnError)
 	if err := opt.parse(args); err != nil {
 		Usage()
-		PrintDefaults(flag.ExitOnError)
-		return fmt.Errorf("%v, %w", CommandName, err)
+		PrintDefaults(flag.ContinueOnError)
+		return errors.New("")
 	}
-	return command(opt)
+	return command(ctx, opt)
 }
 
 // Usage provides information on the use of the lattice tool
 func Usage() {
-	fmt.Fprintf(ErrorWriter, UsageMessage, CommandName)
+	fmt.Fprintf(Stderr, UsageMessage+"\n", CommandName)
 }
 
 // PrintDefaults prints out the default flags
 func PrintDefaults(eh flag.ErrorHandling) {
-	o := newOption(ErrorWriter, eh)
+	o := newOption(Stderr, eh)
 	o.flagSet.PrintDefaults()
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -17,7 +18,7 @@ import (
 type subcommand struct {
 	Name          string
 	Description   string
-	Run           func([]string) error
+	Run           func(context.Context, []string) error
 	Usage         func()
 	OptionCheck   func([]string) error
 	PrintDefaults func(flag.ErrorHandling)
@@ -62,7 +63,7 @@ var (
 		{
 			Name:        "version",
 			Description: "show version",
-			Run: func([]string) error {
+			Run: func(context.Context, []string) error {
 				ShowVersion()
 				return nil
 			},
@@ -115,18 +116,18 @@ func PrintDefaults() {
 
 func main() {
 	var (
-		cmd     func([]string) error
+		run     func(context.Context, []string) error
 		options []string
 	)
 	if len(os.Args) >= 2 {
 		options = os.Args[2:]
 		for i := range subcommands {
 			if os.Args[1] == subcommands[i].Name {
-				cmd = subcommands[i].Run
+				run = subcommands[i].Run
 			}
 		}
 	}
-	if cmd == nil {
+	if run == nil {
 		options = os.Args[1:]
 		if err := defaultSubcommand.OptionCheck(options); err != nil {
 			Usage()
@@ -136,9 +137,9 @@ func main() {
 			defaultSubcommand.PrintDefaults(flag.ExitOnError)
 			os.Exit(1)
 		}
-		cmd = defaultSubcommand.Run
+		run = defaultSubcommand.Run
 	}
-	if err := cmd(options); err != nil {
+	if err := run(context.Background(), options); err != nil {
 		fmt.Fprintf(errorWriter, "%v\n", err)
 		os.Exit(1)
 	}

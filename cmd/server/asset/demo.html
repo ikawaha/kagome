@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <style type="text/css">
+      body {
+          text-align: center;
+      }
+      div#center{
+          width: 800px;
+          margin: 0 auto;
+          text-align: left;
+      }
+      .tbl{
+          width: 100%;
+          border-collapse: separate;
+      }
+      .tbl th{
+          width: 20%;
+          padding: 6px;
+          text-align: left;
+          vertical-align: top;
+          color: #333;
+          background-color: #eee;
+          border: 1px solid #b9b9b9;
+      }
+      .tbl td{
+          padding: 6px;
+          background-color: #fff;
+          border: 1px solid #b9b9b9;
+      }
+      .frm {
+          min-height: 10px;
+          padding: 0 10px 0;
+          margin-bottom: 20px;
+          background-color: #f5f5f5;
+          border: 1px solid #e3e3e3;
+          -webkit-border-radius: 4px;
+          -moz-border-radius: 4px;
+          border-radius: 4px;
+          -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
+          -moz-box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
+          box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
+      }
+      .txar {
+          border:10px;
+          padding:10px;
+          font-size:1.1em;
+          font-family:Arial, sans-serif;
+          border:solid 1px #ccc;
+          margin:0;
+          width:80%;
+          -webkit-border-radius: 3px;
+          -moz-border-radius: 3px;
+          border-radius: 3px;
+          -moz-box-shadow: inset 0 0 4px rgba(0,0,0,0.2);
+          -webkit-box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.2);
+          box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.2);
+      }
+      .btn {
+          background: -moz-linear-gradient(top,#FFF 0%,#EEE);
+          background: -webkit-gradient(linear, left top, left bottom, from(#FFF), to(#EEE));
+          border: 1px solid #DDD;
+          border-radius: 3px;
+          color:#111;
+          width: 100px;
+          padding: 5px 0;
+          margin: 0;
+      }
+      #box {
+          width:100%;
+          margin:10px;
+          height:auto;
+      }
+      #rbox {
+          width:15%;
+          float:right;
+      }
+  </style>
+  <meta charset="UTF-8">
+  <title>Kagome demo - Japanese morphological analyzer</title>
+  <!-- for IE6-8 support of HTML elements -->
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js"></script>
+</head>
+<body>
+<div id="center">
+  <h1>Kagome demo</h1>
+  <form class="frm" action="/_demo" method="POST" oninput="tokenize()" target="_blank">
+    <div id="box">
+    <textarea id="inp" class="txar" rows="3" name="s"
+              placeholder="Enter Japanese text below.">{{.Sentence}}</textarea>
+      <div id="rbox">
+        <div><label><input type="radio" name="r" value="Normal" checked>Normal</label></div>
+        <div><label><input type="radio" name="r" value="Search" {{if eq .RadioOpt "search"}}checked{{end}}>Search</label></div>
+        <div><label><input type="radio" name="r" value="Extended" {{if eq .RadioOpt "extended"}}checked{{end}}>Extended</label></div>
+      </div>
+      <p><input class="btn" type="submit" name="lattice" value="Lattice"/></p>
+    </div>
+  </form>
+
+  <table class="tbl">
+    <thread><tr>
+      <th>Surface</th>
+      <th>Part-of-Speech</th>
+      <th>Base Form</th>
+      <th>Reading</th>
+      <th>Pronunciation</th>
+    </tr></thread>
+    <tbody id="morphs">
+    </tbody>
+  </table>
+</div>
+
+<script>
+    function cb(data, status) {
+        //console.log(data);
+        //console.log(status);
+        if(status == "success" && Array.isArray(data.tokens)){
+            $("#morphs").empty();
+            $.each(data.tokens, function(i, val) {
+                pos = (val.pos == null) ? "*" : val.pos;
+                base = val.base_form != "" ? val.base_form : "*";
+                reading = val.reading != "" ? val.reading : "*";
+                pronoun = val.pronunciation!= "" ? val.pronunciation : "*";
+                $("#morphs").append(
+                    "<tr>"+"<td>" + val.surface + "</td>" +
+                    "<td>" + pos + "</td>"+
+                    "<td>" + base + "</td>"+
+                    "<td>" + reading + "</td>"+
+                    "<td>" + pronoun + "</td>"+
+                    "</tr>"
+                );
+            });
+        }
+    }
+
+    function tokenize() {
+        var s = document.getElementById("inp").value;
+        var m = $('input[name="r"]').filter(':checked').val();
+        var o = {"sentence" : s, "mode" : m};
+        $.post('./tokenize', JSON.stringify(o), cb, 'json');
+    }
+
+    $('input[name="r"]:radio').change( function() {
+        var s = document.getElementById("inp").value;
+        var m = $('input[name="r"]').filter(':checked').val();
+        var o = {"sentence" : s, "mode" : m};
+        $.post('./a', JSON.stringify(o), cb, 'json');
+    })
+</script>
+
+</body>
+</html>

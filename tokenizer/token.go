@@ -216,3 +216,40 @@ func (t Token) Equal(v Token) bool {
 		t.Class == v.Class &&
 		t.Surface == v.Surface
 }
+
+// TokenData is a data format with all the contents of the token.
+type TokenData struct {
+	ID            int      `json:"id"`
+	Start         int      `json:"start"`
+	End           int      `json:"end"`
+	Surface       string   `json:"surface"`
+	Class         string   `json:"class"`
+	POS           []string `json:"pos"`
+	BaseForm      string   `json:"base_form"`
+	Reading       string   `json:"reading"`
+	Pronunciation string   `json:"pronunciation"`
+	Features      []string `json:"features"`
+}
+
+// NewTokenData returns a data which has with all the contents of the token.
+func NewTokenData(t Token) TokenData {
+	ret := TokenData{
+		ID:       t.ID,
+		Start:    t.Start,
+		End:      t.End,
+		Surface:  t.Surface,
+		Class:    t.Class.String(),
+		POS:      t.POS(),
+		Features: t.Features(),
+	}
+	if ret.POS == nil {
+		ret.POS = []string{}
+	}
+	if ret.Features == nil {
+		ret.Features = []string{}
+	}
+	ret.BaseForm, _ = t.BaseForm()
+	ret.Reading, _ = t.Reading()
+	ret.Pronunciation, _ = t.Pronunciation()
+	return ret
+}

@@ -2,11 +2,15 @@ package tokenize
 
 import (
 	"bufio"
+	"bytes"
+	"context"
+	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/ikawaha/kagome-dict/dict"
 	"github.com/ikawaha/kagome-dict/ipa"
@@ -19,13 +23,15 @@ import (
 const (
 	CommandName  = "tokenize"
 	Description  = `command line tokenize`
-	usageMessage = "%s [-file input_file] [-dict dic_file] [-userdict userdic_file]" +
-		" [-sysdict (ipa|uni)] [-simple false] [-mode (normal|search|extended)] [-split] [-json]\n"
+	usageMessage = "%s [-file input_file] [-dict dic_file] [-userdict user_dic_file]" +
+		" [-sysdict (ipa|uni)] [-simple false] [-mode (normal|search|extended)] [-split] [-json]"
 )
 
-// ErrorWriter writes to stderr
 var (
-	ErrorWriter = os.Stderr
+	// Stdout is the standard writer.
+	Stdout io.Writer = os.Stdout
+	// Stderr is the standard error writer.
+	Stderr io.Writer = os.Stderr
 )
 
 // options
@@ -81,7 +87,7 @@ func (o *option) parse(args []string) error {
 
 // OptionCheck receives a slice of args and returns an error if it was not successfully parsed
 func OptionCheck(args []string) error {
-	opt := newOption(ioutil.Discard, flag.ContinueOnError)
+	opt := newOption(io.Discard, flag.ContinueOnError)
 	if err := opt.parse(args); err != nil {
 		return fmt.Errorf("%v, %w", CommandName, err)
 	}
@@ -122,8 +128,7 @@ func selectMode(mode string) tokenizer.TokenizeMode {
 	return tokenizer.Normal
 }
 
-// command main
-func command(opt *option) error {
+func command(_ context.Context, opt *option) error {
 	d, err := selectDict(opt.dict, opt.sysdict, opt.simple)
 	if err != nil {
 		return err
@@ -157,28 +162,80 @@ func command(opt *option) error {
 	if opt.split {
 		s.Split(filter.ScanSentences)
 	}
+	for s.Scan() {
+		tokens := t.Analyze(s.Text(), mode)
+		if !opt.json {
+			printTokens(tokens)
+			continue
+		}
+		if err := printTokensJSON(tokens); err != nil {
+			return err
+		}
+	}
+	return s.Err()
+}
 
-	return PrintScannedTokens(s, t, mode, opt)
+func printTokens(tokens []tokenizer.Token) {
+	w := bufio.NewWriter(Stdout)
+	defer w.Flush()
+	for _, v := range tokens {
+		if v.ID == tokenizer.BosEosID {
+			continue
+		}
+		w.WriteString(v.Surface)
+		if v.Class != tokenizer.DUMMY {
+			w.WriteString("\t")
+			w.WriteString(strings.Join(v.Features(), ","))
+		}
+		w.WriteString("\n")
+	}
+	w.WriteString("EOS\n")
+}
+
+func printTokensJSON(tokens []tokenizer.Token) error {
+	w := bufio.NewWriter(Stdout)
+	defer w.Flush()
+
+	if len(tokens) > 0 {
+		w.WriteString("[\n")
+	}
+	var array [][]byte
+	for _, v := range tokens {
+		if v.Class == tokenizer.DUMMY {
+			continue
+		}
+		r := tokenizer.NewTokenData(v)
+		obj, err := json.Marshal(r)
+		if err != nil {
+			return err
+		}
+		array = append(array, obj)
+	}
+	w.Write(bytes.Join(array, []byte(",\n")))
+	if len(tokens) > 0 {
+		w.WriteString("\n]\n")
+	}
+	return nil
 }
 
 // Run receives the slice of args and executes the tokenize tool
-func Run(args []string) error {
-	opt := newOption(ErrorWriter, flag.ExitOnError)
+func Run(ctx context.Context, args []string) error {
+	opt := newOption(Stderr, flag.ContinueOnError)
 	if err := opt.parse(args); err != nil {
 		Usage()
-		PrintDefaults(flag.ExitOnError)
-		return fmt.Errorf("%v, %w", CommandName, err)
+		PrintDefaults(flag.ContinueOnError)
+		return errors.New("")
 	}
-	return command(opt)
+	return command(ctx, opt)
 }
 
 // Usage provides information on the use of the tokenize tool
 func Usage() {
-	fmt.Fprintf(ErrorWriter, usageMessage, CommandName)
+	fmt.Fprintf(Stderr, usageMessage+"\n", CommandName)
 }
 
 // PrintDefaults prints out the default flags
 func PrintDefaults(eh flag.ErrorHandling) {
-	o := newOption(ErrorWriter, eh)
+	o := newOption(Stderr, eh)
 	o.flagSet.PrintDefaults()
 }

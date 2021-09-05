@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <style type="text/css">
+      body {
+          text-align: center;
+      }
+      div#center{
+          width: 800px;
+          margin: 0 auto;
+          text-align: left;
+      }
+      .tbl{
+          width: 100%;
+          border-collapse: separate;
+      }
+      .tbl th{
+          width: 20%;
+          padding: 6px;
+          text-align: left;
+          vertical-align: top;
+          color: #333;
+          background-color: #eee;
+          border: 1px solid #b9b9b9;
+      }
+      .tbl td{
+          padding: 6px;
+          background-color: #fff;
+          border: 1px solid #b9b9b9;
+      }
+  </style>
+  <meta charset="UTF-8">
+  <title>Kagome demo - Japanese morphological analyzer</title>
+  <!-- for IE6-8 support of HTML elements -->
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+<body>
+<div id="center">
+  <table class="tbl">
+    <tr><th>Input</th><td>{{.Sentence}}</td></tr>
+    <tr><th>Mode</th><td>{{.Mode}}</td></tr>
+  </table>
+
+  <table class="tbl">
+    <thread><tr>
+      <th>Surface</th>
+      <th>Part-of-Speech</th>
+      <th>Base Form</th>
+      <th>Reading</th>
+      <th>Pronunciation</th>
+    </tr></thread>
+    <tbody id="morphs">
+    {{range .Tokens}}
+    <tr>
+      <td>{{.Surface}}</td>
+      <td>{{.POS}}</td>
+      <td>{{.BaseForm}}</td>
+      <td>{{.Reading}}</td>
+      <td>{{.Pronunciation}}</td>
+    </tr>
+    {{end}}
+    </tbody>
+  </table>
+  <div id="graph">
+    {{if .CmdErr}}
+    <strong>{{.CmdErr}}</strong>
+    {{end}}
+    {{if .GraphSVG}}
+    {{.GraphSVG}}
+    {{end}}
+  </div>
+</div>
+</body>
+</html>

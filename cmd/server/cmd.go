@@ -1,11 +1,16 @@
 package server
 
 import (
+	"context"
+	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/ikawaha/kagome-dict/dict"
 	"github.com/ikawaha/kagome-dict/ipa"
@@ -13,12 +18,14 @@ import (
 	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
+// Stderr is the standard error writer.
+var Stderr io.Writer = os.Stderr
+
 // subcommand property
 var (
 	CommandName  = "server"
 	Description  = `run tokenize server`
-	usageMessage = "%s [-http=:6060] [-userdict userdic_file] [-dict (ipa|uni)]\n"
-	ErrorWriter  = os.Stderr
+	usageMessage = "%s [-http=:6060] [-userdict userdic_file] [-dict (ipa|uni)]"
 )
 
 // options
@@ -32,15 +39,16 @@ type option struct {
 // ContinueOnError ErrorHandling // Return a descriptive error.
 // ExitOnError                   // Call os.Exit(2).
 // PanicOnError                  // Call panic with a descriptive error.flag.ContinueOnError
-func newOption(eh flag.ErrorHandling) (o *option) {
-	o = &option{
+func newOption(w io.Writer, eh flag.ErrorHandling) *option {
+	ret := &option{
 		flagSet: flag.NewFlagSet(CommandName, eh),
 	}
 	// option settings
-	o.flagSet.StringVar(&o.http, "http", ":6060", "HTTP service address")
-	o.flagSet.StringVar(&o.udict, "userdict", "", "user dict")
-	o.flagSet.StringVar(&o.dict, "dict", "ipa", "system dict type (ipa|uni)")
-	return
+	ret.flagSet.SetOutput(w)
+	ret.flagSet.StringVar(&ret.http, "http", ":6060", "HTTP service address")
+	ret.flagSet.StringVar(&ret.udict, "userdict", "", "user dict")
+	ret.flagSet.StringVar(&ret.dict, "dict", "ipa", "system dict type (ipa|uni)")
+	return ret
 }
 
 func (o *option) parse(args []string) error {
@@ -59,7 +67,7 @@ func (o *option) parse(args []string) error {
 
 // OptionCheck receives a slice of args and returns an error if it was not successfully parsed
 func OptionCheck(args []string) error {
-	opt := newOption(flag.ContinueOnError)
+	opt := newOption(io.Discard, flag.ContinueOnError)
 	if err := opt.parse(args); err != nil {
 		return fmt.Errorf("%v, %w", CommandName, err)
 	}
@@ -76,8 +84,7 @@ func selectDict(name string) (*dict.Dict, error) {
 	return nil, fmt.Errorf("unknown name type, %v", name)
 }
 
-// command main
-func command(opt *option) error {
+func command(ctx context.Context, opt *option) error {
 	d, err := selectDict(opt.dict)
 	if err != nil {
 		return err
@@ -98,29 +105,55 @@ func command(opt *option) error {
 	mux := http.NewServeMux()
 	mux.Handle("/", &TokenizeDemoHandler{tokenizer: t})
 	mux.Handle("/tokenize", &TokenizeHandler{tokenizer: t})
-	log.Println(opt.http)
-	log.Fatal(http.ListenAndServe(opt.http, mux))
+	srv := http.Server{
+		Addr:    opt.http,
+		Handler: mux,
+	}
+	ch := make(chan error)
+	go func() {
+		log.Println(opt.http)
+		ch <- srv.ListenAndServe()
+	}()
+
+	select {
+	case <-ctx.Done():
+		log.Printf("shutdown, %v", ctx.Err())
+	case err := <-ch:
+		return fmt.Errorf("server error, %w", err)
+	}
+	log.Printf("shutting down HTTP server at %q", opt.http)
+
 	return nil
 }
 
 // Run receives the slice of args and executes the server
-func Run(args []string) error {
-	opt := newOption(flag.ExitOnError)
+func Run(ctx context.Context, args []string) error {
+	opt := newOption(Stderr, flag.ContinueOnError)
 	if err := opt.parse(args); err != nil {
 		Usage()
-		PrintDefaults(flag.ExitOnError)
-		return fmt.Errorf("%v, %w", CommandName, err)
+		PrintDefaults(flag.ContinueOnError)
+		return errors.New("")
 	}
-	return command(opt)
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	go func() {
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
+		select {
+		case <-c:
+			cancel()
+		}
+	}()
+	return command(ctx, opt)
 }
 
 // Usage provides information on the use of the server
 func Usage() {
-	_, _ = fmt.Fprintf(os.Stderr, usageMessage, CommandName)
+	fmt.Fprintf(Stderr, usageMessage+"\n", CommandName)
 }
 
 // PrintDefaults prints out the default flags
 func PrintDefaults(eh flag.ErrorHandling) {
-	o := newOption(eh)
+	o := newOption(Stderr, eh)
 	o.flagSet.PrintDefaults()
 }
