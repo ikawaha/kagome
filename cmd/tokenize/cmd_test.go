@@ -265,11 +265,11 @@ func TestRun(t *testing.T) {
 			wantErr: false,
 		},
 	}
-	//Stdout = os.NewFile(0, os.DevNull)
-	//Stderr = Stdout
+	Stdout = os.NewFile(0, os.DevNull)
+	Stderr = Stdout
 	defer func() {
-		//Stdout = os.Stdout
-		//Stderr = os.Stderr
+		Stdout = os.Stdout
+		Stderr = os.Stderr
 	}()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

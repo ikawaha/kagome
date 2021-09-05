@@ -128,7 +128,6 @@ func selectMode(mode string) tokenizer.TokenizeMode {
 	return tokenizer.Normal
 }
 
-// command main
 func command(_ context.Context, opt *option) error {
 	d, err := selectDict(opt.dict, opt.sysdict, opt.simple)
 	if err != nil {

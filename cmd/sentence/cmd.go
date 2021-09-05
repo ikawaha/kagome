@@ -63,7 +63,6 @@ func OptionCheck(args []string) error {
 	return nil
 }
 
-// command main
 func command(_ context.Context, w io.Writer, opt *option) error {
 	fp := os.Stdin
 	if opt.file != "" {

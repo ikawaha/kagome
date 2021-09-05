@@ -19,6 +19,7 @@ type TokenizerRequestBody struct {
 	Mode  string `json:"mode,omitempty"`
 }
 
+// TokenizerResponseBody is the response type of the "tokenize" endpoint.
 type TokenizerResponseBody struct {
 	Status bool                  `json:"status"`
 	Tokens []tokenizer.TokenData `json:"tokens"`

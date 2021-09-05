@@ -18,10 +18,8 @@ import (
 	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
-var (
-	// Stderr is the standard error writer.
-	Stderr io.Writer = os.Stderr
-)
+// Stderr is the standard error writer.
+var Stderr io.Writer = os.Stderr
 
 // subcommand property
 var (
@@ -86,7 +84,6 @@ func selectDict(name string) (*dict.Dict, error) {
 	return nil, fmt.Errorf("unknown name type, %v", name)
 }
 
-// command main
 func command(ctx context.Context, opt *option) error {
 	d, err := selectDict(opt.dict)
 	if err != nil {
@@ -122,7 +119,7 @@ func command(ctx context.Context, opt *option) error {
 	case <-ctx.Done():
 		log.Printf("shutdown, %v", ctx.Err())
 	case err := <-ch:
-		return fmt.Errorf("server error, %v", err)
+		return fmt.Errorf("server error, %w", err)
 	}
 	log.Printf("shutting down HTTP server at %q", opt.http)
 
