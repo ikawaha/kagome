@@ -3,6 +3,7 @@ name: Reviewdog
 on:
   pull_request:
     types: [opened, synchronize]
+    paths: '**.go'
 
 jobs:
   golangci-lint:
@@ -11,6 +12,8 @@ jobs:
     steps:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: golangci-lint
         uses: reviewdog/action-golangci-lint@v2
         with:
