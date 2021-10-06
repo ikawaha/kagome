@@ -31,7 +31,8 @@ func (nc NodeClass) String() string {
 	return "UNDEF"
 }
 
-type node struct {
+// Node is a lattice node.
+type Node struct {
 	ID       int
 	Position int // byte position
 	Start    int // rune position
@@ -41,15 +42,11 @@ type node struct {
 	Right    int32
 	Weight   int32
 	Surface  string
-	Prev     *node
+	prev     *Node
 }
 
 var nodePool = sync.Pool{
 	New: func() interface{} {
-		return new(node)
+		return new(Node)
 	},
-}
-
-func newNode() *node {
-	return nodePool.Get().(*node)
 }
