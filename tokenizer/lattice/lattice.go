@@ -212,7 +212,7 @@ func additionalCost(n *Node) int {
 	return 0
 }
 
-// Forward runs forward algorithm of the Viterbi.
+// Forward is the forward algorithm of the Viterbi.
 func (la *Lattice) Forward(m TokenizeMode) {
 	for i, size := 1, len(la.list); i < size; i++ {
 		currentList := la.list[i]
@@ -243,7 +243,7 @@ func (la *Lattice) Forward(m TokenizeMode) {
 	}
 }
 
-// Backward runs backward algorithm of the Viterbi.
+// Backward is the backward algorithm of the Viterbi.
 func (la *Lattice) Backward(m TokenizeMode) {
 	const bufferExpandRatio = 2
 	size := len(la.list)
@@ -277,6 +277,10 @@ func (la *Lattice) Backward(m TokenizeMode) {
 			la.Output = append(la.Output, stack[runeLen-1-j])
 		}
 	}
+}
+
+func (la *Lattice) NBestBackward(m TokenizeMode) {
+	/** TODO **/
 }
 
 func posFeature(d *dict.Dict, u *dict.UserDict, t *Node) string {
