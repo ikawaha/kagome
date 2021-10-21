@@ -105,8 +105,7 @@ func (la *Lattice) Build(inp string) {
 	rc := utf8.RuneCountInString(inp)
 	la.Input = inp
 	if cap(la.list) < rc+2 {
-		const expandRatio = 2
-		la.list = make([][]*Node, 0, (rc+2)*expandRatio)
+		la.list = make([][]*Node, 0, rc+2)
 	}
 	la.list = la.list[0 : rc+2]
 
@@ -245,15 +244,9 @@ func (la *Lattice) Forward(m TokenizeMode) {
 
 // Backward runs backward algorithm of the Viterbi.
 func (la *Lattice) Backward(m TokenizeMode) {
-	const bufferExpandRatio = 2
 	size := len(la.list)
 	if size == 0 {
 		return
-	}
-	if cap(la.Output) < size {
-		la.Output = make([]*Node, 0, size*bufferExpandRatio)
-	} else {
-		la.Output = la.Output[:0]
 	}
 	for p := la.list[size-1][0]; p != nil; p = p.prev {
 		if m != Extended || p.Class != UNKNOWN {
