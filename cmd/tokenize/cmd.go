@@ -94,21 +94,21 @@ func OptionCheck(args []string) error {
 	return nil
 }
 
-func selectDict(path, sysdict string, shurink bool) (*dict.Dict, error) {
+func selectDict(path, sysdict string, shrink bool) (*dict.Dict, error) {
 	if path != "" {
-		if shurink {
+		if shrink {
 			return dict.LoadShrink(path)
 		}
 		return dict.LoadDictFile(path)
 	}
 	switch sysdict {
 	case "ipa":
-		if shurink {
+		if shrink {
 			return ipa.DictShrink(), nil
 		}
 		return ipa.Dict(), nil
 	case "uni":
-		if shurink {
+		if shrink {
 			return uni.DictShrink(), nil
 		}
 		return uni.Dict(), nil
