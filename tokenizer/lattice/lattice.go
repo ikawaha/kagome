@@ -279,36 +279,40 @@ func (la *Lattice) Backward(m TokenizeMode) {
 	}
 }
 
-func features(dict *dict.Dict, udict *dict.UserDict, n *node) []string {
-	switch n.Class {
-	case DUMMY:
-		return nil
+func posFeature(d *dict.Dict, u *dict.UserDict, t *node) string {
+	var ret []string
+	switch t.Class {
 	case KNOWN:
-		var c int
-		if dict.Contents != nil {
-			c = len(dict.Contents[n.ID])
+		for _, id := range d.POSTable.POSs[t.ID] {
+			if v := d.POSTable.NameList[id]; v != "*" {
+				ret = append(ret, d.POSTable.NameList[id])
+			}
 		}
-		features := make([]string, 0, len(dict.POSTable.POSs[n.ID])+c)
-		for _, id := range dict.POSTable.POSs[n.ID] {
-			features = append(features, dict.POSTable.NameList[id])
-		}
-		if dict.Contents != nil {
-			features = append(features, dict.Contents[n.ID]...)
-		}
-		return features
 	case UNKNOWN:
-		features := make([]string, len(dict.UnkDict.Contents[n.ID]))
-		for i := range dict.UnkDict.Contents[n.ID] {
-			features[i] = dict.UnkDict.Contents[n.ID][i]
+		start := 0
+		if v, ok := d.UnkDict.ContentsMeta[dict.POSStartIndex]; ok {
+			start = int(v)
 		}
-		return features
+		end := 1
+		if v, ok := d.UnkDict.ContentsMeta[dict.POSHierarchy]; ok {
+			end = start + int(v)
+		}
+		feature := d.UnkDict.Contents[t.ID]
+		if start >= end || end > len(feature) {
+			return "---"
+		}
+		for i := start; i < end; i++ {
+			if feature[i] != "*" {
+				ret = append(ret, feature[i])
+			}
+		}
 	case USER:
-		pos := udict.Contents[n.ID].Pos
-		tokens := strings.Join(udict.Contents[n.ID].Tokens, "/")
-		yomi := strings.Join(udict.Contents[n.ID].Yomi, "/")
-		return []string{pos, tokens, yomi}
+		ret = append(ret, u.Contents[t.ID].Pos)
 	}
-	return nil
+	if len(ret) == 0 {
+		return "---"
+	}
+	return strings.Join(ret, "/")
 }
 
 // Dot outputs a lattice in the graphviz dot format.
@@ -365,11 +369,7 @@ func (la *Lattice) Dot(w io.Writer) {
 					surf = "EOS"
 				}
 			}
-			features := features(la.dic, la.udic, n)
-			pos := "---"
-			if len(features) > 1 {
-				pos = features[0]
-			}
+			pos := posFeature(la.dic, la.udic, n)
 			if _, ok := bests[n]; ok {
 				fmt.Fprintf(w, "\t\"%p\" [label=\"%s\\n%s\\n%d\",shape=ellipse, peripheries=2];\n", n, surf, pos, n.Weight)
 			} else if n.Class != UNKNOWN {
