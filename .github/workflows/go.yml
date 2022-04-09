@@ -54,7 +54,7 @@ jobs:
         with:
           path: src/github.com/ikawaha/kagome
       - name: Install goveralls
-        run: go get github.com/mattn/goveralls
+        run: go install github.com/mattn/goveralls@latest
       - name: Coverage
         run: |
           go test -v -coverprofile=profile.cov -covermode=atomic ./...
