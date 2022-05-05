@@ -39,7 +39,7 @@ jobs:
 
       # Install QEMU emulators for Buildx
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
         with:
           platforms: all
 
