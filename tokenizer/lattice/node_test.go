@@ -5,20 +5,19 @@ import (
 )
 
 func Test_NodeClassString(t *testing.T) {
-	pairs := []struct {
-		in  NodeClass
-		out string
+	testdata := []struct {
+		class NodeClass
+		want  string
 	}{
-		{DUMMY, "DUMMY"},
-		{KNOWN, "KNOWN"},
-		{UNKNOWN, "UNKNOWN"},
-		{USER, "USER"},
-		{NodeClass(999), "UNDEF"},
+		{class: DUMMY, want: "DUMMY"},
+		{class: KNOWN, want: "KNOWN"},
+		{class: UNKNOWN, want: "UNKNOWN"},
+		{class: USER, want: "USER"},
+		{class: NodeClass(999), want: "UNDEF"},
 	}
-
-	for _, p := range pairs {
-		if p.in.String() != p.out {
-			t.Errorf("got %v, expected %v", p.in.String(), p.out)
+	for _, p := range testdata {
+		if got := p.class.String(); got != p.want {
+			t.Errorf("got %v, expected %v", got, p.want)
 		}
 	}
 }

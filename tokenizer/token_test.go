@@ -657,3 +657,176 @@ func TestEqual(t *testing.T) {
 		}
 	}
 }
+
+func Test_EqualFeatures(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+
+	tokens1 := tnz.Tokenize("公園に行くトトロ") // BOS/公園/に/行く/トトロ/EOS
+	if want, got := 6, len(tokens1); want != got {
+		t.Fatalf("token length: want %d, got %d", want, got)
+	}
+	tokens2 := tnz.Tokenize("学校に行くトトロ")
+	if want, got := 6, len(tokens2); want != got {
+		t.Fatalf("token length: want %d, got %d", want, got)
+	}
+
+	testdata := []struct {
+		name     string
+		lhs, rhs Token
+		want     bool
+	}{
+		{
+			name: "BOS vs BOS",
+			lhs:  tokens1[0],
+			rhs:  tokens2[0],
+			want: true,
+		},
+		{
+			name: "公園 vs 学校",
+			lhs:  tokens1[1],
+			rhs:  tokens2[1],
+			want: false,
+		},
+		{
+			name: "に vs に",
+			lhs:  tokens1[2],
+			rhs:  tokens2[2],
+			want: true,
+		},
+		{
+			name: "行く vs 行く",
+			lhs:  tokens1[3],
+			rhs:  tokens2[3],
+			want: true,
+		},
+		{
+			name: "トトロ vs トトロ",
+			lhs:  tokens1[4],
+			rhs:  tokens2[4],
+			want: true,
+		},
+		{
+			name: "EOS vs EOS",
+			lhs:  tokens1[5],
+			rhs:  tokens2[5],
+			want: true,
+		},
+		{
+			name: "BOS vs EOS",
+			lhs:  tokens1[0],
+			rhs:  tokens2[5],
+			want: true,
+		},
+		{
+			name: "学校 vs トトロ",
+			lhs:  tokens1[0],
+			rhs:  tokens2[4],
+			want: false,
+		},
+	}
+	for _, tt := range testdata {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := EqualFeatures(tt.lhs.Features(), tt.rhs.Features()); tt.want != got {
+				t.Errorf("want %t, got %t, %q%+v vs %q%+v", tt.want, got, tt.lhs.Surface, tt.lhs.Features(), tt.rhs.Surface, tt.rhs.Features())
+			}
+			if got := tt.lhs.EqualFeatures(tt.rhs); tt.want != got {
+				t.Errorf("want %t, got %t, %q%+v vs %q%+v", tt.want, got, tt.lhs.Surface, tt.lhs.Features(), tt.rhs.Surface, tt.rhs.Features())
+			}
+		})
+	}
+}
+
+func Test_EqualPOS(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tnz, err := New(d)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+
+	tokens1 := tnz.Tokenize("公園に行くトトロ") // BOS/公園/に/行く/トトロ/EOS
+	if want, got := 6, len(tokens1); want != got {
+		t.Fatalf("token length: want %d, got %d", want, got)
+	}
+	tokens2 := tnz.Tokenize("学校に行くトトロ")
+	if want, got := 6, len(tokens2); want != got {
+		t.Fatalf("token length: want %d, got %d", want, got)
+	}
+
+	testdata := []struct {
+		name     string
+		lhs, rhs Token
+		want     bool
+	}{
+		{
+			name: "BOS vs BOS",
+			lhs:  tokens1[0],
+			rhs:  tokens2[0],
+			want: true,
+		},
+		{
+			name: "公園 vs 学校",
+			lhs:  tokens1[1],
+			rhs:  tokens2[1],
+			want: true,
+		},
+		{
+			name: "に vs に",
+			lhs:  tokens1[2],
+			rhs:  tokens2[2],
+			want: true,
+		},
+		{
+			name: "行く vs 行く",
+			lhs:  tokens1[3],
+			rhs:  tokens2[3],
+			want: true,
+		},
+		{
+			name: "トトロ vs トトロ",
+			lhs:  tokens1[4],
+			rhs:  tokens2[4],
+			want: true,
+		},
+		{
+			name: "EOS vs EOS",
+			lhs:  tokens1[5],
+			rhs:  tokens2[5],
+			want: true,
+		},
+		{
+			name: "BOS vs EOS",
+			lhs:  tokens1[0],
+			rhs:  tokens2[5],
+			want: true,
+		},
+		{
+			name: "学校 vs トトロ",
+			lhs:  tokens1[1],
+			rhs:  tokens2[4],
+			want: true,
+		},
+		{
+			name: "学校 vs 行く",
+			lhs:  tokens1[1],
+			rhs:  tokens2[3],
+			want: false,
+		},
+	}
+	for _, tt := range testdata {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.lhs.EqualPOS(tt.rhs); tt.want != got {
+				t.Errorf("want %t, got %t, %q%+v vs %q%+v", tt.want, got, tt.lhs.Surface, tt.lhs.POS(), tt.rhs.Surface, tt.rhs.POS())
+			}
+		})
+	}
+}

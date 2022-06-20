@@ -165,6 +165,29 @@ func (t Token) POS() []string {
 	return nil
 }
 
+// EqualFeatures returns true, if the features of tokens are equal.
+func (t Token) EqualFeatures(tt Token) bool {
+	return EqualFeatures(t.Features(), tt.Features())
+}
+
+// EqualPOS returns true, if the POSs of tokens are equal.
+func (t Token) EqualPOS(tt Token) bool {
+	return EqualFeatures(t.POS(), tt.POS())
+}
+
+// EqualFeatures returns true, if the features are equal.
+func EqualFeatures(lhs, rhs []string) bool {
+	if len(lhs) != len(rhs) {
+		return false
+	}
+	for i := 0; i < len(lhs); i++ {
+		if lhs[i] != rhs[i] {
+			return false
+		}
+	}
+	return true
+}
+
 // InflectionalType returns the inflectional type feature if exists.
 func (t Token) InflectionalType() (string, bool) {
 	return t.pickupFromFeatures(dict.InflectionalType)

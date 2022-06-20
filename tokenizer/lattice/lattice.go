@@ -41,8 +41,8 @@ var latticePool = sync.Pool{
 // Lattice represents a grid of morph nodes.
 type Lattice struct {
 	Input  string
-	Output []*node
-	list   [][]*node
+	Output []*Node
+	list   [][]*Node
 	dic    *dict.Dict
 	udic   *dict.UserDict
 }
@@ -86,7 +86,7 @@ func (la *Lattice) addNode(pos, id, position, start int, class NodeClass, surfac
 	case USER:
 		// use default cost
 	}
-	n := newNode()
+	n := nodePool.Get().(*Node)
 	n.ID = id
 	n.Position = position
 	n.Start = start
@@ -94,7 +94,7 @@ func (la *Lattice) addNode(pos, id, position, start int, class NodeClass, surfac
 	n.Cost = 0
 	n.Left, n.Right, n.Weight = int32(m.LeftID), int32(m.RightID), int32(m.Weight)
 	n.Surface = surface
-	n.Prev = nil
+	n.prev = nil
 	p := pos + utf8.RuneCountInString(surface)
 	la.list[p] = append(la.list[p], n)
 }
@@ -105,8 +105,7 @@ func (la *Lattice) Build(inp string) {
 	rc := utf8.RuneCountInString(inp)
 	la.Input = inp
 	if cap(la.list) < rc+2 {
-		const expandRatio = 2
-		la.list = make([][]*node, 0, (rc+2)*expandRatio)
+		la.list = make([][]*Node, 0, rc+2)
 	}
 	la.list = la.list[0 : rc+2]
 
@@ -201,7 +200,7 @@ func kanjiOnly(s string) bool {
 	return s != ""
 }
 
-func additionalCost(n *node) int {
+func additionalCost(n *Node) int {
 	l := utf8.RuneCountInString(n.Surface)
 	if l > searchModeKanjiLength && kanjiOnly(n.Surface) {
 		return (l - searchModeKanjiLength) * searchModeKanjiPenalty
@@ -236,7 +235,7 @@ func (la *Lattice) Forward(m TokenizeMode) {
 				}
 				if j == 0 || int32(totalCost) < la.list[i][index].Cost {
 					la.list[i][index].Cost = int32(totalCost)
-					la.list[i][index].Prev = la.list[target.Start][j]
+					la.list[i][index].prev = la.list[target.Start][j]
 				}
 			}
 		}
@@ -245,26 +244,20 @@ func (la *Lattice) Forward(m TokenizeMode) {
 
 // Backward runs backward algorithm of the Viterbi.
 func (la *Lattice) Backward(m TokenizeMode) {
-	const bufferExpandRatio = 2
 	size := len(la.list)
 	if size == 0 {
 		return
 	}
-	if cap(la.Output) < size {
-		la.Output = make([]*node, 0, size*bufferExpandRatio)
-	} else {
-		la.Output = la.Output[:0]
-	}
-	for p := la.list[size-1][0]; p != nil; p = p.Prev {
+	for p := la.list[size-1][0]; p != nil; p = p.prev {
 		if m != Extended || p.Class != UNKNOWN {
 			la.Output = append(la.Output, p)
 			continue
 		}
 		runeLen := utf8.RuneCountInString(p.Surface)
-		stack := make([]*node, 0, runeLen)
+		stack := make([]*Node, 0, runeLen)
 		i := 0
 		for k, r := range p.Surface {
-			stack = append(stack, &node{
+			stack = append(stack, &Node{
 				ID:       p.ID,
 				Start:    p.Start + i,
 				Class:    DUMMY,
@@ -279,7 +272,7 @@ func (la *Lattice) Backward(m TokenizeMode) {
 	}
 }
 
-func posFeature(d *dict.Dict, u *dict.UserDict, t *node) string {
+func posFeature(d *dict.Dict, u *dict.UserDict, t *Node) string {
 	var ret []string
 	switch t.Class {
 	case KNOWN:
@@ -318,13 +311,13 @@ func posFeature(d *dict.Dict, u *dict.UserDict, t *node) string {
 // Dot outputs a lattice in the graphviz dot format.
 //nolint:gocyclo
 func (la *Lattice) Dot(w io.Writer) {
-	bests := make(map[*node]struct{})
+	bests := make(map[*Node]struct{})
 	for _, n := range la.Output {
 		bests[n] = struct{}{}
 	}
 	type edge struct {
-		from *node
-		to   *node
+		from *Node
+		to   *Node
 	}
 	edges := make([]edge, 0, 1024)
 	for i, size := 1, len(la.list); i < size; i++ {
