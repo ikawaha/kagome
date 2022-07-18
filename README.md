@@ -33,7 +33,7 @@ The dictionary/statistical models such as MeCab-IPADIC, UniDic (unidic-mecab) an
 
 ## Segmentation mode for search
 
-Kagome has segmentation mode for search such as [Kuromoji](http://www.atilika.com/en/products/kuromoji.html).
+Kagome has segmentation mode for search such as [Kuromoji](https://www.atilika.org/).
 
 * Normal: Regular segmentation
 * Search: Use a heuristic to do additional segmentation useful for search
