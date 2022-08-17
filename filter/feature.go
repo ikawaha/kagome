@@ -76,7 +76,7 @@ func (f *FeaturesFilter) add(fs Features) {
 }
 
 // Match returns true if a filter matches given features.
-func (f FeaturesFilter) Match(fs Features) bool {
+func (f *FeaturesFilter) Match(fs Features) bool {
 	n := &f.root
 	for _, v := range fs {
 		if k := n.has(v); k >= 0 {
@@ -92,7 +92,7 @@ func (f FeaturesFilter) Match(fs Features) bool {
 }
 
 // String implements string interface.
-func (f FeaturesFilter) String() string {
+func (f *FeaturesFilter) String() string {
 	var buf strings.Builder
 	filterString(&buf, 0, &f.root)
 	return buf.String()
