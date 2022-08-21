@@ -76,10 +76,10 @@ func TestPOSFilter_Match(t *testing.T) {
 
 	for _, v := range testdata {
 		t.Run(v.title, func(t *testing.T) {
-			filter := filter.NewPOSFilter(v.featuresList...)
+			fl := filter.NewPOSFilter(v.featuresList...)
 			var got []string
 			for _, token := range tokens {
-				if filter.Match(token.POS()) {
+				if fl.Match(token.POS()) {
 					got = append(got, token.Surface)
 				}
 			}
@@ -126,9 +126,9 @@ func TestPOSFilter_Keep(t *testing.T) {
 	for _, v := range testdata {
 		t.Run(v.title, func(t *testing.T) {
 			tokens := tnz.Tokenize(input)
-			filter := filter.NewPOSFilter(v.featuresList...)
+			fl := filter.NewPOSFilter(v.featuresList...)
 			var got []string
-			filter.Keep(&tokens)
+			fl.Keep(&tokens)
 			for _, token := range tokens {
 				got = append(got, token.Surface)
 			}
@@ -139,8 +139,8 @@ func TestPOSFilter_Keep(t *testing.T) {
 	}
 
 	t.Run("empty input test", func(t *testing.T) {
-		filter := filter.NewPOSFilter(nil)
-		filter.Keep(nil)
+		fl := filter.NewPOSFilter(nil)
+		fl.Keep(nil)
 	})
 }
 
@@ -182,9 +182,9 @@ func TestPOSFilter_Drop(t *testing.T) {
 	for _, v := range testdata {
 		t.Run(v.title, func(t *testing.T) {
 			tokens := tnz.Tokenize(input)
-			filter := filter.NewPOSFilter(v.featuresList...)
+			fl := filter.NewPOSFilter(v.featuresList...)
 			var got []string
-			filter.Drop(&tokens)
+			fl.Drop(&tokens)
 			for _, token := range tokens {
 				got = append(got, token.Surface)
 			}
@@ -195,8 +195,8 @@ func TestPOSFilter_Drop(t *testing.T) {
 	}
 
 	t.Run("empty input test", func(t *testing.T) {
-		filter := filter.NewPOSFilter(nil)
-		filter.Drop(nil)
+		fl := filter.NewPOSFilter(nil)
+		fl.Drop(nil)
 	})
 }
 

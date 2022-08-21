@@ -156,10 +156,10 @@ func Benchmark_TokenFilter_WordFilter(b *testing.B) {
 	b.Run("specific token filter", func(b *testing.B) {
 		tokens := tnz.Tokenize(input)
 		words := []string{"人魚", "南", "の"}
-		filter := filter.NewWordFilter(words)
+		fl := filter.NewWordFilter(words)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
-			filter.Keep(&tokens)
+			fl.Keep(&tokens)
 		}
 	})
 }
