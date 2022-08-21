@@ -44,10 +44,10 @@ func TestWordFilter_Match(t *testing.T) {
 
 	for _, v := range testdata {
 		t.Run(v.title, func(t *testing.T) {
-			filter := filter.NewWordFilter(v.wordList)
+			fl := filter.NewWordFilter(v.wordList)
 			var got []string
 			for _, token := range tokens {
-				if filter.Match(token.Surface) {
+				if fl.Match(token.Surface) {
 					got = append(got, token.Surface)
 				}
 			}
@@ -92,9 +92,9 @@ func TestWordFilter_Keep(t *testing.T) {
 	for _, v := range testdata {
 		t.Run(v.title, func(t *testing.T) {
 			tokens := tnz.Tokenize(input)
-			filter := filter.NewWordFilter(v.wordList)
+			fl := filter.NewWordFilter(v.wordList)
 			var got []string
-			filter.Keep(&tokens)
+			fl.Keep(&tokens)
 			for _, token := range tokens {
 				got = append(got, token.Surface)
 			}
@@ -105,8 +105,8 @@ func TestWordFilter_Keep(t *testing.T) {
 	}
 
 	t.Run("empty input test", func(t *testing.T) {
-		filter := filter.NewWordFilter(nil)
-		filter.Keep(nil)
+		fl := filter.NewWordFilter(nil)
+		fl.Keep(nil)
 	})
 }
 
@@ -146,9 +146,9 @@ func TestWordFilter_Drop(t *testing.T) {
 	for _, v := range testdata {
 		t.Run(v.title, func(t *testing.T) {
 			tokens := tnz.Tokenize(input)
-			filter := filter.NewWordFilter(v.wordList)
+			fl := filter.NewWordFilter(v.wordList)
 			var got []string
-			filter.Drop(&tokens)
+			fl.Drop(&tokens)
 			for _, token := range tokens {
 				got = append(got, token.Surface)
 			}
@@ -159,8 +159,8 @@ func TestWordFilter_Drop(t *testing.T) {
 	}
 
 	t.Run("empty input test", func(t *testing.T) {
-		filter := filter.NewWordFilter(nil)
-		filter.Drop(nil)
+		fl := filter.NewWordFilter(nil)
+		fl.Drop(nil)
 	})
 }
 
