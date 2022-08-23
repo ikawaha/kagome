@@ -1,6 +1,6 @@
 github.com/ikawaha/kagome-dict v1.0.5 h1:7eUhaCuktTBVduV1/GwsEAR55ewBRJ2dDHtrzQHOnKc=
 github.com/ikawaha/kagome-dict v1.0.5/go.mod h1:IMAq6d/YI2kDegn2smxhOjejGX4aes5JgCeFik6zFXI=
-github.com/ikawaha/kagome-dict/ipa v1.0.5 h1:cdZn0uTu30b6gNDuE4gYj4kAeV7lVga2nHkZtK7UfxE=
-github.com/ikawaha/kagome-dict/ipa v1.0.5/go.mod h1:TkvBLrjWBNyp4STPzxTqd2KAPkNhXf20z/GS5p5bqv8=
+github.com/ikawaha/kagome-dict/ipa v1.0.6 h1:+v9o37pjnlZGVm2Jv98jxuZ+RJO3ZCEWa+ownJL6AMg=
+github.com/ikawaha/kagome-dict/ipa v1.0.6/go.mod h1:+ydIDyvA+g6weyS362m1Q4xT19kJUlF2ciBqbnOQ7WE=
 github.com/ikawaha/kagome-dict/uni v1.1.4 h1:N/78KaW48bTKIuA0F91K7VWvdErGC5ByzxQl/F3IQ0Y=
 github.com/ikawaha/kagome-dict/uni v1.1.4/go.mod h1:fbVExox9lOpWc9SrmBDXlpzB8RR1F0UWFF5nUYd25fI=
