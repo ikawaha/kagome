@@ -104,7 +104,9 @@ output:
 
 **Go**
 
+```shellsession
 go install github.com/ikawaha/kagome/v2@latest
+```
 
 **Homebrew tap**
 ```shellsession
