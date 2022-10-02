@@ -1,6 +1,5 @@
 module github.com/ikawaha/kagome/v2
 
-// +heroku goVersion go1.18
 go 1.19
 
 require (
