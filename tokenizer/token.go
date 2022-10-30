@@ -131,6 +131,27 @@ func (t Token) FeatureAt(i int) (string, bool) {
 	return "", false
 }
 
+// UserExtra represents custom segmentation and custom reading for user entries.
+type UserExtra struct {
+	Tokens []string
+	Yomi   []string
+}
+
+// UserExtra returns extra data if token comes from a user dict.
+func (t Token) UserExtra() *UserExtra {
+	if t.Class != USER {
+		return nil
+	}
+	tokens := make([]string, len(t.udict.Contents[t.ID].Tokens))
+	copy(tokens, t.udict.Contents[t.ID].Tokens)
+	yomi := make([]string, len(t.udict.Contents[t.ID].Yomi))
+	copy(yomi, t.udict.Contents[t.ID].Yomi)
+	return &UserExtra{
+		Tokens: tokens,
+		Yomi:   yomi,
+	}
+}
+
 // POS returns POS elements of features.
 func (t Token) POS() []string {
 	switch t.Class {
