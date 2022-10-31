@@ -346,6 +346,35 @@ func Test_FeaturesAndPosUserDict(t *testing.T) {
 	}
 }
 
+func Test_FeaturesUserExtra(t *testing.T) {
+	d, err := dict.LoadDictFile(testDictPath)
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	tok := Token{
+		ID:      0,
+		Class:   USER,
+		Start:   0,
+		End:     1,
+		Surface: "",
+	}
+	tok.dict = d
+	if udic, err := dict.NewUserDict(userDictSample); err != nil {
+		t.Fatalf("build user dict error: %v", err)
+	} else {
+		tok.udict = udic
+	}
+
+	got := tok.UserExtra()
+	want := &UserExtra{
+		Tokens:   []string{"日本", "経済", "新聞"},
+		Readings: []string{"ニホン", "ケイザイ", "シンブン"},
+	}
+	if !reflect.DeepEqual(want, got) {
+		t.Errorf("want %v, got %v", want, got)
+	}
+}
+
 func Test_TokenString(t *testing.T) {
 	tok := Token{
 		ID:      123,
