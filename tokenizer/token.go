@@ -133,8 +133,8 @@ func (t Token) FeatureAt(i int) (string, bool) {
 
 // UserExtra represents custom segmentation and custom reading for user entries.
 type UserExtra struct {
-	Tokens []string
-	Yomi   []string
+	Tokens   []string
+	Readings []string
 }
 
 // UserExtra returns extra data if token comes from a user dict.
@@ -147,8 +147,8 @@ func (t Token) UserExtra() *UserExtra {
 	yomi := make([]string, len(t.udict.Contents[t.ID].Yomi))
 	copy(yomi, t.udict.Contents[t.ID].Yomi)
 	return &UserExtra{
-		Tokens: tokens,
-		Yomi:   yomi,
+		Tokens:   tokens,
+		Readings: yomi,
 	}
 }
 

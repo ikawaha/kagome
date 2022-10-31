@@ -367,8 +367,8 @@ func Test_FeaturesUserExtra(t *testing.T) {
 
 	got := tok.UserExtra()
 	want := &UserExtra{
-		Tokens: []string{"日本", "経済", "新聞"},
-		Yomi:   []string{"ニホン", "ケイザイ", "シンブン"},
+		Tokens:   []string{"日本", "経済", "新聞"},
+		Readings: []string{"ニホン", "ケイザイ", "シンブン"},
 	}
 	if !reflect.DeepEqual(want, got) {
 		t.Errorf("want %v, got %v", want, got)
