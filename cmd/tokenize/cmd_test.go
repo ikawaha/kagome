@@ -258,7 +258,7 @@ func TestRun(t *testing.T) {
 		{
 			name: "normal operation w/ options",
 			args: []string{
-				"-udict", "../../sample/userdict.txt",
+				"-udict", "../../sample/dict/userdict.txt",
 				"-file", "../../testdata/nekodearu.txt",
 				"-split",
 			},
