@@ -26,6 +26,7 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version-file: 'go.mod'
+          cache: true
 
       - name: Set up Graphviz
         uses: ts-graphviz/setup-graphviz@v1
@@ -48,6 +49,7 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version-file: 'go.mod'
+          cache: true
       - name: Install goveralls
         run: go install github.com/mattn/goveralls@latest
       - name: Coverage
