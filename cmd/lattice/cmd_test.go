@@ -43,7 +43,7 @@ func TestOptionCheck(t *testing.T) {
 		{
 			name: "all options and input",
 			args: []string{
-				"-udict", "../../sample/userdict.txt",
+				"-udict", "../../sample/dict/userdict.txt",
 				"-dict", "ipa",
 				"-mode", "search",
 				"-output", "/dev/null",
@@ -83,7 +83,7 @@ func TestRun(t *testing.T) {
 		{
 			name: "all options and input",
 			args: []string{
-				"-udict", "../../sample/userdict.txt",
+				"-udict", "../../sample/dict/userdict.txt",
 				"-dict", "ipa",
 				"-mode", "search",
 				"-output", "/dev/null",
@@ -139,7 +139,7 @@ func Test_command(t *testing.T) {
 		{
 			name: "verbose",
 			args: &option{
-				udict:   "../../sample/userdict.txt",
+				udict:   "../../sample/dict/userdict.txt",
 				dict:    "uni",
 				mode:    "extended",
 				output:  "",
