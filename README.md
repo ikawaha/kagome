@@ -1,13 +1,14 @@
 [![GoDev](https://pkg.go.dev/badge/github.com/ikawaha/kagome/v2)](https://pkg.go.dev/github.com/ikawaha/kagome/v2)
 [![Go](https://github.com/ikawaha/kagome/workflows/Go/badge.svg)](https://github.com/ikawaha/kagome/actions?query=workflow%3AGo)
+[![Release](https://github.com/ikawaha/kagome/actions/workflows/release.yml/badge.svg)](https://github.com/ikawaha/kagome/actions/workflows/release.yml)
 [![Coverage Status](https://coveralls.io/repos/github/ikawaha/kagome/badge.svg?branch=v2)](https://coveralls.io/github/ikawaha/kagome?branch=v2)
-[![Docker Build Latest](https://github.com/ikawaha/kagome/actions/workflows/build-docker-latest.yml/badge.svg)](https://github.com/ikawaha/kagome/actions/workflows/build-docker-latest.yml)
 [![Docker Pulls](https://img.shields.io/docker/pulls/ikawaha/kagome.svg?style)](https://hub.docker.com/r/ikawaha/kagome/)
 
 Kagome v2
 ===
 
 Kagome is an open source Japanese morphological analyzer written in pure golang.
+
 The dictionary/statistical models such as MeCab-IPADIC, UniDic (unidic-mecab) and so on, are able to be embedded in binaries.
 
 ### Improvements from [v1](https://github.com/ikawaha/kagome/tree/master).
@@ -21,6 +22,8 @@ The dictionary/statistical models such as MeCab-IPADIC, UniDic (unidic-mecab) an
 |:---|:---|:---|
 |MeCab IPADIC| mecab-ipadic-2.7.0-20070801 | [github.com/ikawaha/kagome-dict/ipa](https://github.com/ikawaha/kagome-dict/tree/master/ipa)|
 |UniDIC| unidic-mecab-2.1.2_src | [github.com/ikawaha/kagome-dict/uni](https://github.com/ikawaha/kagome-dict/tree/master/uni) |
+
+> __Note__: IPADIC is MeCab's so-called "standard dictionary" and is characterized by its ability to split morphological units more intuitively than UniDIC. In contrast, UniDIC breaks phrases into smaller example sentence units to create metadata for full-text search. For more details, see the [wiki](https://github.com/ikawaha/kagome/wiki/About-the-dictionary).
 
 **Experimental Features**
 
@@ -43,7 +46,6 @@ Kagome has segmentation mode for search such as [Kuromoji](https://www.atilika.o
 |日本経済新聞|日本経済新聞|日本　経済　新聞|日本　経済　新聞|
 |シニアソフトウェアエンジニア|シニアソフトウェアエンジニア|シニア　ソフトウェア　エンジニア|シニア　ソフトウェア　エンジニア|
 |デジカメを買った|デジカメ　を　買っ　た|デジカメ　を　買っ　た|デ　ジ　カ　メ　を　買っ　た|
-
 
 # Programming example
 
@@ -93,25 +95,37 @@ output:
 うち	名詞,非自立,副詞可能,*,*,*,うち,ウチ,ウチ
 ```
 
+- For more examples, see the [sample directory](https://github.com/ikawaha/kagome/tree/v2/sample).
+
 ## Reference
 
 [![実践：形態素解析 kagome v2](https://user-images.githubusercontent.com/4232165/102152682-e281e400-3eb8-11eb-91f7-13e08a8977d9.png)](https://zenn.dev/ikawaha/books/kagome-v2-japanese-tokenizer)
-
 
 # Commands
 
 ## Install
 
-**Go**
+* **Go**
 
-```shellsession
-go install github.com/ikawaha/kagome/v2@latest
-```
+  ```shellsession
+  go install github.com/ikawaha/kagome/v2@latest
+  ```
 
-**Homebrew tap**
-```shellsession
-brew install ikawaha/kagome/kagome
-```
+* **Homebrew**
+
+  ```shellsession
+  # macOS and Linux (for both AMD64 and ARM64)
+  brew install ikawaha/kagome/kagome
+  ```
+
+* **Docker**
+
+  * See the [Docker section](#docker) below
+
+* **Manual Install**
+
+  * For manual installation, download and extract the appropriate archived file for your OS and architecture from the [releases page](https://github.com/ikawaha/kagome/releases/latest).
+  * Note that the extracted binary must be placed in an accessible directory with execution permission.
 
 ## Usage
 
@@ -126,29 +140,29 @@ The commands are:
    sentence - tiny sentence splitter
    version - show version
 
-tokenize [-file input_file] [-dict dic_file] [-userdict userdic_file] [-sysdict (ipa|uni)] [-simple false] [-mode (normal|search|extended)] [-split] [-json]
+tokenize [-file input_file] [-dict dic_file] [-userdict user_dic_file] [-sysdict (ipa|uni)] [-simple false] [-mode (normal|search|extended)] [-split] [-json]
   -dict string
-        dict
+    	dict
   -file string
-        input file
+    	input file
   -json
-        outputs in JSON format
+    	outputs in JSON format
   -mode string
-        tokenize mode (normal|search|extended) (default "normal")
+    	tokenize mode (normal|search|extended) (default "normal")
   -simple
-        display abbreviated dictionary contents
+    	display abbreviated dictionary contents
   -split
-        use tiny sentence splitter
+    	use tiny sentence splitter
   -sysdict string
-        system dict type (ipa|uni) (default "ipa")
+    	system dict type (ipa|uni) (default "ipa")
   -udict string
-        user dict
+    	user dict
 ```
 
 ### Tokenize command
 
 ```shellsession
-% # interactive mode
+% # interactive/REPL mode
 % kagome
 すもももももももものうち
 すもも	名詞,一般,*,*,*,*,すもも,スモモ,スモモ
@@ -252,9 +266,25 @@ A debug tool of tokenize process outputs a lattice in graphviz dot format.
 ![lattice](https://user-images.githubusercontent.com/4232165/89723585-74717000-da33-11ea-886a-baab85f7a06e.png)
 
 # Docker
+
 [![Docker](https://dockeri.co/image/ikawaha/kagome)](https://hub.docker.com/r/ikawaha/kagome)
 
 [![](https://images.microbadger.com/badges/image/ikawaha/kagome.svg)](https://microbadger.com/images/ikawaha/kagome "View image info on microbadger.com")
+
+```sh
+# Compatible architectures: AMD64, Arm64, Arm32 (Arm v5, v6 and v7)
+docker pull ikawaha/kagome:latest
+```
+
+```sh
+# Interactive/REPL mode
+docker run --rm -it ikawaha/kagome:latest
+```
+
+```sh
+# Server mode (http://localhost:6060)
+docker run --rm -p 6060:6060 ikawaha/kagome:latest server
+```
 
 # Building to WebAssembly
 
