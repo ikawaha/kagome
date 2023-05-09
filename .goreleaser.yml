@@ -1,24 +1,48 @@
+# =============================================================================
+#  GoReleaser configuration file for Kagome
+# =============================================================================
+#  For local testing run:
+#    goreleaser --skip-publish --rm-dist --snapshot
+#
+#  Note:
+#  To build multiarch Docker image, you may be required to install Docker buildx
+#  plugin and QEMU.
 env:
   - GO111MODULE=on
+
 before:
   hooks:
     - go mod download
+
 builds:
   - env:
       - CGO_ENABLED=0
+    binary: kagome
     goos:
       - linux
       - darwin
       - windows
     goarch:
       - amd64
-      - arm
       - arm64
+      - arm
+    # Variant for ARM32
+    goarm:
+      - "5"
+      - "6"
+      - "7"
+    # Ignore ARM32 build for both macOS and Windows
+    ignore:
+      - goos: darwin
+        goarch: arm
+      - goos: windows
+        goarch: arm
     mod_timestamp: '{{ .CommitTimestamp }}'
     flags:
       - -trimpath
     ldflags:
-      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }} -X main.builtBy=goreleaser
+      - -s -w -extldflags '-static' -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }} -X main.builtBy=goreleaser
+
 brews:
   - tap:
       owner: ikawaha
@@ -33,3 +57,64 @@ brews:
       bin.install "kagome"
     test: |
       system "#{bin}/kagome version"
+
+dockers:
+  - image_templates:
+      - "ikawaha/kagome:{{ .Version }}-amd64"
+    use: buildx
+    goarch: amd64
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--platform=linux/amd64"
+
+  - image_templates:
+      - "ikawaha/kagome:{{ .Version }}-arm64"
+    use: buildx
+    goarch: arm64
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--platform=linux/arm64/v8"
+
+  - image_templates:
+      - "ikawaha/kagome:{{ .Version }}-arm32v5"
+    use: buildx
+    goarch: arm
+    goarm: 5
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--platform=linux/arm/v5"
+
+  - image_templates:
+      - "ikawaha/kagome:{{ .Version }}-arm32v6"
+    use: buildx
+    goarch: arm
+    goarm: 6
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--platform=linux/arm/v6"
+
+  - image_templates:
+      - "ikawaha/kagome:{{ .Version }}-arm32v7"
+    use: buildx
+    goarch: arm
+    goarm: 7
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--platform=linux/arm/v7"
+
+# Build multiarch manifest file of Docker image
+docker_manifests:
+  - name_template: ikawaha/kagome:{{ .Version }}
+    image_templates:
+      - ikawaha/kagome:{{ .Version }}-amd64
+      - ikawaha/kagome:{{ .Version }}-arm64
+      - ikawaha/kagome:{{ .Version }}-arm32v5
+      - ikawaha/kagome:{{ .Version }}-arm32v6
+      - ikawaha/kagome:{{ .Version }}-arm32v7
+  - name_template: ikawaha/kagome:latest
+    image_templates:
+      - ikawaha/kagome:{{ .Version }}-amd64
+      - ikawaha/kagome:{{ .Version }}-arm64
+      - ikawaha/kagome:{{ .Version }}-arm32v5
+      - ikawaha/kagome:{{ .Version }}-arm32v6
+      - ikawaha/kagome:{{ .Version }}-arm32v7
