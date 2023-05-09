@@ -1,7 +1,7 @@
 [![GoDev](https://pkg.go.dev/badge/github.com/ikawaha/kagome/v2)](https://pkg.go.dev/github.com/ikawaha/kagome/v2)
 [![Go](https://github.com/ikawaha/kagome/workflows/Go/badge.svg)](https://github.com/ikawaha/kagome/actions?query=workflow%3AGo)
 [![Coverage Status](https://coveralls.io/repos/github/ikawaha/kagome/badge.svg?branch=v2)](https://coveralls.io/github/ikawaha/kagome?branch=v2)
-[![Docker Images](https://github.com/ikawaha/kagome/workflows/Docker%20Images/badge.svg)](https://github.com/ikawaha/kagome/actions?query=workflow%3A%22Docker+Images%22)
+[![Docker Build Latest](https://github.com/ikawaha/kagome/actions/workflows/build-docker-latest.yml/badge.svg)](https://github.com/ikawaha/kagome/actions/workflows/build-docker-latest.yml)
 [![Docker Pulls](https://img.shields.io/docker/pulls/ikawaha/kagome.svg?style)](https://hub.docker.com/r/ikawaha/kagome/)
 
 Kagome v2
