@@ -2,7 +2,7 @@
 #  GoReleaser configuration file for Kagome
 # =============================================================================
 #  For local testing run:
-#    goreleaser --skip-publish --rm-dist --snapshot
+#    goreleaser --skip-publish --clean --snapshot
 #
 #  Note:
 #  To build multiarch Docker image, you may be required to install Docker buildx
@@ -43,6 +43,14 @@ builds:
     ldflags:
       - -s -w -extldflags '-static' -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }} -X main.builtBy=goreleaser
 
+# macOS universal binaries. It will join the binaries for AMD64 and Amd64 into
+# a single binary. Suitable for Apple Silicon (Arm64) and Intel (amd64).
+universal_binaries:
+  -
+    name_template: 'kagome'
+    # Remove each after joining
+    replace: true
+
 brews:
   - tap:
       owner: ikawaha
@@ -58,6 +66,7 @@ brews:
     test: |
       system "#{bin}/kagome version"
 
+# Build Docker images. It will copy the built binary from the "builds" step above.
 dockers:
   - image_templates:
       - "ikawaha/kagome:{{ .Version }}-amd64"
@@ -102,7 +111,8 @@ dockers:
     build_flag_templates:
       - "--platform=linux/arm/v7"
 
-# Build multiarch manifest file of Docker image
+# Create multiarch manifest file of Docker image. This will bind all the images
+# above into a single manifest file for "latest" and each version tag.
 docker_manifests:
   - name_template: ikawaha/kagome:{{ .Version }}
     image_templates:
