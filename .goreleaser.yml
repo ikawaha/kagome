@@ -52,7 +52,7 @@ universal_binaries:
     replace: true
 
 brews:
-  - tap:
+  - repository:
       owner: ikawaha
       name: homebrew-kagome
     commit_author:
