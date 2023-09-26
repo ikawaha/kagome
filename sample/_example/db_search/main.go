@@ -51,16 +51,12 @@ func main() {
 	// Contents to be inserted into the database. Each element represents a line
 	// of text and will be inserted into a row of the database.
 	lines := []string{
-		"あいうえお",
-		"かきくけこ",
-		"さしすせそ",
-		"たちつてと",
-		"なにぬねの",
-		"はひふへほ",
-		"まみむめも",
-		"やゆよ",
-		"らりるれろ",
-		"わをん",
+		"人魚は、南の方の海にばかり棲んでいるのではありません。",
+		"北の海にも棲んでいたのであります。",
+		"北方の海の色は、青うございました。",
+		"ある時、岩の上に、女の人魚があがって、",
+		"あたりの景色を眺めながら休んでいました。",
+		"小川未明 『赤い蝋燭と人魚』",
 	}
 
 	// Create a database. In-memory database is used for simplicity.
