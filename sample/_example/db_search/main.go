@@ -188,7 +188,8 @@ func searchFTS4(db *sql.DB, searchWord string) ([]int, error) {
 			return nil, err
 		}
 
-		//fmt.Printf("- Table: fts, RowID: %d, Value: %s\n", lineID, words)
+		// Debug
+		// fmt.Printf("- Table: fts, RowID: %d, Value: %s\n", lineID, words)
 
 		lineIDs = append(lineIDs, lineID)
 	}
