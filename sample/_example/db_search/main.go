@@ -97,6 +97,13 @@ func main() {
 	// Found content: ある時、岩の上に、女の人魚があがって、 at line: 4
 	// Found content: 小川未明 『赤い蝋燭と人魚』 at line: 6
 
+	// Search "人" (not found)
+	rowIDsFound, err = searchFTS4(db, "人")
+	PanicOnError(err)
+	fmt.Printf("rows: %v\n", rowIDsFound)
+	// Output:
+	// Searching for: 人
+	// rows: []
 }
 
 func insertContent(db *sql.DB, content string) (int64, error) {
