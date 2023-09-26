@@ -45,9 +45,6 @@ import (
 )
 
 func main() {
-	// Search word
-	const searchWord = "かき"
-
 	// Contents to be inserted into the database. Each element represents a line
 	// of text and will be inserted into a row of the database.
 	lines := []string{
@@ -83,8 +80,8 @@ func main() {
 		PanicOnError(err)
 	}
 
-	// Search
-	rowIDsFound, err := searchFTS4(db, searchWord)
+	// Search "人魚" (found at line 1,4,6)
+	rowIDsFound, err := searchFTS4(db, "人魚")
 	PanicOnError(err)
 
 	// Print search results
@@ -95,8 +92,11 @@ func main() {
 		fmt.Printf("Found content: %s at line: %v\n", cont, rowID)
 	}
 	// Output:
-	// Searching for: かき
-	// Found content: かきくけこ at line: 2
+	// Searching for: 人魚
+	// Found content: 人魚は、南の方の海にばかり棲んでいるのではありません。 at line: 1
+	// Found content: ある時、岩の上に、女の人魚があがって、 at line: 4
+	// Found content: 小川未明 『赤い蝋燭と人魚』 at line: 6
+
 }
 
 func insertContent(db *sql.DB, content string) (int64, error) {
