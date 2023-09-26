@@ -73,8 +73,8 @@ func main() {
 	// The first table "contents_fts" is for storing the original content, and
 	// the second table "fts" is for storing the tokenized content.
 	_, err = db.Exec(`
-		CREATE TABLE IF NOT EXISTS contents_fts(docid INTEGER PRIMARY KEY AUTOINCREMENT, words TEXT);
-		CREATE VIRTUAL TABLE IF NOT EXISTS fts USING fts4(content, tokenize=unicode61 "remove_diacritics=2");
+		CREATE TABLE IF NOT EXISTS contents_fts(docid INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT);
+		CREATE VIRTUAL TABLE IF NOT EXISTS fts USING fts4(words, tokenize=unicode61 "remove_diacritics=2");
 	`)
 	PanicOnError(err)
 
@@ -105,7 +105,7 @@ func main() {
 
 func insertContent(db *sql.DB, content string) (int64, error) {
 	res, err := db.Exec(
-		`INSERT INTO contents_fts(words) VALUES(?)`,
+		`INSERT INTO contents_fts(content) VALUES(?)`,
 		content,
 	)
 	if err != nil {
@@ -125,7 +125,7 @@ func insertSearchToken(db *sql.DB, rowID int64, content string) error {
 	tokenizedContent := strings.Join(seg, " ")
 
 	_, err = db.Exec(
-		`INSERT INTO fts(docid, content) VALUES(?, ?)`,
+		`INSERT INTO fts(docid, words) VALUES(?, ?)`,
 		rowID,
 		tokenizedContent,
 	)
@@ -142,7 +142,7 @@ func PanicOnError(err error) {
 
 func retrieveContent(db *sql.DB, rowID int) (string, error) {
 	rows, err := db.Query(
-		`SELECT rowid, words FROM contents_fts WHERE rowid=?`,
+		`SELECT rowid, content FROM contents_fts WHERE rowid=?`,
 		rowID,
 	)
 	if err != nil {
@@ -153,15 +153,15 @@ func retrieveContent(db *sql.DB, rowID int) (string, error) {
 
 	for rows.Next() {
 		var foundID int
-		var words string
+		var content string
 
-		err := rows.Scan(&foundID, &words)
+		err := rows.Scan(&foundID, &content)
 		if err != nil {
 			return "", err
 		}
 
 		if foundID == rowID {
-			return words, nil
+			return content, nil
 		}
 	}
 
@@ -171,7 +171,7 @@ func retrieveContent(db *sql.DB, rowID int) (string, error) {
 func searchFTS4(db *sql.DB, searchWord string) ([]int, error) {
 	fmt.Println("Searching for:", searchWord)
 
-	rows, err := db.Query(`SELECT rowid, content FROM fts WHERE content MATCH ?`, searchWord)
+	rows, err := db.Query(`SELECT rowid, words FROM fts WHERE words MATCH ?`, searchWord)
 	if err != nil {
 		return nil, err
 	}
@@ -182,13 +182,13 @@ func searchFTS4(db *sql.DB, searchWord string) ([]int, error) {
 
 	for rows.Next() {
 		var lineID int
-		var content string
+		var words string
 
-		if err := rows.Scan(&lineID, &content); err != nil {
+		if err := rows.Scan(&lineID, &words); err != nil {
 			return nil, err
 		}
 
-		//fmt.Printf("- Table: fts, RowID: %d, Value: %s\n", lineID, content)
+		//fmt.Printf("- Table: fts, RowID: %d, Value: %s\n", lineID, words)
 
 		lineIDs = append(lineIDs, lineID)
 	}
