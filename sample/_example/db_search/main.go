@@ -5,7 +5,7 @@ This example provides a practical example of how to work with Japanese text data
 
 # TS; WM
 
-In this example, each line of text is inserted into a row of the SQLite3 database, and then the database is searched for the word "かき".
+In this example, each line of text is inserted into a row of the SQLite3 database, and then the database is searched for the word "人魚" and "人".
 
 Note that the string tokenized by Kagome, a.k.a. "Wakati", is recorded in a separate table for FTS (Full-Text-Search) at the same time as the original text.
 
@@ -67,7 +67,7 @@ func main() {
 	// the second table "fts" is for storing the tokenized content.
 	_, err = db.Exec(`
 		CREATE TABLE IF NOT EXISTS contents_fts(docid INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT);
-		CREATE VIRTUAL TABLE IF NOT EXISTS fts USING fts4(words, tokenize=unicode61 "remove_diacritics=2");
+		CREATE VIRTUAL TABLE IF NOT EXISTS fts USING fts4(words);
 	`)
 	PanicOnError(err)
 
@@ -80,30 +80,50 @@ func main() {
 		PanicOnError(err)
 	}
 
-	// Search "人魚" (found at line 1,4,6)
-	rowIDsFound, err := searchFTS4(db, "人魚")
-	PanicOnError(err)
+	// Search by word.
+	// Note the difference between words and character search.
+	for _, searchWord := range []string{
+		// "人魚" should be found at line 1, 4, 6.
+		"人魚",
+		// "人" exists as a character but should not be found since it is not used
+		// as a word.
+		"人",
+		// "北方" should be found at line 3.
+		"北方",
+		// "北" should be found at line 2.
+		// The character "北" itself exists in line 3 as well, but it is not used
+		// as a word. Therefore, line 3 should not match.
+		"北",
+	} {
+		fmt.Println("Searching for:", searchWord)
 
-	// Print search results
-	for _, rowID := range rowIDsFound {
-		cont, err := retrieveContent(db, rowID)
+		rowIDsFound, err := searchFTS4(db, searchWord)
 		PanicOnError(err)
 
-		fmt.Printf("Found content: %s at line: %v\n", cont, rowID)
+		if len(rowIDsFound) == 0 {
+			fmt.Println("  No results found")
+			continue
+		}
+
+		// Print search results
+		for _, rowID := range rowIDsFound {
+			cont, err := retrieveContent(db, rowID)
+			PanicOnError(err)
+
+			fmt.Printf("  Found content: %s at line: %v\n", cont, rowID)
+		}
 	}
 	// Output:
 	// Searching for: 人魚
-	// Found content: 人魚は、南の方の海にばかり棲んでいるのではありません。 at line: 1
-	// Found content: ある時、岩の上に、女の人魚があがって、 at line: 4
-	// Found content: 小川未明 『赤い蝋燭と人魚』 at line: 6
-
-	// Search "人" (not found)
-	rowIDsFound, err = searchFTS4(db, "人")
-	PanicOnError(err)
-	fmt.Printf("rows: %v\n", rowIDsFound)
-	// Output:
+	//   Found content: 人魚は、南の方の海にばかり棲んでいるのではありません。 at line: 1
+	//   Found content: ある時、岩の上に、女の人魚があがって、 at line: 4
+	//   Found content: 小川未明 『赤い蝋燭と人魚』 at line: 6
 	// Searching for: 人
-	// rows: []
+	//   No results found
+	// Searching for: 北方
+	//   Found content: 北方の海の色は、青うございました。 at line: 3
+	// Searching for: 北
+	//   Found content: 北の海にも棲んでいたのであります。 at line: 2
 }
 
 func insertContent(db *sql.DB, content string) (int64, error) {
@@ -172,8 +192,6 @@ func retrieveContent(db *sql.DB, rowID int) (string, error) {
 }
 
 func searchFTS4(db *sql.DB, searchWord string) ([]int, error) {
-	fmt.Println("Searching for:", searchWord)
-
 	rows, err := db.Query(`SELECT rowid, words FROM fts WHERE words MATCH ?`, searchWord)
 	if err != nil {
 		return nil, err
