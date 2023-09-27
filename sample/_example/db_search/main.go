@@ -45,22 +45,15 @@ import (
 )
 
 func main() {
-	// Search word
-	const searchWord = "かき"
-
 	// Contents to be inserted into the database. Each element represents a line
 	// of text and will be inserted into a row of the database.
 	lines := []string{
-		"あいうえお",
-		"かきくけこ",
-		"さしすせそ",
-		"たちつてと",
-		"なにぬねの",
-		"はひふへほ",
-		"まみむめも",
-		"やゆよ",
-		"らりるれろ",
-		"わをん",
+		"人魚は、南の方の海にばかり棲んでいるのではありません。",
+		"北の海にも棲んでいたのであります。",
+		"北方の海の色は、青うございました。",
+		"ある時、岩の上に、女の人魚があがって、",
+		"あたりの景色を眺めながら休んでいました。",
+		"小川未明 『赤い蝋燭と人魚』",
 	}
 
 	// Create a database. In-memory database is used for simplicity.
@@ -87,8 +80,8 @@ func main() {
 		PanicOnError(err)
 	}
 
-	// Search
-	rowIDsFound, err := searchFTS4(db, searchWord)
+	// Search "人魚" (found at line 1,4,6)
+	rowIDsFound, err := searchFTS4(db, "人魚")
 	PanicOnError(err)
 
 	// Print search results
@@ -99,8 +92,18 @@ func main() {
 		fmt.Printf("Found content: %s at line: %v\n", cont, rowID)
 	}
 	// Output:
-	// Searching for: かき
-	// Found content: かきくけこ at line: 2
+	// Searching for: 人魚
+	// Found content: 人魚は、南の方の海にばかり棲んでいるのではありません。 at line: 1
+	// Found content: ある時、岩の上に、女の人魚があがって、 at line: 4
+	// Found content: 小川未明 『赤い蝋燭と人魚』 at line: 6
+
+	// Search "人" (not found)
+	rowIDsFound, err = searchFTS4(db, "人")
+	PanicOnError(err)
+	fmt.Printf("rows: %v\n", rowIDsFound)
+	// Output:
+	// Searching for: 人
+	// rows: []
 }
 
 func insertContent(db *sql.DB, content string) (int64, error) {
