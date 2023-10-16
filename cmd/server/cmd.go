@@ -140,10 +140,8 @@ func Run(ctx context.Context, args []string) error {
 	go func() {
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
-		select {
-		case <-c:
-			cancel()
-		}
+		<-c
+		cancel()
 	}()
 	return command(ctx, opt)
 }
