@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -134,7 +133,7 @@ func Run(ctx context.Context, args []string) error {
 	if err := opt.parse(args); err != nil {
 		Usage()
 		PrintDefaults(flag.ContinueOnError)
-		return errors.New("")
+		return fmt.Errorf("option parse error: %w", err)
 	}
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
