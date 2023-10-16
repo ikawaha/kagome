@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/ikawaha/kagome-dict/dict"
 	"github.com/ikawaha/kagome-dict/ipa"
@@ -106,8 +107,9 @@ func command(ctx context.Context, opt *option) error {
 	mux.Handle("/", &TokenizeDemoHandler{tokenizer: t})
 	mux.Handle("/tokenize", &TokenizeHandler{tokenizer: t})
 	srv := http.Server{
-		Addr:    opt.http,
-		Handler: mux,
+		Addr:              opt.http,
+		Handler:           mux,
+		ReadHeaderTimeout: 20 * time.Second,
 	}
 	ch := make(chan error)
 	go func() {
