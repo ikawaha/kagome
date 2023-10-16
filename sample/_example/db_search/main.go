@@ -37,6 +37,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/ikawaha/kagome-dict/ipa"
@@ -45,6 +46,13 @@ import (
 )
 
 func main() {
+	if err := run(); err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+}
+
+func run() error {
 	// Contents to be inserted into the database. Each element represents a line
 	// of text and will be inserted into a row of the database.
 	lines := []string{
@@ -58,26 +66,30 @@ func main() {
 
 	// Create a database. In-memory database is used for simplicity.
 	db, err := sql.Open("sqlite3", ":memory:")
-	PanicOnError(err)
-
+	if err != nil {
+		return err
+	}
 	defer db.Close()
 
 	// Create tables.
 	// The first table "contents_fts" is for storing the original content, and
 	// the second table "fts" is for storing the tokenized content.
-	_, err = db.Exec(`
+	if _, err = db.Exec(`
 		CREATE TABLE IF NOT EXISTS contents_fts(docid INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT);
 		CREATE VIRTUAL TABLE IF NOT EXISTS fts USING fts4(words);
-	`)
-	PanicOnError(err)
+	`); err != nil {
+		return err
+	}
 
 	// Insert contents
 	for _, line := range lines {
 		rowID, err := insertContent(db, line)
-		PanicOnError(err)
-
-		err = insertSearchToken(db, rowID, line)
-		PanicOnError(err)
+		if err != nil {
+			return err
+		}
+		if err := insertSearchToken(db, rowID, line); err != nil {
+			return err
+		}
 	}
 
 	// Search by word.
@@ -98,7 +110,9 @@ func main() {
 		fmt.Println("Searching for:", searchWord)
 
 		rowIDsFound, err := searchFTS4(db, searchWord)
-		PanicOnError(err)
+		if err != nil {
+			return err
+		}
 
 		if len(rowIDsFound) == 0 {
 			fmt.Println("  No results found")
@@ -108,8 +122,9 @@ func main() {
 		// Print search results
 		for _, rowID := range rowIDsFound {
 			cont, err := retrieveContent(db, rowID)
-			PanicOnError(err)
-
+			if err != nil {
+				return err
+			}
 			fmt.Printf("  Found content: %s at line: %v\n", cont, rowID)
 		}
 	}
@@ -124,6 +139,8 @@ func main() {
 	//   Found content: 北方の海の色は、青うございました。 at line: 3
 	// Searching for: 北
 	//   Found content: 北の海にも棲んでいたのであります。 at line: 2
+
+	return nil
 }
 
 func insertContent(db *sql.DB, content string) (int64, error) {
@@ -142,7 +159,9 @@ func insertSearchToken(db *sql.DB, rowID int64, content string) error {
 	// This example uses the IPA dictionary, but it may be more efficient to use
 	// the 'Uni' dictionary if memory is available.
 	tknzr, err := tokenizer.New(ipa.Dict(), tokenizer.OmitBosEos())
-	PanicOnError(err)
+	if err != nil {
+		return err
+	}
 
 	seg := tknzr.Wakati(content)
 	tokenizedContent := strings.Join(seg, " ")
@@ -154,13 +173,6 @@ func insertSearchToken(db *sql.DB, rowID int64, content string) error {
 	)
 
 	return err
-}
-
-// PanicOnError exits the program with panic if the given error is not nil.
-func PanicOnError(err error) {
-	if err != nil {
-		log.Panic(err)
-	}
 }
 
 func retrieveContent(db *sql.DB, rowID int) (string, error) {
