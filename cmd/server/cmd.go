@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -11,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/ikawaha/kagome-dict/dict"
 	"github.com/ikawaha/kagome-dict/ipa"
@@ -106,8 +106,9 @@ func command(ctx context.Context, opt *option) error {
 	mux.Handle("/", &TokenizeDemoHandler{tokenizer: t})
 	mux.Handle("/tokenize", &TokenizeHandler{tokenizer: t})
 	srv := http.Server{
-		Addr:    opt.http,
-		Handler: mux,
+		Addr:              opt.http,
+		Handler:           mux,
+		ReadHeaderTimeout: 20 * time.Second,
 	}
 	ch := make(chan error)
 	go func() {
@@ -132,17 +133,15 @@ func Run(ctx context.Context, args []string) error {
 	if err := opt.parse(args); err != nil {
 		Usage()
 		PrintDefaults(flag.ContinueOnError)
-		return errors.New("")
+		return fmt.Errorf("option parse error: %w", err)
 	}
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	go func() {
 		c := make(chan os.Signal, 1)
 		signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
-		select {
-		case <-c:
-			cancel()
-		}
+		<-c
+		cancel()
 	}()
 	return command(ctx, opt)
 }
