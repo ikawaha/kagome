@@ -38,7 +38,7 @@ func TestKagomeTokenizerGolden(t *testing.T) {
 	}
 	defer golden.Close()
 
-	dump, err := os.OpenFile(dumpText, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0o666)
+	dump, err := os.OpenFile(dumpText, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0o600)
 	if err != nil {
 		t.Fatalf("unexpected error, %v", err)
 	}
