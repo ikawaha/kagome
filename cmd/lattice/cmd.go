@@ -59,7 +59,7 @@ func (o *option) parse(args []string) error {
 	}
 	// validations
 	if o.flagSet.NArg() == 0 {
-		return fmt.Errorf("input is empty")
+		return errors.New("no option is specified")
 	}
 	if o.dict != "" && o.dict != "ipa" && o.dict != "uni" {
 		return fmt.Errorf("invalid argument: -dict %v", o.dict)
@@ -153,7 +153,7 @@ func Run(ctx context.Context, args []string) error {
 	if err := opt.parse(args); err != nil {
 		Usage()
 		PrintDefaults(flag.ContinueOnError)
-		return errors.New("")
+		return err
 	}
 	return command(ctx, opt)
 }
