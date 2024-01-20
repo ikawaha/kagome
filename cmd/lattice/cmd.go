@@ -121,7 +121,7 @@ func command(_ context.Context, opt *option) error {
 	}
 	out := Stdout
 	if opt.output != "" {
-		f, err := os.OpenFile(opt.output, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0o666)
+		f, err := os.OpenFile(opt.output, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0o600)
 		if err != nil {
 			return err
 		}
