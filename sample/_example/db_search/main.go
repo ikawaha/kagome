@@ -24,7 +24,7 @@ Acknowledgements:
 
 This example is taken in part from the following book for reference.
 
-- p.203, 9.2 "データーベース登録プログラム", "Go言語プログラミングエッセンス エンジニア選書"
+- p.204, 9.2 "データーベース登録プログラム", "Go言語プログラミングエッセンス エンジニア選書"
   - Written by: Mattn
   - Published: 2023/3/9 (技術評論社)
   - ISBN: 4297134195 / 978-4297134198
