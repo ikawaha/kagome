@@ -248,6 +248,8 @@ Start a server and try to access the "/tokenize" endpoint.
 
 ![webapp](https://raw.githubusercontent.com/wiki/ikawaha/kagome/images/demoapp.gif)
 
+GitHub Page: https://ikawaha.github.io/kagome/
+
 Start a server and access `http://localhost:6060`.
 (To draw a lattice, demo application uses graphviz . You need graphviz installed.)
 
