@@ -70,6 +70,7 @@ brews:
 dockers:
   - image_templates:
       - "ikawaha/kagome:{{ .Version }}-amd64"
+      - "ghcr.io/ikawaha/kagome:{{ .Version }}-amd64"
     use: buildx
     goarch: amd64
     dockerfile: Dockerfile
@@ -78,6 +79,7 @@ dockers:
 
   - image_templates:
       - "ikawaha/kagome:{{ .Version }}-arm64"
+      - "ghcr.io/ikawaha/kagome:{{ .Version }}-arm64"
     use: buildx
     goarch: arm64
     dockerfile: Dockerfile
@@ -86,6 +88,7 @@ dockers:
 
   - image_templates:
       - "ikawaha/kagome:{{ .Version }}-arm32v5"
+      - "ghcr.io/ikawaha/kagome:{{ .Version }}-arm32v5"
     use: buildx
     goarch: arm
     goarm: 5
@@ -95,6 +98,7 @@ dockers:
 
   - image_templates:
       - "ikawaha/kagome:{{ .Version }}-arm32v6"
+      - "ghcr.io/ikawaha/kagome:{{ .Version }}-arm32v6"
     use: buildx
     goarch: arm
     goarm: 6
@@ -104,6 +108,7 @@ dockers:
 
   - image_templates:
       - "ikawaha/kagome:{{ .Version }}-arm32v7"
+      - "ghcr.io/ikawaha/kagome:{{ .Version }}-arm32v7"
     use: buildx
     goarch: arm
     goarm: 7
@@ -114,6 +119,7 @@ dockers:
 # Create multiarch manifest file of Docker image. This will bind all the images
 # above into a single manifest file for "latest" and each version tag.
 docker_manifests:
+  # Manifest for Docker Hub
   - name_template: ikawaha/kagome:{{ .Version }}
     image_templates:
       - ikawaha/kagome:{{ .Version }}-amd64
@@ -128,3 +134,19 @@ docker_manifests:
       - ikawaha/kagome:{{ .Version }}-arm32v5
       - ikawaha/kagome:{{ .Version }}-arm32v6
       - ikawaha/kagome:{{ .Version }}-arm32v7
+
+  # Manifest for GitHub Container Registry
+  - name_template: ghcr.io/ikawaha/kagome:{{ .Version }}
+    image_templates:
+      - ghcr.io/ikawaha/kagome:{{ .Version }}-amd64
+      - ghcr.io/ikawaha/kagome:{{ .Version }}-arm64
+      - ghcr.io/ikawaha/kagome:{{ .Version }}-arm32v5
+      - ghcr.io/ikawaha/kagome:{{ .Version }}-arm32v6
+      - ghcr.io/ikawaha/kagome:{{ .Version }}-arm32v7
+  - name_template: ghcr.io/ikawaha/kagome:latest
+    image_templates:
+      - ghcr.io/ikawaha/kagome:{{ .Version }}-amd64
+      - ghcr.io/ikawaha/kagome:{{ .Version }}-arm64
+      - ghcr.io/ikawaha/kagome:{{ .Version }}-arm32v5
+      - ghcr.io/ikawaha/kagome:{{ .Version }}-arm32v6
+      - ghcr.io/ikawaha/kagome:{{ .Version }}-arm32v7
