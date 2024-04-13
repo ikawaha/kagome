@@ -1,6 +1,8 @@
 package lattice
 
-import "sync"
+import (
+	"github.com/ikawaha/kagome/v2/tokenizer/lattice/mem"
+)
 
 // BosEosID represents Reserved identifier of node id.
 const BosEosID int = -1
@@ -45,8 +47,6 @@ type Node struct {
 	prev     *Node
 }
 
-var nodePool = sync.Pool{
-	New: func() interface{} {
-		return new(Node)
-	},
-}
+var nodePool = mem.NewPool[Node](func() *Node {
+	return new(Node)
+})
