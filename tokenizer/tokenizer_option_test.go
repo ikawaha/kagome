@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	testUserDictPath = "../sample/dict/userdict.txt"
+	testUserDictPath = "../testdata/userdict.txt"
 )
 
 func TestTokenizer_Analyze_Nop(t *testing.T) {

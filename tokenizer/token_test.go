@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	userDictSample = "../sample/dict/userdict.txt"
+	userDictSample = "../testdata/userdict.txt"
 )
 
 func Test_TokenClassString(t *testing.T) {
