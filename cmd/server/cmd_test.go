@@ -33,7 +33,7 @@ func TestOptionCheck(t *testing.T) {
 		{
 			name: "all args",
 			args: []string{
-				"-userdict", "../../sample/dict/userdict.txt",
+				"-userdict", "../../testdata/userdict.txt",
 				"-http", ":8888",
 				"-dict", "ipa",
 			},
@@ -73,7 +73,7 @@ func TestRun(t *testing.T) {
 		{
 			name: "normal operation w/ options",
 			args: []string{
-				"-userdict", "../../sample/dict/userdict.txt",
+				"-userdict", "../../testdata/userdict.txt",
 				"-http", ":0",
 				"-dict", "ipa",
 			},
@@ -127,7 +127,7 @@ func Test_command(t *testing.T) {
 			opt: &option{
 				http:    ":0",
 				dict:    "ipa",
-				udict:   "../../sample/dict/userdict.txt",
+				udict:   "../../testdata/userdict.txt",
 				flagSet: flag.NewFlagSet(CommandName, flag.ContinueOnError),
 			},
 			wantErr: false,

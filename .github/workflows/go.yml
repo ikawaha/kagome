@@ -28,6 +28,13 @@ jobs:
           go-version-file: 'go.mod'
           cache: true
 
+      - name: Remove symlink 2to3
+        if: matrix.os == 'macos-latest'
+        run: |
+          : # Workaround GitHub Actions Python issues
+          : # https://github.com/Homebrew/homebrew-core/issues/165793#issuecomment-1989441193
+          brew unlink python && brew link --overwrite python
+
       - name: Set up Graphviz
         uses: ts-graphviz/setup-graphviz@v2
 
