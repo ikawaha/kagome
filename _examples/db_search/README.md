@@ -55,7 +55,7 @@ It demonstrates how to tokenize Japanese text using Kagome, which is a common re
 By using SQLite with FTS4, it efficiently manages and searches through a large amount of text data, making it suitable for applications like:
 
 1. **Search Engines:** You can use this code as a basis for building a search engine that indexes and searches Japanese text content.
-2. **Document Management Systems:**	This code can be integrated into a document management system to enable full-text search capabilities for Japanese documents.
+2. **Document Management Systems:** This code can be integrated into a document management system to enable full-text search capabilities for Japanese documents.
 3. **Content Recommendation Systems:** When you have a large collection of Japanese content, you can use this code to implement content recommendation systems based on user queries.
 4. **Chatbots and NLP:**  If you're building chatbots or natural language processing (NLP) systems for Japanese language, this code can assist in text analysis and search within the chatbot's knowledge base.
 
