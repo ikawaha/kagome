@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"io"
 	"strings"
-	"sync"
 	"unicode"
 	"unicode/utf8"
 
 	"github.com/ikawaha/kagome-dict/dict"
+	"github.com/ikawaha/kagome/v2/tokenizer/lattice/mem"
 )
 
 const (
@@ -32,11 +32,9 @@ const (
 	Extended
 )
 
-var latticePool = sync.Pool{
-	New: func() interface{} {
-		return new(Lattice)
-	},
-}
+var latticePool = mem.NewPool[Lattice](func() *Lattice {
+	return new(Lattice)
+})
 
 // Lattice represents a grid of morph nodes.
 type Lattice struct {
@@ -49,7 +47,7 @@ type Lattice struct {
 
 // New returns a new lattice.
 func New(d *dict.Dict, u *dict.UserDict) *Lattice {
-	la := latticePool.Get().(*Lattice)
+	la := latticePool.Get()
 	la.dic = d
 	la.udic = u
 	return la
@@ -86,7 +84,7 @@ func (la *Lattice) addNode(pos, id, position, start int, class NodeClass, surfac
 	case USER:
 		// use default cost
 	}
-	n := nodePool.Get().(*Node)
+	n := nodePool.Get()
 	n.ID = id
 	n.Position = position
 	n.Start = start
@@ -309,6 +307,7 @@ func posFeature(d *dict.Dict, u *dict.UserDict, t *Node) string {
 }
 
 // Dot outputs a lattice in the graphviz dot format.
+//
 //nolint:gocyclo
 func (la *Lattice) Dot(w io.Writer) {
 	bests := make(map[*Node]struct{})

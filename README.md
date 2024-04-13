@@ -276,16 +276,25 @@ A debug tool of tokenize process outputs a lattice in graphviz dot format.
 ```sh
 # Compatible architectures: AMD64, Arm64, Arm32 (Arm v5, v6 and v7)
 docker pull ikawaha/kagome:latest
+
+# Alternatively, you can pull from GitHub Container Registry
+docker pull ghcr.io/ikawaha/kagome:latest
 ```
 
 ```sh
 # Interactive/REPL mode
 docker run --rm -it ikawaha/kagome:latest
+
+# If pulling from GitHub Container Registry
+docker run --rm -it ghcr.io/ikawaha/kagome:latest
 ```
 
 ```sh
 # Server mode (http://localhost:6060)
 docker run --rm -p 6060:6060 ikawaha/kagome:latest server
+
+# If pulling from GitHub Container Registry
+docker run --rm -p 6060:6060 ghcr.io/ikawaha/kagome:latest server
 ```
 
 # Building to WebAssembly

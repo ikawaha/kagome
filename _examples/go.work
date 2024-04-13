@@ -1,0 +1,9 @@
+go 1.19
+
+use (
+	./db_search
+	./tokenize
+	./user_dict
+	./wakati
+	./wasm
+)
