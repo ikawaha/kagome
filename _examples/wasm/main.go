@@ -1,5 +1,5 @@
-//go:build ignore
-// +build ignore
+//go:build js && wasm
+// +build js,wasm
 
 package main
 
