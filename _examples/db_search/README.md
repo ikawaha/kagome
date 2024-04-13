@@ -34,11 +34,17 @@ Searching for: 北
 
 ## Details
 
-In this example, each line of text is inserted into a row of the SQLite3 database, and then the database is searched for the word "人魚" and "人".
+In this example, each line of text is inserted into a row of the SQLite3 database, and then the database is searched for the word "人魚", "人", "北方" and "北".
 
-Note that the string tokenized by Kagome, a.k.a. "Wakati", is recorded in a separate table for [FTS4](https://www.sqlite.org/fts3.html) (Full-Text-Search) at the same time as the original text.
+When inserting text data into the database, Kagome is used to tokenize the text into words.
+
+The string (or a line) tokenized by Kagome, a.k.a. "Wakati", is recorded in a separate table for [FTS4](https://www.sqlite.org/fts3.html) (Full-Text-Search) relative to the original text.
 
 This allows Unicode text data that is not separated by spaces, such as Japanese, to be searched by FTS.
+
+Note that it is searching by word and not by character. For example "人" doesn't match "人魚". Likewise, "北" doesn't match "北方".
+
+This is due to the fact that the FTS4 module in SQLite3 is designed to search for words, not characters.
 
 ### Aim of this example
 
