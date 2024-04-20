@@ -111,9 +111,9 @@ func FuzzPool(f *testing.F) {
 	f.Add("this is a test with a long string")
 	f.Add("これは、いささか長いテスト用の文字列です。")
 
-	f.Fuzz(func(t *testing.T, s string) {
-		a := bufPool.Get()
-		a.Bar += s
-		bufPool.Put(a)
+	f.Fuzz(func(_ *testing.T, s string) {
+		a := bufPool.Get() // get
+		a.Bar += s         // append
+		bufPool.Put(a)     // put
 	})
 }
