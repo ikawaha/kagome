@@ -17,13 +17,13 @@ type Pool[T any] struct {
 	internal *sync.Pool
 }
 
-// NewPool returns a memory pool of T. f is a constructor of T and it is called
+// NewPool returns a memory pool of T. newF is a constructor of T, and it is called
 // when the memory pool is empty.
-func NewPool[T any](f func() *T) Pool[T] {
+func NewPool[T any](newF func() *T) Pool[T] {
 	return Pool[T]{
 		internal: &sync.Pool{
 			New: func() any {
-				return f()
+				return newF()
 			},
 		},
 	}
