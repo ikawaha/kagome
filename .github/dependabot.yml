@@ -9,7 +9,11 @@ updates:
     directory: /
     schedule:
       interval: daily
+    reviewers:
+      - ikawaha
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: daily
+    reviewers:
+      - ikawaha
