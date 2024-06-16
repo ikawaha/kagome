@@ -54,4 +54,4 @@ jobs:
           version: "~> v2"
           args: release --config .goreleaser.yml --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GO_RELEASER_TOKEN }}
