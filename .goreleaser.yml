@@ -1,5 +1,5 @@
 # =============================================================================
-#  GoReleaser configuration file for Kagome
+#  GoReleaser v2 configuration file for Kagome
 # =============================================================================
 #  For local testing run:
 #    goreleaser --skip-publish --clean --snapshot
@@ -7,6 +7,7 @@
 #  Note:
 #  To build multiarch Docker image, you may be required to install Docker buildx
 #  plugin and QEMU.
+version: 2
 env:
   - GO111MODULE=on
 
@@ -60,7 +61,7 @@ brews:
       email: goreleaser@carlosbecker.com
     description: "Self-contained Japanese Morphological Analyzer written in pure Go."
     homepage: "https://github.com/ikawaha/kagome"
-    folder: Formula
+    directory: Formula
     install: |
       bin.install "kagome"
     test: |
