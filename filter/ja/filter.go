@@ -124,3 +124,9 @@ func (f Filter) Yield(tokens []tokenizer.Token) []string {
 	}
 	return ret
 }
+
+// Drop drops a token given the provided match function (stop-tags and stop-words).
+func (f Filter) Drop(tokens *[]tokenizer.Token) {
+	f.stopTags.Drop(tokens)
+	f.stopWords.Drop(tokens)
+}
