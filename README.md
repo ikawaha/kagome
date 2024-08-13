@@ -95,7 +95,7 @@ output:
 うち	名詞,非自立,副詞可能,*,*,*,うち,ウチ,ウチ
 ```
 
-- For more examples, see the [sample directory](https://github.com/ikawaha/kagome/tree/v2/sample).
+- For more examples, see the [examples directory](https://github.com/ikawaha/kagome/tree/v2/_examples).
 
 ## Reference
 
@@ -300,7 +300,7 @@ docker run --rm -p 6060:6060 ghcr.io/ikawaha/kagome:latest server
 # Building to WebAssembly
 
 You can see how kagome wasm works in [demo site.](http://ikawaha.github.io/kagome/)
-The source code can be found in `./sample/wasm`.
+The source code can be found in `./_examples/wasm`.
 
 # Licence
 
