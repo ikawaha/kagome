@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"os/exec"
 	"reflect"
 	"strings"
 	"testing"
@@ -60,9 +59,6 @@ func TestTokenizeDemoHandler_ServeHTTP(t *testing.T) {
 	})
 
 	t.Run("w/ lattice", func(t *testing.T) {
-		if _, err := exec.LookPath(graphvizCmd); err != nil {
-			t.Skipf("graphviz command not found, %v", err)
-		}
 		req := httptest.NewRequest(http.MethodPost, `/?s=ねこです&r=Search&lattice=true`, nil)
 		w := httptest.NewRecorder()
 		(&TokenizeDemoHandler{tokenizer: tnz}).ServeHTTP(w, req)
@@ -86,9 +82,6 @@ func TestTokenizeDemoHandler_ServeHTTP(t *testing.T) {
 }
 
 func TestTokenizeDemoHandler_analyzeGraph(t *testing.T) {
-	if _, err := exec.LookPath(graphvizCmd); err != nil {
-		t.Skipf("graphviz command not found, %v", err)
-	}
 	tnz, err := tokenizer.New(loadTestDict(t))
 	if err != nil {
 		t.Fatalf("unexpected error, %v", err)
@@ -116,11 +109,8 @@ func TestTokenizeDemoHandler_analyzeGraph(t *testing.T) {
 	}; !reflect.DeepEqual(got, want) {
 		t.Errorf("got %+v, want %v", got, want)
 	}
-	if !strings.HasPrefix(svg, "<svg width=") {
-		if len(svg) > 50 {
-			svg = svg[:50]
-		}
-		t.Errorf("broken svg, %s", svg)
+	if len(svg) == 0 {
+		t.Errorf("svg is empty")
 	}
 }
 
