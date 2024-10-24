@@ -7,12 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
-	"io"
 	"net/http"
-	"os/exec"
 	"strings"
-	"time"
 
+	"github.com/goccy/go-graphviz"
 	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
@@ -25,11 +23,6 @@ var (
 	//go:embed asset/demo.html
 	demoHTML string
 	demoT    = template.Must(template.New("demo").Parse(demoHTML))
-)
-
-const (
-	graphvizCmd = "dot"
-	cmdTimeout  = 25 * time.Second
 )
 
 // TokenizeDemoHandler represents the tokenizer demo server struct.
@@ -80,31 +73,21 @@ func toRecords(tokens []tokenizer.Token) []record {
 }
 
 func (h *TokenizeDemoHandler) analyzeGraph(ctx context.Context, sen string, mode tokenizer.TokenizeMode) (records []record, svg string, err error) {
-	if _, err := exec.LookPath(graphvizCmd); err != nil {
-		return nil, "", errors.New("circo/graphviz is not installed in your $PATH")
-	}
-	ctx, cancel := context.WithTimeout(ctx, cmdTimeout)
-	defer cancel()
 	var b bytes.Buffer
-	cmd := exec.CommandContext(ctx, graphvizCmd, "-Tsvg")
-	r0, w0 := io.Pipe()
-	cmd.Stdin = r0
-	cmd.Stdout = &b
-	cmd.Stderr = Stderr
-	if err := cmd.Start(); err != nil {
-		return nil, "", fmt.Errorf("process done with error, %w", err)
+	tokens := h.tokenizer.AnalyzeGraph(&b, sen, mode)
+	graph, err := graphviz.ParseBytes(b.Bytes())
+	if err != nil {
+		return nil, "", err
 	}
-	tokens := h.tokenizer.AnalyzeGraph(w0, sen, mode)
-	if err := w0.Close(); err != nil {
-		return nil, "", fmt.Errorf("pipe close error, %w", err)
+	g, err := graphviz.New(ctx)
+	if err != nil {
+		return nil, "", err
 	}
-	if err := cmd.Wait(); err != nil {
-		return nil, "", fmt.Errorf("process done with error, %w", err)
+	b.Reset()
+	if err := g.Render(ctx, graph, graphviz.SVG, &b); err != nil {
+		return nil, "", fmt.Errorf("render error: %w", err)
 	}
 	svg = b.String()
-	if pos := strings.Index(svg, "<svg"); pos > 0 {
-		svg = svg[pos:]
-	}
 	records = toRecords(tokens)
 	return records, svg, nil
 }
