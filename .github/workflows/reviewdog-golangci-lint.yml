@@ -15,7 +15,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: golangci-lint
-        uses: reviewdog/action-golangci-lint@64c149605d92715a545b1d80908eff8cecec21b1 # v2.7.1
+        uses: reviewdog/action-golangci-lint@3dfdce20f5ca12d264c214abb993dbb40834da90 # v2.7.2
         with:
           github_token: ${{ github.token }}
           level: warning
