@@ -4,41 +4,42 @@
 [![Coverage Status](https://coveralls.io/repos/github/ikawaha/kagome/badge.svg?branch=v2)](https://coveralls.io/github/ikawaha/kagome?branch=v2)
 [![Docker Pulls](https://img.shields.io/docker/pulls/ikawaha/kagome.svg?style)](https://hub.docker.com/r/ikawaha/kagome/)
 
-Kagome v2
-===
+# Kagome v2
 
 Kagome is an open source Japanese morphological analyzer written in pure golang.
 
 The dictionary/statistical models such as MeCab-IPADIC, UniDic (unidic-mecab) and so on, are able to be embedded in binaries.
 
-### Improvements from [v1](https://github.com/ikawaha/kagome/tree/master).
+> [!NOTE]
+> **Improvements from [v1](https://github.com/ikawaha/kagome/tree/master)**
+>
+> * Dictionaries are maintained in a separate repository, and only the dictionaries you need are embedded in the binary.
+> * Brushed up and added several APIs.
 
-* Dictionaries are maintained in a separate repository, and only the dictionaries you need are embedded in the binary.
-* Brushed up and added several APIs.
-
-# Dictionaries
+## Dictionaries
 
 |dict| source | package |
 |:---|:---|:---|
 |MeCab IPADIC| mecab-ipadic-2.7.0-20070801 | [github.com/ikawaha/kagome-dict/ipa](https://github.com/ikawaha/kagome-dict/tree/master/ipa)|
 |UniDIC| unidic-mecab-2.1.2_src | [github.com/ikawaha/kagome-dict/uni](https://github.com/ikawaha/kagome-dict/tree/master/uni) |
 
-> __Note__: IPADIC is MeCab's so-called "standard dictionary" and is characterized by its ability to split morphological units more intuitively than UniDIC. In contrast, UniDIC breaks phrases into smaller example sentence units to create metadata for full-text search. For more details, see the [wiki](https://github.com/ikawaha/kagome/wiki/About-the-dictionary).
+> [!NOTE]
+> IPADIC is MeCab's so-called "standard dictionary" and is characterized by its ability to split morphological units more intuitively than UniDIC. In contrast, UniDIC breaks phrases into smaller example sentence units to create metadata for full-text search. For more details, see the [wiki](https://github.com/ikawaha/kagome/wiki/About-the-dictionary).
 
-**Experimental Features**
+* Experimental Features
 
-|dict|source|package|
-|:---|:---|:---|
-|mecab-ipadic-NEologd|mecab-ipadic-neologd| [github.com/ikawaha/kagome-ipa-neologd](https://github.com/ikawaha/kagome-dict-ipa-neologd)|
-|Korean MeCab|mecab-ko-dic-2.1.1-20180720 | [github.com/ikawaha/kagome-dict-ko](https://github.com/ikawaha/kagome-dict-ko)|
+  |dict|source|package|
+  |:---|:---|:---|
+  |mecab-ipadic-NEologd|mecab-ipadic-neologd| [github.com/ikawaha/kagome-ipa-neologd](https://github.com/ikawaha/kagome-dict-ipa-neologd)|
+  |Korean MeCab|mecab-ko-dic-2.1.1-20180720 | [github.com/ikawaha/kagome-dict-ko](https://github.com/ikawaha/kagome-dict-ko)|
 
-## Segmentation mode for search
+## Segmentation modes
 
-Kagome has segmentation mode for search such as [Kuromoji](https://www.atilika.org/).
+Similar to [Kuromoji](https://www.atilika.org/), Kagome also supports _segmentation modes_ that enable various segmentations.
 
-* Normal: Regular segmentation
-* Search: Use a heuristic to do additional segmentation useful for search
-* Extended: Similar to search mode, but also uni-gram unknown words
+* **Normal:** Regular segmentation
+* **Search:** Use a heuristic to perform additional segmentation that is **useful for search** purposes
+* **Extended:** Similar to search mode, but also unknown words with uni-grams
 
 |Untokenized|Normal|Search|Extended|
 |:-------|:---------|:---------|:---------|
@@ -47,36 +48,36 @@ Kagome has segmentation mode for search such as [Kuromoji](https://www.atilika.o
 |シニアソフトウェアエンジニア|シニアソフトウェアエンジニア|シニア　ソフトウェア　エンジニア|シニア　ソフトウェア　エンジニア|
 |デジカメを買った|デジカメ　を　買っ　た|デジカメ　を　買っ　た|デ　ジ　カ　メ　を　買っ　た|
 
-# Programming example
+## Programming example
 
 ```Go
 package main
 
 import (
-	"fmt"
-	"strings"
+  "fmt"
+  "strings"
 
-	"github.com/ikawaha/kagome-dict/ipa"
-	"github.com/ikawaha/kagome/v2/tokenizer"
+  "github.com/ikawaha/kagome-dict/ipa"
+  "github.com/ikawaha/kagome/v2/tokenizer"
 )
 
 func main() {
-	t, err := tokenizer.New(ipa.Dict(), tokenizer.OmitBosEos())
-	if err != nil {
-		panic(err)
-	}
-	// wakati
-	fmt.Println("---wakati---")
-	seg := t.Wakati("すもももももももものうち")
-	fmt.Println(seg)
+  t, err := tokenizer.New(ipa.Dict(), tokenizer.OmitBosEos())
+  if err != nil {
+    panic(err)
+  }
+  // wakati
+  fmt.Println("---wakati---")
+  seg := t.Wakati("すもももももももものうち")
+  fmt.Println(seg)
 
-	// tokenize
-	fmt.Println("---tokenize---")
-	tokens := t.Tokenize("すもももももももものうち")
-	for _, token := range tokens {
-		features := strings.Join(token.Features(), ",")
-		fmt.Printf("%s\t%v\n", token.Surface, features)
-	}
+  // tokenize
+  fmt.Println("---tokenize---")
+  tokens := t.Tokenize("すもももももももものうち")
+  for _, token := range tokens {
+    features := strings.Join(token.Features(), ",")
+    fmt.Printf("%s\t%v\n", token.Surface, features)
+  }
 }
 ```
 
@@ -95,15 +96,15 @@ output:
 うち	名詞,非自立,副詞可能,*,*,*,うち,ウチ,ウチ
 ```
 
-- For more examples, see the [examples directory](https://github.com/ikawaha/kagome/tree/v2/_examples).
+* For more examples, see the [examples directory](https://github.com/ikawaha/kagome/tree/v2/_examples).
 
 ## Reference
 
 [![実践：形態素解析 kagome v2](https://user-images.githubusercontent.com/4232165/102152682-e281e400-3eb8-11eb-91f7-13e08a8977d9.png)](https://zenn.dev/ikawaha/books/kagome-v2-japanese-tokenizer)
 
-# Commands
+## Commands
 
-## Install
+### Install
 
 * **Go**
 
@@ -114,7 +115,7 @@ output:
 * **Homebrew**
 
   ```shellsession
-  # macOS and Linux (for both AMD64 and ARM64)
+  # macOS and Linux (for both AMD64 and Arm64)
   brew install ikawaha/kagome/kagome
   ```
 
@@ -127,7 +128,7 @@ output:
   * For manual installation, download and extract the appropriate archived file for your OS and architecture from the [releases page](https://github.com/ikawaha/kagome/releases/latest).
   * Note that the extracted binary must be placed in an accessible directory with execution permission.
 
-## Usage
+### Usage
 
 ```shellsession
 $ kagome -h
@@ -142,24 +143,24 @@ The commands are:
 
 tokenize [-file input_file] [-dict dic_file] [-userdict user_dic_file] [-sysdict (ipa|uni)] [-simple false] [-mode (normal|search|extended)] [-split] [-json]
   -dict string
-    	dict
+      dict
   -file string
-    	input file
+      input file
   -json
-    	outputs in JSON format
+      outputs in JSON format
   -mode string
-    	tokenize mode (normal|search|extended) (default "normal")
+      tokenize mode (normal|search|extended) (default "normal")
   -simple
-    	display abbreviated dictionary contents
+      display abbreviated dictionary contents
   -split
-    	use tiny sentence splitter
+      use tiny sentence splitter
   -sysdict string
-    	system dict type (ipa|uni) (default "ipa")
+      system dict type (ipa|uni) (default "ipa")
   -udict string
-    	user dict
+      user dict
 ```
 
-### Tokenize command
+#### Tokenize command
 
 ```shellsession
 % # interactive/REPL mode
@@ -235,7 +236,7 @@ echo "私ははにわよわわわんわん" | kagome -json | jq -r '.[].pronunci
 
 ### Server command
 
-**API**
+#### RESTful API
 
 Start a server and try to access the "/tokenize" endpoint.
 
@@ -244,18 +245,23 @@ Start a server and try to access the "/tokenize" endpoint.
 % curl -XPUT localhost:6060/tokenize -d'{"sentence":"すもももももももものうち", "mode":"normal"}' | jq .
 ```
 
-**Web App**
+#### Web App
 
-![webapp](https://raw.githubusercontent.com/wiki/ikawaha/kagome/images/demoapp.gif)
-
-GitHub Page: https://ikawaha.github.io/kagome/
-
-Start a server and access `http://localhost:6060`.
-(To draw a lattice, demo application uses graphviz . You need graphviz installed.)
+Start a server and access `http://localhost:6060` in your browser.
 
 ```shellsession
 % kagome server &
 ```
+
+> [!IMPORTANT]
+> The demo web application uses [graphviz](https://graphviz.org/) to draw a lattice. You need graphviz to be installed on your system.
+
+![webapp](https://raw.githubusercontent.com/wiki/ikawaha/kagome/images/demoapp.gif)
+
+> [!TIP]
+> Kagome can be compiled to WebAssembly (wasm) and run locally in a web browser. For details, see the [WebAssembly section](#webassembly).
+>
+> * Wasm Demo: [https://ikawaha.github.io/kagome/](https://ikawaha.github.io/kagome/)
 
 ### Lattice command
 
@@ -267,11 +273,9 @@ A debug tool of tokenize process outputs a lattice in graphviz dot format.
 
 ![lattice](https://user-images.githubusercontent.com/4232165/89723585-74717000-da33-11ea-886a-baab85f7a06e.png)
 
-# Docker
+### Docker
 
 [![Docker](https://dockeri.co/image/ikawaha/kagome)](https://hub.docker.com/r/ikawaha/kagome)
-
-[![](https://images.microbadger.com/badges/image/ikawaha/kagome.svg)](https://microbadger.com/images/ikawaha/kagome "View image info on microbadger.com")
 
 ```sh
 # Compatible architectures: AMD64, Arm64, Arm32 (Arm v5, v6 and v7)
@@ -297,11 +301,12 @@ docker run --rm -p 6060:6060 ikawaha/kagome:latest server
 docker run --rm -p 6060:6060 ghcr.io/ikawaha/kagome:latest server
 ```
 
-# Building to WebAssembly
+### WebAssembly
 
-You can see how kagome wasm works in [demo site.](http://ikawaha.github.io/kagome/)
-The source code can be found in `./_examples/wasm`.
+Kagome can be compiled to WebAssembly (wasm) and run in a web browser.
 
-# Licence
+You can see how kagome wasm works in the [demo site](http://ikawaha.github.io/kagome/). The source code can be found in `./_examples/wasm`.
 
-MIT
+## Licence
+
+* MIT
