@@ -69,20 +69,22 @@ func (t Token) Features() []string {
 		return features
 	case UNKNOWN:
 		features := make([]string, len(t.dict.UnkDict.Contents[t.ID]))
-		for i := range t.dict.UnkDict.Contents[t.ID] {
-			features[i] = t.dict.UnkDict.Contents[t.ID][i]
-		}
+		copy(features, t.dict.UnkDict.Contents[t.ID])
 		return features
 	case USER:
 		pos := t.udict.Contents[t.ID].Pos
 		tokens := strings.Join(t.udict.Contents[t.ID].Tokens, "/")
 		yomi := strings.Join(t.udict.Contents[t.ID].Yomi, "/")
 		return []string{pos, tokens, yomi}
+	case DUMMY:
+		return nil
 	}
 	return nil
 }
 
 // FeatureAt returns the i th feature if exists.
+//
+//nolint:gocyclo
 func (t Token) FeatureAt(i int) (string, bool) {
 	if i < 0 {
 		return "", false
@@ -127,6 +129,8 @@ func (t Token) FeatureAt(i int) (string, bool) {
 		case 2:
 			return strings.Join(t.udict.Contents[t.ID].Yomi, "/"), true
 		}
+	case DUMMY:
+		return "", false
 	}
 	return "", false
 }
@@ -182,6 +186,8 @@ func (t Token) POS() []string {
 	case USER:
 		pos := t.udict.Contents[t.ID].Pos
 		return []string{pos}
+	case DUMMY:
+		return nil
 	}
 	return nil
 }
@@ -201,7 +207,7 @@ func EqualFeatures(lhs, rhs []string) bool {
 	if len(lhs) != len(rhs) {
 		return false
 	}
-	for i := 0; i < len(lhs); i++ {
+	for i := range lhs {
 		if lhs[i] != rhs[i] {
 			return false
 		}
@@ -241,6 +247,8 @@ func (t Token) pickupFromFeatures(key string) (string, bool) {
 		meta = t.dict.ContentsMeta
 	case UNKNOWN:
 		meta = t.dict.UnkDict.ContentsMeta
+	case DUMMY, USER:
+		return "", false
 	}
 	i, ok := meta[key]
 	if !ok {

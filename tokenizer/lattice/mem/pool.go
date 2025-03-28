@@ -31,7 +31,7 @@ func NewPool[T any](newF func() *T) Pool[T] {
 
 // Get gets instance of T from the memory pool.
 func (p Pool[T]) Get() *T {
-	return p.internal.Get().(*T)
+	return p.internal.Get().(*T) //nolint:forcetypeassert
 }
 
 // Put puts the instance to the memory pool.

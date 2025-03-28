@@ -33,7 +33,7 @@ func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if req.Input == "" {
-		w.Write([]byte(`{"status":true,"tokens":[]}`))
+		w.Write([]byte(`{"status":true,"tokens":[]}`)) //nolint:gosec
 		return
 	}
 	mode := tokenizer.Normal
@@ -44,7 +44,7 @@ func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		mode = tokenizer.Extended
 	}
 	tokens := h.tokenizer.Analyze(req.Input, mode)
-	var tokenData []tokenizer.TokenData
+	tokenData := make([]tokenizer.TokenData, 0, len(tokens))
 	for _, v := range tokens {
 		if v.ID == tokenizer.BosEosID {
 			continue
@@ -60,5 +60,5 @@ func (h *TokenizeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	w.Write(resp)
+	w.Write(resp) //nolint:gosec
 }

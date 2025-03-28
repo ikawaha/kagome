@@ -115,7 +115,7 @@ func PrintDefaults() {
 }
 
 func main() {
-	var run     func(context.Context, []string) error
+	var run func(context.Context, []string) error
 	var options []string
 	if len(os.Args) >= 2 {
 		options = os.Args[2:]

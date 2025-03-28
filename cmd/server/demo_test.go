@@ -2,7 +2,6 @@ package server
 
 import (
 	"bytes"
-	"context"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -24,7 +23,7 @@ func TestTokenizeDemoHandler_ServeHTTP(t *testing.T) {
 		w := httptest.NewRecorder()
 		(&TokenizeDemoHandler{tokenizer: tnz}).ServeHTTP(w, req)
 		resp := w.Result()
-		defer resp.Body.Close()
+		defer resp.Body.Close() //nolint:errcheck
 
 		if got, want := resp.StatusCode, http.StatusOK; got != want {
 			t.Errorf("http status: got %d, want %d", got, want)
@@ -42,7 +41,7 @@ func TestTokenizeDemoHandler_ServeHTTP(t *testing.T) {
 		w := httptest.NewRecorder()
 		(&TokenizeDemoHandler{tokenizer: tnz}).ServeHTTP(w, req)
 		resp := w.Result()
-		defer resp.Body.Close()
+		defer resp.Body.Close() //nolint:errcheck
 
 		if got, want := resp.StatusCode, http.StatusOK; got != want {
 			t.Errorf("http status: got %d, want %d", got, want)
@@ -67,7 +66,7 @@ func TestTokenizeDemoHandler_ServeHTTP(t *testing.T) {
 		w := httptest.NewRecorder()
 		(&TokenizeDemoHandler{tokenizer: tnz}).ServeHTTP(w, req)
 		resp := w.Result()
-		defer resp.Body.Close()
+		defer resp.Body.Close() //nolint:errcheck
 
 		if got, want := resp.StatusCode, http.StatusOK; got != want {
 			t.Errorf("http status: got %d, want %d", got, want)
@@ -94,7 +93,7 @@ func TestTokenizeDemoHandler_analyzeGraph(t *testing.T) {
 		t.Fatalf("unexpected error, %v", err)
 	}
 	handler := TokenizeDemoHandler{tokenizer: tnz}
-	records, svg, err := handler.analyzeGraph(context.TODO(), "ねこです", tokenizer.Normal)
+	records, svg, err := handler.analyzeGraph(t.Context(), "ねこです", tokenizer.Normal)
 	if err != nil {
 		t.Fatalf("unexpected error, analyzeGraph() failed, %v", err)
 	}

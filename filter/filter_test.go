@@ -146,7 +146,7 @@ func Benchmark_TokenFilter_WordFilter(b *testing.B) {
 			"の":  {},
 		}
 		b.ResetTimer()
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			filter.Keep(&tokens, func(t tokenizer.Token) bool {
 				_, ok := words[t.Surface]
 				return ok
@@ -158,7 +158,7 @@ func Benchmark_TokenFilter_WordFilter(b *testing.B) {
 		words := []string{"人魚", "南", "の"}
 		fl := filter.NewWordFilter(words)
 		b.ResetTimer()
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			fl.Keep(&tokens)
 		}
 	})

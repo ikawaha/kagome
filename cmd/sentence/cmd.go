@@ -33,14 +33,14 @@ type option struct {
 // ContinueOnError ErrorHandling // Return a descriptive error.
 // ExitOnError                   // Call os.Exit(2).
 // PanicOnError                  // Call panic with a descriptive error.flag.ContinueOnError
-func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
-	o = &option{
+func newOption(w io.Writer, eh flag.ErrorHandling) *option {
+	o := &option{
 		flagSet: flag.NewFlagSet(CommandName, eh),
 	}
 	// option settings
 	o.flagSet.SetOutput(w)
 	o.flagSet.StringVar(&o.file, "file", "", "input file")
-	return
+	return o
 }
 
 func (o *option) parse(args []string) error {
