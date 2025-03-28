@@ -1,34 +1,69 @@
-run:
-
-issues:
-  exclude-use-default: false
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - gocyclo
-
+version: "2"
 linters:
-  enable:
-    - gocyclo
-    - staticcheck
-    - govet
-    - revive
+  default: all
   disable:
-    - maligned
-    - exhaustive
-    - noctx
-    - asciicheck
-    - sqlclosecheck
-    - rowserrcheck
-    - gosec
-    - scopelint
-  presets:
-    - bugs
-    - unused
-    - format
-
-linters-settings:
-  gocyclo:
-    min-complexity: 15
-  errcheck:
-    ignore: fmt:.*,io/ioutil:^Read,^Close|^Write|^Shutdown
+    - cyclop      # Use gocyclo instead
+    - depguard    # Not managing available packages
+    - err113      # Use errcheck instead
+    - exhaustruct # Allow omission of structure fields
+    - forbidigo
+    - gochecknoglobals # Allow global variables
+    - gocognit    # Use gocyclo instead
+    - godot       # Allow comment end not in period
+    - lll         # Allow long lines
+    - mnd         # Allow magic number
+    - nlreturn    # Allow returning with no blank line before
+    - paralleltest
+    - testpackage
+    - varnamelen  # I love short variable names
+    - wrapcheck   # Allow unwrapped errors
+    - wsl         # Add or remove empty lines.
+  settings:
+    errcheck:
+      exclude-functions:
+        - (*os.File).Close
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - (*bufio.Writer).Write
+        - (*bufio.Writer).WriteString
+        - (net/http.ResponseWriter).Write
+    gocyclo:
+      min-complexity: 15
+    tagliatelle:
+      case:
+        rules:
+          json: snake
+    revive:
+      rules:
+        - name: package-comments
+          disabled: true
+  exclusions:
+    generated: lax
+    rules:
+      - linters:
+          - dupl
+          - dupword
+          - funlen
+          - goconst
+          - gocyclo
+          - gosec
+          - gosmopolitan
+          - gocritic
+          - nestif
+        path: _test\.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
