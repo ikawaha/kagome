@@ -60,8 +60,8 @@ func TestKagomeTokenizerGolden(t *testing.T) {
 			if want != got {
 				t.Errorf("got %v, want %v", got, want)
 			}
-			dump.WriteString(got)
-			dump.WriteString("\n")
+			dump.WriteString(got)  //nolint:errcheck
+			dump.WriteString("\n") //nolint:errcheck
 		}
 	}
 	if err := is.Err(); err != nil {

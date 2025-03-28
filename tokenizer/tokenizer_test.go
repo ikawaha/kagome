@@ -56,13 +56,13 @@ func Example_tokenize_mode() {
 	if err != nil {
 		panic(err)
 	}
-	t, err := New(d)
+	t, err := New(d, OmitBosEos())
 	if err != nil {
 		panic(err)
 	}
 	for _, mode := range []TokenizeMode{Normal, Search, Extended} {
-		tokens := t.Analyze("関西国際空港", Normal)
-		fmt.Printf("---%s---", mode)
+		tokens := t.Analyze("関西国際空港", mode)
+		fmt.Printf("---%s---\n", mode)
 		for _, token := range tokens {
 			if token.Class == DUMMY {
 				// BOS: Begin Of Sentence, EOS: End Of Sentence.
@@ -73,6 +73,17 @@ func Example_tokenize_mode() {
 			fmt.Printf("%s\t%v\n", token.Surface, features)
 		}
 	}
+	// Output:
+	//---normal---
+	//関西国際空港	名詞,固有名詞,組織,*,*,*,関西国際空港,カンサイコクサイクウコウ,カンサイコクサイクーコー
+	//---search---
+	//関西	名詞,固有名詞,地域,一般,*,*,関西,カンサイ,カンサイ
+	//国際	名詞,一般,*,*,*,*,国際,コクサイ,コクサイ
+	//空港	名詞,一般,*,*,*,*,空港,クウコウ,クーコー
+	//---extend---
+	//関西	名詞,固有名詞,地域,一般,*,*,関西,カンサイ,カンサイ
+	//国際	名詞,一般,*,*,*,*,国際,コクサイ,コクサイ
+	//空港	名詞,一般,*,*,*,*,空港,クウコウ,クーコー
 }
 
 func Test_Tokenizer_New(t *testing.T) {
@@ -412,7 +423,7 @@ func BenchmarkAnalyzeNormal(b *testing.B) {
 	}
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		tnz.Analyze(benchSampleText, Normal)
 	}
 }
@@ -428,7 +439,7 @@ func BenchmarkAnalyzeSearch(b *testing.B) {
 	}
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		tnz.Analyze(benchSampleText, Search)
 	}
 }
@@ -444,7 +455,7 @@ func BenchmarkAnalyzeExtended(b *testing.B) {
 	}
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		tnz.Analyze(benchSampleText, Extended)
 	}
 }
@@ -461,7 +472,7 @@ func BenchmarkTooLongUnknownToken(b *testing.B) {
 	}
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		tnz.Tokenize(input)
 	}
 }

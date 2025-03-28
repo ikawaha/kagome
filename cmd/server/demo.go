@@ -79,6 +79,7 @@ func toRecords(tokens []tokenizer.Token) []record {
 	return ret
 }
 
+//nolint:nonamedreturns
 func (h *TokenizeDemoHandler) analyzeGraph(ctx context.Context, sen string, mode tokenizer.TokenizeMode) (records []record, svg string, err error) {
 	if _, err := exec.LookPath(graphvizCmd); err != nil {
 		return nil, "", errors.New("circo/graphviz is not installed in your $PATH")
@@ -150,7 +151,7 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		Sentence: sen,
 		Tokens:   records,
 		CmdErr:   cmdErr,
-		GraphSVG: template.HTML(svg),
+		GraphSVG: template.HTML(svg), //nolint:gosec // G203: The used method does not auto-escape HTML. This can potentially lead to 'Cross-site Scripting' vulnerabilities, in case the attacker controls the input.
 		Mode:     mode,
 	}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

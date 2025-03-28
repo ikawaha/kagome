@@ -38,8 +38,8 @@ type option struct {
 // ContinueOnError ErrorHandling // Return a descriptive error.
 // ExitOnError                   // Call os.Exit(2).
 // PanicOnError                  // Call panic with a descriptive error.flag.ContinueOnError
-func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
-	o = &option{
+func newOption(w io.Writer, eh flag.ErrorHandling) *option {
+	o := &option{
 		flagSet: flag.NewFlagSet(CommandName, eh),
 	}
 	// option settings
@@ -50,7 +50,7 @@ func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	o.flagSet.StringVar(&o.output, "output", "", "output file")
 	o.flagSet.BoolVar(&o.verbose, "v", false, "verbose mode")
 
-	return
+	return o
 }
 
 func (o *option) parse(args []string) error {
@@ -102,7 +102,8 @@ func selectMode(mode string) tokenizer.TokenizeMode {
 	return tokenizer.Normal
 }
 
-func command(_ context.Context, opt *option) error {
+//nolint:nonamedreturns
+func command(_ context.Context, opt *option) (err error) {
 	d, err := selectDict(opt.dict)
 	if err != nil {
 		return err
@@ -126,7 +127,8 @@ func command(_ context.Context, opt *option) error {
 			return err
 		}
 		defer func() {
-			f.Close()
+			err = f.Sync()
+			_ = f.Close()
 		}()
 		out = f
 	}

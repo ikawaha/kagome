@@ -155,8 +155,10 @@ func Test_LatticeBuildUnknown(t *testing.T) {
 			known++
 		case UNKNOWN:
 			unknown++
-		default:
+		case USER:
 			undef++
+		case DUMMY:
+			t.Errorf("unexpected class DUMMY, %+v", v)
 		}
 	}
 	if known != 0 {
@@ -297,7 +299,7 @@ node [shape=box, style=filled, fillcolor="#e8e8f0", fontname=Helvetica]
 }
 
 func Test_LatticeNewAndFree(t *testing.T) {
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		la := New(ipa.Dict(), nil)
 		if la == nil {
 			t.Fatal("unexpected error: cannot new a lattice")

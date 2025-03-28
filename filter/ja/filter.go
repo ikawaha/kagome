@@ -64,6 +64,12 @@ const (
 	defaultPOSFeature = "*"
 )
 
+const (
+	POS_動詞   = "動詞"   //nolint:asciicheck,gosmopolitan
+	POS_形容詞  = "形容詞"  //nolint:asciicheck,gosmopolitan
+	POS_形容動詞 = "形容動詞" //nolint:asciicheck,gosmopolitan
+)
+
 func newDefaultLuceneFilter() (*Filter, error) {
 	ta, err := newDefaultLuceneStopTagPOSFilter()
 	if err != nil {
@@ -74,7 +80,7 @@ func newDefaultLuceneFilter() (*Filter, error) {
 		return nil, fmt.Errorf("failed to load stop words: %w", err)
 	}
 	return &Filter{
-		baserForm: filter.NewPOSFilter(filter.POS{"動詞"}, filter.POS{"形容詞"}, filter.POS{"形容動詞"}),
+		baserForm: filter.NewPOSFilter(filter.POS{POS_動詞}, filter.POS{POS_形容詞}, filter.POS{POS_形容動詞}),
 		stopTags:  ta,
 		stopWords: wo,
 	}, nil
@@ -106,7 +112,7 @@ func newDefaultLuceneStopWordFilter() (*filter.WordFilter, error) {
 
 // Yield returns a filtered word sequence from a token sequence.
 func (f Filter) Yield(tokens []tokenizer.Token) []string {
-	var ret []string
+	ret := make([]string, 0, len(tokens))
 	for _, v := range tokens {
 		if f.stopTags.Match(v.POS()) {
 			continue

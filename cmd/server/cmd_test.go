@@ -86,7 +86,7 @@ func TestRun(t *testing.T) {
 	}()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+			ctx, cancel := context.WithTimeout(t.Context(), 100*time.Millisecond)
 			defer cancel()
 			if err := Run(ctx, tt.args); (err != nil) != tt.wantErr {
 				t.Errorf("Run() error = %v, wantErr %v", err, tt.wantErr)
@@ -139,7 +139,7 @@ func Test_command(t *testing.T) {
 	}()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+			ctx, cancel := context.WithTimeout(t.Context(), 100*time.Millisecond)
 			defer cancel()
 			if err := command(ctx, tt.opt); (err != nil) != tt.wantErr {
 				t.Errorf("command() error = %v, wantErr %v", err, tt.wantErr)

@@ -13,9 +13,10 @@ import (
 // TokenizeMode represents a mode of tokenize.
 //
 // Kagome has segmentation mode for search such as Kuromoji.
-//    Normal: Regular segmentation
-//    Search: Use a heuristic to do additional segmentation useful for search
-//    Extended: Similar to search mode, but also unigram unknown words
+//
+//	Normal: Regular segmentation
+//	Search: Use a heuristic to do additional segmentation useful for search
+//	Extended: Similar to search mode, but also unigram unknown words
 type TokenizeMode int
 
 func (m TokenizeMode) String() string {
@@ -126,7 +127,7 @@ func (t Tokenizer) Analyze(input string, mode TokenizeMode) []Token {
 }
 
 // Dot returns morphs of a sentence and exports a lattice graph to dot format in standard tokenize mode.
-func (t Tokenizer) Dot(w io.Writer, input string) (tokens []Token) {
+func (t Tokenizer) Dot(w io.Writer, input string) []Token {
 	return t.AnalyzeGraph(w, input, Normal)
 }
 

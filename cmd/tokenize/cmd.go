@@ -50,8 +50,8 @@ type option struct {
 // ContinueOnError ErrorHandling // Return a descriptive error.
 // ExitOnError                   // Call os.Exit(2).
 // PanicOnError                  // Call panic with a descriptive error.flag.ContinueOnError
-func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
-	o = &option{
+func newOption(w io.Writer, eh flag.ErrorHandling) *option {
+	o := &option{
 		flagSet: flag.NewFlagSet(CommandName, eh),
 	}
 	// option settings
@@ -65,7 +65,7 @@ func newOption(w io.Writer, eh flag.ErrorHandling) (o *option) {
 	o.flagSet.BoolVar(&o.split, "split", false, "use tiny sentence splitter")
 	o.flagSet.BoolVar(&o.json, "json", false, "outputs in JSON format")
 
-	return
+	return o
 }
 
 func (o *option) parse(args []string) error {
@@ -177,29 +177,29 @@ func command(_ context.Context, opt *option) error {
 
 func printTokens(tokens []tokenizer.Token) {
 	w := bufio.NewWriter(Stdout)
-	defer w.Flush()
+	defer w.Flush() //nolint:errcheck
 	for _, v := range tokens {
 		if v.ID == tokenizer.BosEosID {
 			continue
 		}
-		w.WriteString(v.Surface)
+		w.WriteString(v.Surface) //nolint:gosec
 		if v.Class != tokenizer.DUMMY {
-			w.WriteString("\t")
-			w.WriteString(strings.Join(v.Features(), ","))
+			w.WriteString("\t")                            //nolint:gosec
+			w.WriteString(strings.Join(v.Features(), ",")) //nolint:gosec
 		}
-		w.WriteString("\n")
+		w.WriteString("\n") //nolint:gosec
 	}
-	w.WriteString("EOS\n")
+	w.WriteString("EOS\n") //nolint:gosec
 }
 
 func printTokensJSON(tokens []tokenizer.Token) error {
 	w := bufio.NewWriter(Stdout)
-	defer w.Flush()
+	defer w.Flush() //nolint:errcheck
 
 	if len(tokens) > 0 {
-		w.WriteString("[\n")
+		w.WriteString("[\n") //nolint:gosec
 	}
-	var array [][]byte
+	array := make([][]byte, 0, len(tokens))
 	for _, v := range tokens {
 		if v.Class == tokenizer.DUMMY {
 			continue
@@ -211,9 +211,9 @@ func printTokensJSON(tokens []tokenizer.Token) error {
 		}
 		array = append(array, obj)
 	}
-	w.Write(bytes.Join(array, []byte(",\n")))
+	w.Write(bytes.Join(array, []byte(",\n"))) //nolint:gosec
 	if len(tokens) > 0 {
-		w.WriteString("\n]\n")
+		w.WriteString("\n]\n") //nolint:gosec
 	}
 	return nil
 }

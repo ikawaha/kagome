@@ -72,13 +72,13 @@ func BenchmarkPool(b *testing.B) {
 	// and no new memory will be allocated.
 	var wg sync.WaitGroup
 
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		wg.Add(1)
 
-		go func(max int) {
+		go func(n int) {
 			defer wg.Done()
 
-			for i := 0; i < max; i++ {
+			for i := range n {
 				a := bufPool.Get() // get
 				a.Bar += i         // increment
 				bufPool.Put(a)     // put

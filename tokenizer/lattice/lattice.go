@@ -98,7 +98,8 @@ func (la *Lattice) addNode(pos, id, position, start int, class NodeClass, surfac
 }
 
 // Build builds a lattice from the inputs.
-// nolint: gocyclo
+//
+//nolint:gocyclo,funlen
 func (la *Lattice) Build(inp string) {
 	rc := utf8.RuneCountInString(inp)
 	la.Input = inp
@@ -136,7 +137,7 @@ func (la *Lattice) Build(inp string) {
 		})
 		// (3) UNKNOWN DIC
 		class := la.dic.CharacterCategory(ch)
-		if !anyMatches || la.dic.InvokeList[int(class)] {
+		if !anyMatches || la.dic.InvokeList[int(class)] { //nolint:nestif
 			var endPos int
 			if ch != utf8.RuneError {
 				endPos = pos + utf8.RuneLen(ch)
@@ -145,7 +146,7 @@ func (la *Lattice) Build(inp string) {
 			}
 			unkWordLen := 1
 			if la.dic.GroupList[int(class)] {
-				for i, w, size := endPos, 0, len(inp); i < size; i += w {
+				for i, w, size := endPos, 0, len(inp); i < size; i += w { //nolint:wastedassign
 					var c rune
 					c, w = utf8.DecodeRuneInString(inp[i:])
 					if la.dic.CharacterCategory(c) != class {
@@ -165,7 +166,7 @@ func (la *Lattice) Build(inp string) {
 			}
 			id := la.dic.UnkDict.Index[int32(class)]
 			dup := la.dic.UnkDict.IndexDup[int32(class)]
-			for x := 0; x < int(dup)+1; x++ {
+			for x := range int(dup) + 1 {
 				if pos < prev {
 					// add the string with one character truncated at the end.
 					la.addNode(runePos, int(id)+x, pos, runePos, UNKNOWN, inp[pos:prev])
@@ -231,8 +232,8 @@ func (la *Lattice) Forward(m TokenizeMode) {
 				if totalCost > maximumCost {
 					totalCost = maximumCost
 				}
-				if j == 0 || int32(totalCost) < la.list[i][index].Cost {
-					la.list[i][index].Cost = int32(totalCost)
+				if j == 0 || int32(totalCost) < la.list[i][index].Cost { //nolint:gosec // G115: integer overflow conversion int64 -> int32
+					la.list[i][index].Cost = int32(totalCost) //nolint:gosec // G115: integer overflow conversion int64 -> int32
 					la.list[i][index].prev = la.list[target.Start][j]
 				}
 			}
@@ -273,6 +274,8 @@ func (la *Lattice) Backward(m TokenizeMode) {
 func posFeature(d *dict.Dict, u *dict.UserDict, t *Node) string {
 	var ret []string
 	switch t.Class {
+	case DUMMY:
+		// undefined
 	case KNOWN:
 		for _, id := range d.POSTable.POSs[t.ID] {
 			if v := d.POSTable.NameList[id]; v != "*" {
@@ -308,7 +311,7 @@ func posFeature(d *dict.Dict, u *dict.UserDict, t *Node) string {
 
 // Dot outputs a lattice in the graphviz dot format.
 //
-//nolint:gocyclo
+//nolint:gocyclo,funlen
 func (la *Lattice) Dot(w io.Writer) {
 	bests := make(map[*Node]struct{})
 	for _, n := range la.Output {

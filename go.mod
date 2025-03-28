@@ -1,8 +1,6 @@
 module github.com/ikawaha/kagome/v2
 
-go 1.23.0
-
-toolchain go1.23.2
+go 1.24.1
 
 require (
 	github.com/ikawaha/kagome-dict v1.1.2

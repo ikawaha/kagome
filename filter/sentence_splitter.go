@@ -25,6 +25,8 @@ var defaultSplitter = &SentenceSplitter{
 
 // ScanSentences implements SplitFunc interface of bufio.Scanner that returns each sentence of text.
 // see. https://pkg.go.dev/bufio#SplitFunc
+//
+//nolint:nonamedreturns
 func ScanSentences(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	return defaultSplitter.ScanSentences(data, atEOF)
 }
@@ -48,7 +50,8 @@ func (s SentenceSplitter) isFollower(r rune) bool {
 }
 
 // ScanSentences is a split function for a Scanner that returns each sentence of text.
-// nolint: gocyclo
+//
+//nolint:gocyclo,funlen,nonamedreturns
 func (s SentenceSplitter) ScanSentences(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if atEOF && len(data) == 0 {
 		return 0, nil, nil
@@ -79,7 +82,7 @@ func (s SentenceSplitter) ScanSentences(data []byte, atEOF bool) (advance int, t
 		}
 		head = false
 		if end != p {
-			for i := 0; i < size; i++ {
+			for i := range size {
 				data[end+i] = data[p+i]
 			}
 		}
@@ -99,7 +102,7 @@ func (s SentenceSplitter) ScanSentences(data []byte, atEOF bool) (advance int, t
 		nn = false
 		for p < len(data) {
 			r, size := utf8.DecodeRune(data[p:])
-			if s.SkipWhiteSpace && unicode.IsSpace(r) {
+			if s.SkipWhiteSpace && unicode.IsSpace(r) { //nolint:gocritic,nestif
 				p += size
 				if s.DoubleLineFeedSplit && r == '\n' {
 					if nn {
@@ -109,7 +112,7 @@ func (s SentenceSplitter) ScanSentences(data []byte, atEOF bool) (advance int, t
 				}
 			} else if s.isDelim(r) || s.isFollower(r) {
 				if end != p {
-					for i := 0; i < size; i++ {
+					for i := range size {
 						data[end+i] = data[p+i]
 					}
 				}
