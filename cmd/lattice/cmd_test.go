@@ -2,6 +2,7 @@ package lattice
 
 import (
 	"bytes"
+	"context"
 	"flag"
 	"os"
 	"strings"
@@ -100,7 +101,7 @@ func TestRun(t *testing.T) {
 	}()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := Run(t.Context(), tt.args); (err != nil) != tt.wantErr {
+			if err := Run(context.Background(), tt.args); (err != nil) != tt.wantErr {
 				t.Errorf("Run() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -159,7 +160,7 @@ func Test_command(t *testing.T) {
 				Stdout = os.Stdout
 				Stderr = os.Stderr
 			}()
-			if err := command(t.Context(), tt.args); (err != nil) != tt.wantErr {
+			if err := command(context.Background(), tt.args); (err != nil) != tt.wantErr {
 				t.Errorf("command() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if tt.wantErr {
