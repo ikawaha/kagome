@@ -423,7 +423,7 @@ func BenchmarkAnalyzeNormal(b *testing.B) {
 	}
 
 	b.ResetTimer()
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		tnz.Analyze(benchSampleText, Normal)
 	}
 }
@@ -439,7 +439,7 @@ func BenchmarkAnalyzeSearch(b *testing.B) {
 	}
 
 	b.ResetTimer()
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		tnz.Analyze(benchSampleText, Search)
 	}
 }
@@ -455,7 +455,7 @@ func BenchmarkAnalyzeExtended(b *testing.B) {
 	}
 
 	b.ResetTimer()
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		tnz.Analyze(benchSampleText, Extended)
 	}
 }
@@ -472,7 +472,7 @@ func BenchmarkTooLongUnknownToken(b *testing.B) {
 	}
 
 	b.ResetTimer()
-	for b.Loop() {
+	for i := 0; i < b.N; i++ {
 		tnz.Tokenize(input)
 	}
 }
