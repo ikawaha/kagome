@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -93,7 +94,7 @@ func TestTokenizeDemoHandler_analyzeGraph(t *testing.T) {
 		t.Fatalf("unexpected error, %v", err)
 	}
 	handler := TokenizeDemoHandler{tokenizer: tnz}
-	records, svg, err := handler.analyzeGraph(t.Context(), "ねこです", tokenizer.Normal)
+	records, svg, err := handler.analyzeGraph(context.Background(), "ねこです", tokenizer.Normal)
 	if err != nil {
 		t.Fatalf("unexpected error, analyzeGraph() failed, %v", err)
 	}

@@ -2,6 +2,7 @@ package tokenize
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -39,7 +40,7 @@ func TestCommand_NormalOutput(t *testing.T) {
 		Stdout = stdout
 	}()
 
-	if err := command(t.Context(), &option{
+	if err := command(context.Background(), &option{
 		dict: "../../testdata/ipa.dict",
 	}); err != nil {
 		t.Errorf("unexpected error, command failed, %v", err)
@@ -88,7 +89,7 @@ func TestCommand_JSONOutput(t *testing.T) {
 	}()
 
 	// test
-	if err := command(t.Context(), &option{
+	if err := command(context.Background(), &option{
 		dict: "../../testdata/ipa.dict",
 		json: true,
 	}); err != nil {
@@ -147,7 +148,7 @@ func TestCommand_JSONOutput_issue249(t *testing.T) {
 	}()
 
 	// test
-	if err := command(t.Context(), &option{
+	if err := command(context.Background(), &option{
 		dict: "../../testdata/ipa.dict",
 		json: true,
 	}); err != nil {
@@ -272,7 +273,7 @@ func TestRun(t *testing.T) {
 	}()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := Run(t.Context(), tt.args); (err != nil) != tt.wantErr {
+			if err := Run(context.Background(), tt.args); (err != nil) != tt.wantErr {
 				t.Errorf("Run() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
