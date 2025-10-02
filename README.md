@@ -275,7 +275,7 @@ A debug tool of tokenize process outputs a lattice in graphviz dot format.
 
 ### Docker
 
-[![Docker](https://dockeri.co/image/ikawaha/kagome)](https://hub.docker.com/r/ikawaha/kagome)
+[![Docker](https://dockerico.blankenship.io/image/ikawaha/kagome)](https://hub.docker.com/r/ikawaha/kagome)
 
 ```sh
 # Compatible architectures: AMD64, Arm64, Arm32 (Arm v5, v6 and v7)
