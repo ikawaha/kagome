@@ -1,0 +1,13 @@
+services:
+  kagome:
+    image: kagome:local
+    init: true
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: server -userdict="/data/userdict.txt"
+    ports:
+      - "6060:6060"
+    volumes:
+      - ./userdict.txt:/data/userdict.txt
+    restart: unless-stopped
