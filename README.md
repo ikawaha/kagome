@@ -238,8 +238,8 @@ EOS
 
 ```shellsession
 % # word splitting/segmentation only (equivalent to "wakati" functionality)
-% echo "すもももももももものうち" | kagome -json | jq -r '[.[].surface] | join(" ")'
-すもも も もも も もも の うち
+% echo "すもももももももものうち" | kagome -json | jq -r '[.[].surface] | join("/")'
+すもも/も/もも/も/もも/の/うち
 ```
 
 ```shellsession
@@ -308,20 +308,20 @@ Split long text into sentences:
 This command is useful if a single line of data is too lengthy, and you want to avoid errors such as `bufio.Scanner: token too long`.
 
 ```shellsession
-% echo "吾輩は猫である。名前はまだ無い。" | kagome -json | jq -r '[.[].surface] | join(" ")'
-吾輩 は 猫 で ある 。 名前 は まだ 無い 。
+% echo "吾輩は猫である。名前はまだ無い。" | kagome -json | jq -r '[.[].surface] | join("/")'
+吾輩/は/猫/で/ある/。/名前/は/まだ/無い/。
 
-% echo "吾輩は猫である。名前はまだ無い。" | kagome sentence | kagome -json | jq -r '[.[].surface] | join(" ")'
-吾輩 は 猫 で ある 。
-名前 は まだ 無い 。
+% echo "吾輩は猫である。名前はまだ無い。" | kagome sentence | kagome -json | jq -r '[.[].surface] | join("/")'
+吾輩/は/猫/で/ある/。
+名前/は/まだ/無い/。
 ```
 
 This command is equivalent to the `-split` option of the `tokenize` command.
 
 ```shellsession
-% echo "吾輩は猫である。名前はまだ無い。" | kagome -split -json | jq -r '[.[].surface] | join(" ")'
-吾輩 は 猫 で ある 。
-名前 は まだ 無い 。
+% echo "吾輩は猫である。名前はまだ無い。" | kagome -split -json | jq -r '[.[].surface] | join("/")'
+吾輩/は/猫/で/ある/。
+名前/は/まだ/無い/。
 ```
 
 ## Dictionaries
