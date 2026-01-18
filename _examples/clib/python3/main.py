@@ -12,10 +12,10 @@ elif system == "Darwin":
 else:
 	libname = "libkagome.so"
 
-libpath = os.path.join(os.path.dirname(__file__), libname)
+# ./.. /bin/libkagome.(so|dll|dylib)
+libpath = os.path.join(os.path.dirname(__file__), os.path.pardir, "bin", libname)
+
 lib = ctypes.cdll.LoadLibrary(libpath)
-
-
 lib.KagomeInit.argtypes = [ctypes.c_char_p]
 lib.KagomeInit.restype = ctypes.c_size_t  # uintptr_t is size_t
 

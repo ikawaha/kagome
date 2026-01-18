@@ -1,3 +1,5 @@
 *.so
 *.dll
 *.dylib
+bin/
+__pycache__/
