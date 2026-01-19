@@ -1,0 +1,8 @@
+services:
+  test_python3:
+    build:
+      context: .
+    volumes:
+      - ./python3:/app/python3
+      - ./c:/app/c
+      - ./Makefile:/app/Makefile
