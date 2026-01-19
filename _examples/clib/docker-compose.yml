@@ -1,8 +1,19 @@
+volumes:
+  kagome-dist:
+
 services:
-  test_python3:
+  kagome-build:
     build:
       context: .
     volumes:
+      - kagome-dist:/app/bin
+
+  python-test:
+    image: python:latest
+    volumes:
+      - kagome-dist:/app/bin
       - ./python3:/app/python3
-      - ./c:/app/c
-      - ./Makefile:/app/Makefile
+    working_dir: /app
+    entrypoint: ["/usr/local/bin/python3", "/app/python3/main.py"]
+    depends_on:
+      - kagome-build

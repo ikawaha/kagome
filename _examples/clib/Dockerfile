@@ -14,15 +14,4 @@ RUN \
     go get "github.com/ikawaha/kagome-dict/ipa" && \
     go mod tidy
 
-RUN make build
-RUN ls /app/bin
-
-FROM python:latest
-
-WORKDIR /app
-
-COPY --from=builder /app/bin /app/bin
-COPY ./python3 /app/python3
-COPY ./Makefile /app/Makefile
-
-ENTRYPOINT ["make", "test"]
+CMD ["make", "build"]
