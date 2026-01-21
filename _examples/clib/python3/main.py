@@ -18,8 +18,7 @@ libpath = os.path.abspath(
 )
 print(f"Loading library: {libpath}")
 
-# lib = ctypes.cdll.LoadLibrary(libpath)
-lib = ctypes.CDLL(os.path.abspath(libpath), mode=ctypes.RTLD_GLOBAL)
+lib = ctypes.CDLL(libpath)
 lib.KagomeInit.argtypes = []
 lib.KagomeInit.restype = ctypes.c_void_p
 
