@@ -8,11 +8,11 @@ $libnames = [
 ];
 $libpath = null;
 foreach ($libnames as $name) {
-	$try = __DIR__ . '/../bin/' . $name;
-	if (file_exists($try)) {
-		$libpath = $try;
-		break;
-	}
+    $try = realpath(__DIR__ . '/../bin/' . $name);
+    if ($try !== false && file_exists($try)) {
+        $libpath = $try;
+        break;
+    }
 }
 
 if (!$libpath) {
