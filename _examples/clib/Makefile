@@ -12,13 +12,14 @@ prebuild:
 	fi
 	@sleep 1; # cooldown for file system
 
+# Use -fvisibility=hidden to only export symbols explicitly marked in the wrapper (for a clean public API)
 build: prebuild
 	@if [ "$$(go env GOOS)" = "darwin" ]; then \
-		cc -fPIC -shared ./c/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.dylib; \
+		cc -fPIC -fvisibility=hidden -shared ./c/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.dylib; \
 	elif [ "$$(go env GOOS)" = "windows" ]; then \
-		cc -fPIC -shared ./c/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.dll; \
+		cc -fPIC -fvisibility=hidden -shared ./c/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.dll; \
 	elif [ "$$(go env GOOS)" = "linux" ]; then \
-		cc -fPIC -shared ./c/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.so; \
+		cc -fPIC -fvisibility=hidden -shared ./c/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.so; \
 	else \
 		echo "Unsupported GOOS: $$(go env GOOS)" ; exit 1 ; \
 	fi
