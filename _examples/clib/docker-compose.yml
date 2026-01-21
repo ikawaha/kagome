@@ -13,7 +13,7 @@ services:
     image: python:latest
     volumes:
       - kagome-dist:/app/bin:ro
-      - ./python3:/app/python3
+      - ./python3:/app/python3:ro
     working_dir: /app
     entrypoint: ["/usr/local/bin/python3", "/app/python3/main.py"]
     depends_on:
@@ -26,7 +26,7 @@ services:
       context: ./php
     volumes:
       - kagome-dist:/app/bin:ro
-      - ./php:/app/php
+      - ./php:/app/php:ro
     working_dir: /app
     entrypoint: ["/usr/local/bin/php", "/app/php/main.php"]
     depends_on:
