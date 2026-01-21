@@ -37,17 +37,19 @@ type Token C.struct_Token
 type TokenArray C.struct_TokenArray
 
 // Opaque handle struct for C API
-type KagomeHandle struct{}
+
+// type KagomeHandle struct{} // No longer used for handle, see below
 
 var (
-	mu        sync.Mutex
-	instances = make(map[*KagomeHandle]*tokenizer.Tokenizer)
+	mu sync.Mutex
+	// Use C-allocated pointer as the key for maximum cgo safety
+	instances = make(map[unsafe.Pointer]*tokenizer.Tokenizer)
 )
 
 //export KagomeTokenizeStruct
 func KagomeTokenizeStruct(handle unsafe.Pointer, input *C.char) *C.TokenArray {
 	mu.Lock()
-	t := instances[(*KagomeHandle)(handle)]
+	t := instances[handle]
 	mu.Unlock()
 	if t == nil || input == nil {
 		return nil
@@ -152,15 +154,21 @@ func KagomeInit() unsafe.Pointer {
 	if err != nil {
 		return nil
 	}
-	handle := &KagomeHandle{}
+	// Allocate a dummy handle in C heap to avoid passing Go pointer to C.
+	// This ensures cgo safety and future-proofing.
+	handle := C.malloc(1)
+	if handle == nil {
+		return nil
+	}
+	// Use the C pointer as the map key.
 	instances[handle] = t
-	return unsafe.Pointer(handle)
+	return handle
 }
 
 //export KagomeTokenize
 func KagomeTokenize(handle unsafe.Pointer, input *C.char) *C.char {
 	mu.Lock()
-	t := instances[(*KagomeHandle)(handle)]
+	t := instances[handle]
 	mu.Unlock()
 
 	if t == nil || input == nil {
@@ -195,8 +203,10 @@ func KagomeFree(p *C.char) {
 //export KagomeDestroy
 func KagomeDestroy(handle unsafe.Pointer) {
 	mu.Lock()
-	delete(instances, (*KagomeHandle)(handle))
+	delete(instances, handle)
 	mu.Unlock()
+	// Free the dummy handle allocated by C.malloc in KagomeInit
+	C.free(handle)
 }
 
 func main() {}
