@@ -49,7 +49,10 @@ class TokenArray(ctypes.Structure):
 
 
 # Set argument and return types for Go shared library functions (pointer version)
-lib.KagomeTokenizeStruct.argtypes = [ctypes.c_size_t, ctypes.c_char_p]
+lib.KagomeTokenizeStruct.argtypes = [
+    ctypes.c_void_p,
+    ctypes.c_char_p,
+]  # handle is a C pointer, not an integer
 lib.KagomeTokenizeStruct.restype = ctypes.POINTER(TokenArray)
 lib.KagomeFreeTokenArray.argtypes = [ctypes.POINTER(TokenArray)]
 lib.KagomeFreeTokenArray.restype = None
