@@ -98,25 +98,32 @@ func getOrEmpty(arr []string, idx int) string {
 	return ""
 }
 
+// Always free arr if it was malloc'ed, even if arr->tokens is nil.
+// This ensures no memory leak occurs for empty results or allocation failures.
+//
 //export KagomeFreeTokenArray
 func KagomeFreeTokenArray(arr *C.TokenArray) {
-	if arr == nil || arr.tokens == nil || arr.length == 0 {
+	if arr == nil {
 		return
 	}
-	slice := (*[1 << 30]C.Token)(unsafe.Pointer(arr.tokens))[:arr.length:arr.length]
-	for i := 0; i < int(arr.length); i++ {
-		C.free(unsafe.Pointer(slice[i].surface))
-		C.free(unsafe.Pointer(slice[i].pos1))
-		C.free(unsafe.Pointer(slice[i].pos2))
-		C.free(unsafe.Pointer(slice[i].pos3))
-		C.free(unsafe.Pointer(slice[i].pos4))
-		C.free(unsafe.Pointer(slice[i].base_form))
-		C.free(unsafe.Pointer(slice[i].conj_type))
-		C.free(unsafe.Pointer(slice[i].conj_form))
-		C.free(unsafe.Pointer(slice[i].reading))
-		C.free(unsafe.Pointer(slice[i].pronunciation))
+	// Free token memory if present
+	if arr.tokens != nil {
+		slice := (*[1 << 30]C.Token)(unsafe.Pointer(arr.tokens))[:arr.length:arr.length]
+		for i := 0; i < int(arr.length); i++ {
+			C.free(unsafe.Pointer(slice[i].surface))
+			C.free(unsafe.Pointer(slice[i].pos1))
+			C.free(unsafe.Pointer(slice[i].pos2))
+			C.free(unsafe.Pointer(slice[i].pos3))
+			C.free(unsafe.Pointer(slice[i].pos4))
+			C.free(unsafe.Pointer(slice[i].base_form))
+			C.free(unsafe.Pointer(slice[i].conj_type))
+			C.free(unsafe.Pointer(slice[i].conj_form))
+			C.free(unsafe.Pointer(slice[i].reading))
+			C.free(unsafe.Pointer(slice[i].pronunciation))
+		}
+		C.free(unsafe.Pointer(arr.tokens))
 	}
-	C.free(unsafe.Pointer(arr.tokens))
+	// Always free arr itself
 	C.free(unsafe.Pointer(arr))
 }
 
