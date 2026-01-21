@@ -41,23 +41,22 @@ typedef struct {
 	Token* tokens;
 	int length;
 } TokenArray;
-typedef unsigned long uintptr_t;
-TokenArray* KagomeTokenizeStruct(uintptr_t handle, char* input);
+TokenArray* KagomeTokenizeStruct(void* handle, char* input);
 void KagomeFreeTokenArray(TokenArray* arr);
-uintptr_t KagomeInit(char* dictPath);
+void* KagomeInit(void);
 ', $libpath);
 
 // Prepare input
 $text = "すもももももももものうち";
 
-// Go: uintptr_t KagomeInit(char* dictPath);
-$handle = $ffi->KagomeInit($ffi->new('char[1]', false));
-if ($handle == 0) {
+// Go: void* KagomeInit(void);
+$handle = $ffi->KagomeInit();
+if ($handle == null) {
 	fwrite(STDERR, "Failed to initialize Kagome tokenizer" . PHP_EOL);
 	exit(1);
 }
 
-// Go: TokenArray* KagomeTokenizeStruct(uintptr_t handle, char* input);
+// Go: TokenArray* KagomeTokenizeStruct(void* handle, char* input);
 $cstr = $ffi->new('char[' . (strlen($text) + 1) . ']', false);
 FFI::memcpy($cstr, $text, strlen($text));
 $arr_p = $ffi->KagomeTokenizeStruct($handle, $cstr);

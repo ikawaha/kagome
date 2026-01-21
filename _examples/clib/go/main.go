@@ -137,7 +137,7 @@ func EchoFree(p *C.char) {
 }
 
 //export KagomeInit
-func KagomeInit(dictPath *C.char) unsafe.Pointer {
+func KagomeInit() unsafe.Pointer {
 	mu.Lock()
 	defer mu.Unlock()
 

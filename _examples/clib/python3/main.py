@@ -20,8 +20,8 @@ print(f"Loading library: {libpath}")
 
 # lib = ctypes.cdll.LoadLibrary(libpath)
 lib = ctypes.CDLL(os.path.abspath(libpath), mode=ctypes.RTLD_GLOBAL)
-lib.KagomeInit.argtypes = [ctypes.c_char_p]
-lib.KagomeInit.restype = ctypes.c_size_t  # uintptr_t is size_t
+lib.KagomeInit.argtypes = []
+lib.KagomeInit.restype = ctypes.c_void_p
 
 
 # Define Token and TokenArray struct for ctypes
@@ -56,7 +56,7 @@ lib.KagomeFreeTokenArray.argtypes = [ctypes.POINTER(TokenArray)]
 lib.KagomeFreeTokenArray.restype = None
 
 # Initialize tokenizer and get handle
-handle = lib.KagomeInit(b"")
+handle = lib.KagomeInit()
 if handle == 0:
     raise RuntimeError("Failed to initialize Kagome tokenizer")
 
