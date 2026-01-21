@@ -28,10 +28,10 @@ lib.KagomeInit.restype = ctypes.c_size_t  # uintptr_t is size_t
 class Token(ctypes.Structure):
     _fields_ = [
         ("surface", ctypes.c_char_p),
-        ("pos1", ctypes.c_char_p),
-        ("pos2", ctypes.c_char_p),
-        ("pos3", ctypes.c_char_p),
-        ("pos4", ctypes.c_char_p),
+        ("pos1", ctypes.c_char_p),  # Part-of-speech, 品詞
+        ("pos2", ctypes.c_char_p),  # POS Subcategory1, 品詞細分類1
+        ("pos3", ctypes.c_char_p),  # POS Subcategory2, 品詞細分類2
+        ("pos4", ctypes.c_char_p),  # POS Subcategory3, 品詞細分類3
         ("start", ctypes.c_int),
         ("end", ctypes.c_int),
     ]
