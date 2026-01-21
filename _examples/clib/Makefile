@@ -10,6 +10,7 @@ prebuild:
 	else \
 		echo "Unsupported GOOS: $$(go env GOOS)" ; exit 1 ; \
 	fi
+	@sleep 1; # cooldown for file system
 
 build: prebuild
 	@if [ "$$(go env GOOS)" = "darwin" ]; then \
@@ -21,6 +22,7 @@ build: prebuild
 	else \
 		echo "Unsupported GOOS: $$(go env GOOS)" ; exit 1 ; \
 	fi
+	@sleep 1; # cooldown for file system
 
 test:
 	@if [ -f ./bin/libkagome.so ] || [ -f ./bin/libkagome.dll ] || [ -f ./bin/libkagome.dylib ]; then \
@@ -30,14 +32,20 @@ test:
 	fi
 
 clean:
-	@docker compose down --rmi --volumes --remove-orphans
+	@docker compose down --rmi all --volumes --remove-orphans
 	@rm -rf ./bin
 	@docker container prune -f
 	@docker image prune -f
 	@docker volume prune -f
 	@docker network prune -f
-	@docker image rm clib-kagome-build:latest clib-php-test:latest
-	@docker volume rm clib_kagome-dist
+	@docker image rm -f clib-kagome-build:latest clib-php-test:latest
+	@docker volume rm -f clib_kagome-dist
+
+docker-build:
+	@docker pull golang:latest
+	@docker pull python:latest
+	@docker pull php:latest
+	@docker compose build --no-cache
 
 docker-test:
 	@docker compose build

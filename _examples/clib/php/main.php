@@ -1,4 +1,3 @@
-
 <?php
 
 // Detect shared library name by platform
@@ -15,16 +14,21 @@ foreach ($libnames as $name) {
 		break;
 	}
 }
+
 if (!$libpath) {
-	fwrite(STDERR, "libkagome shared library not found\n");
+	fwrite(STDERR, "libkagome shared library not found" . PHP_EOL);
 	exit(1);
 }
+echo "Loading library: {$libpath}" . PHP_EOL;
 
 // Load FFI
 $ffi = FFI::cdef('
 typedef struct {
 	char* surface;
-	char* pos;
+	char* pos1;
+	char* pos2;
+	char* pos3;
+	char* pos4;
 	int start;
 	int end;
 } Token;
@@ -44,7 +48,7 @@ $text = "すもももももももものうち";
 // Go: uintptr_t KagomeInit(char* dictPath);
 $handle = $ffi->KagomeInit($ffi->new('char[1]', false));
 if ($handle == 0) {
-	fwrite(STDERR, "Failed to initialize Kagome tokenizer\n");
+	fwrite(STDERR, "Failed to initialize Kagome tokenizer" . PHP_EOL);
 	exit(1);
 }
 
@@ -53,45 +57,52 @@ $cstr = $ffi->new('char[' . (strlen($text) + 1) . ']', false);
 FFI::memcpy($cstr, $text, strlen($text));
 $arr_p = $ffi->KagomeTokenizeStruct($handle, $cstr);
 if ($arr_p == null) {
-	fwrite(STDERR, "tokenize failed\n");
+	fwrite(STDERR, "tokenize failed" . PHP_EOL);
 	exit(1);
 }
 $arr = $arr_p[0];
 
 $expect = [
-	"surface=すもも, pos=名詞,一般,*,*, start=0, end=3",
-	"surface=も, pos=助詞,係助詞,*,*, start=3, end=4",
-	"surface=もも, pos=名詞,一般,*,*, start=4, end=6",
-	"surface=も, pos=助詞,係助詞,*,*, start=6, end=7",
-	"surface=もも, pos=名詞,一般,*,*, start=7, end=9",
-	"surface=の, pos=助詞,連体化,*,*, start=9, end=10",
-	"surface=うち, pos=名詞,非自立,副詞可能,*, start=10, end=12",
+    "surface=すもも, pos=[名詞, 一般, *, *], start=0, end=3",
+    "surface=も, pos=[助詞, 係助詞, *, *], start=3, end=4",
+    "surface=もも, pos=[名詞, 一般, *, *], start=4, end=6",
+    "surface=も, pos=[助詞, 係助詞, *, *], start=6, end=7",
+    "surface=もも, pos=[名詞, 一般, *, *], start=7, end=9",
+    "surface=の, pos=[助詞, 連体化, *, *], start=9, end=10",
+    "surface=うち, pos=[名詞, 非自立, 副詞可能, *], start=10, end=12",
 ];
 $actual = [];
 
 if ($arr->tokens != null && $arr->length > 0) {
 	for ($i = 0; $i < $arr->length; $i++) {
 		$token = $arr->tokens[$i];
+		$surface = FFI::string($token->surface);
+		$posArr = [
+			FFI::string($token->pos1),
+			FFI::string($token->pos2),
+			FFI::string($token->pos3),
+			FFI::string($token->pos4),
+		];
 		$line = sprintf(
-			"surface=%s, pos=%s, start=%d, end=%d",
-			FFI::string($token->surface),
-			FFI::string($token->pos),
+			"surface=%s, pos=[%s], start=%d, end=%d",
+			$surface,
+			implode(', ', $posArr),
 			$token->start,
 			$token->end
 		);
-		echo $line . "\n";
+		echo $line . PHP_EOL;
 		$actual[] = $line;
 	}
 	$ffi->KagomeFreeTokenArray($arr_p);
 }
 
 if ($actual === $expect) {
-	echo "PASS\n";
+	echo "PASS" . PHP_EOL;
 	exit(0);
 } else {
-	echo "FAIL\nexpect:\n";
-	foreach ($expect as $line) echo $line . "\n";
-	echo "actual:\n";
-	foreach ($actual as $line) echo $line . "\n";
+	echo "FAIL" . PHP_EOL . "expect:" . PHP_EOL;
+	foreach ($expect as $line) echo $line . PHP_EOL;
+	echo "actual:" . PHP_EOL;
+	foreach ($actual as $line) echo $line . PHP_EOL;
 	exit(1);
 }

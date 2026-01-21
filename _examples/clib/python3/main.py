@@ -28,7 +28,10 @@ lib.KagomeInit.restype = ctypes.c_size_t  # uintptr_t is size_t
 class Token(ctypes.Structure):
     _fields_ = [
         ("surface", ctypes.c_char_p),
-        ("pos", ctypes.c_char_p),
+        ("pos1", ctypes.c_char_p),
+        ("pos2", ctypes.c_char_p),
+        ("pos3", ctypes.c_char_p),
+        ("pos4", ctypes.c_char_p),
         ("start", ctypes.c_int),
         ("end", ctypes.c_int),
     ]
@@ -59,13 +62,13 @@ text = "すもももももももものうち".encode("utf-8")
 
 # --- Testable output ---
 expect = [
-    "surface=すもも, pos=名詞,一般,*,*, start=0, end=3",
-    "surface=も, pos=助詞,係助詞,*,*, start=3, end=4",
-    "surface=もも, pos=名詞,一般,*,*, start=4, end=6",
-    "surface=も, pos=助詞,係助詞,*,*, start=6, end=7",
-    "surface=もも, pos=名詞,一般,*,*, start=7, end=9",
-    "surface=の, pos=助詞,連体化,*,*, start=9, end=10",
-    "surface=うち, pos=名詞,非自立,副詞可能,*, start=10, end=12",
+    "surface=すもも, pos=['名詞', '一般', '*', '*'], start=0, end=3",
+    "surface=も, pos=['助詞', '係助詞', '*', '*'], start=3, end=4",
+    "surface=もも, pos=['名詞', '一般', '*', '*'], start=4, end=6",
+    "surface=も, pos=['助詞', '係助詞', '*', '*'], start=6, end=7",
+    "surface=もも, pos=['名詞', '一般', '*', '*'], start=7, end=9",
+    "surface=の, pos=['助詞', '連体化', '*', '*'], start=9, end=10",
+    "surface=うち, pos=['名詞', '非自立', '副詞可能', '*'], start=10, end=12",
 ]
 
 actual = []
@@ -79,7 +82,14 @@ arr = arr_p.contents
 if arr.tokens and arr.length > 0:
     for i in range(arr.length):
         token = arr.tokens[i]
-        line = f"surface={token.surface.decode('utf-8')}, pos={token.pos.decode('utf-8')}, start={token.start}, end={token.end}"
+        surface = token.surface.decode("utf-8")
+        pos_arr = [
+            token.pos1.decode("utf-8"),
+            token.pos2.decode("utf-8"),
+            token.pos3.decode("utf-8"),
+            token.pos4.decode("utf-8"),
+        ]
+        line = f"surface={surface}, pos={pos_arr}, start={token.start}, end={token.end}"
         print(line)
         actual.append(line)
     lib.KagomeFreeTokenArray(arr_p)

@@ -4,10 +4,13 @@ package main
 #include <stdint.h>
 #include <stdlib.h>
 typedef struct {
-  char* surface;
-  char* pos;
-  int start;
-  int end;
+	char* surface;
+	char* pos1;
+	char* pos2;
+	char* pos3;
+	char* pos4;
+	int start;
+	int end;
 } Token;
 typedef struct {
   Token* tokens;
@@ -17,7 +20,6 @@ typedef struct {
 import "C"
 
 import (
-	"strings"
 	"sync"
 	"unsafe"
 
@@ -61,7 +63,28 @@ func KagomeTokenizeStruct(handle C.uintptr_t, input *C.char) *C.TokenArray {
 
 	for i, tok := range tokens {
 		slice[i].surface = C.CString(tok.Surface)
-		slice[i].pos = C.CString(strings.Join(tok.POS(), ","))
+		pos := tok.POS()
+		// Always 4 elements, but check length for safety
+		if len(pos) > 0 {
+			slice[i].pos1 = C.CString(pos[0])
+		} else {
+			slice[i].pos1 = C.CString("")
+		}
+		if len(pos) > 1 {
+			slice[i].pos2 = C.CString(pos[1])
+		} else {
+			slice[i].pos2 = C.CString("")
+		}
+		if len(pos) > 2 {
+			slice[i].pos3 = C.CString(pos[2])
+		} else {
+			slice[i].pos3 = C.CString("")
+		}
+		if len(pos) > 3 {
+			slice[i].pos4 = C.CString(pos[3])
+		} else {
+			slice[i].pos4 = C.CString("")
+		}
 		slice[i].start = C.int(tok.Start)
 		slice[i].end = C.int(tok.End)
 	}
@@ -78,7 +101,10 @@ func KagomeFreeTokenArray(arr *C.TokenArray) {
 	slice := (*[1 << 30]C.Token)(unsafe.Pointer(arr.tokens))[:arr.length:arr.length]
 	for i := 0; i < int(arr.length); i++ {
 		C.free(unsafe.Pointer(slice[i].surface))
-		C.free(unsafe.Pointer(slice[i].pos))
+		C.free(unsafe.Pointer(slice[i].pos1))
+		C.free(unsafe.Pointer(slice[i].pos2))
+		C.free(unsafe.Pointer(slice[i].pos3))
+		C.free(unsafe.Pointer(slice[i].pos4))
 	}
 	C.free(unsafe.Pointer(arr.tokens))
 	C.free(unsafe.Pointer(arr))
