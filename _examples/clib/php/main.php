@@ -22,13 +22,18 @@ if (!$libpath) {
 echo "Loading library: {$libpath}" . PHP_EOL;
 
 // Load FFI
-$ffi = FFI::cdef('
+ $ffi = FFI::cdef('
 typedef struct {
 	char* surface;
 	char* pos1;
 	char* pos2;
 	char* pos3;
 	char* pos4;
+	char* base_form;
+	char* conj_type;
+	char* conj_form;
+	char* reading;
+	char* pronunciation;
 	int start;
 	int end;
 } Token;
@@ -63,13 +68,13 @@ if ($arr_p == null) {
 $arr = $arr_p[0];
 
 $expect = [
-    "surface=すもも, pos=[名詞, 一般, *, *], start=0, end=3",
-    "surface=も, pos=[助詞, 係助詞, *, *], start=3, end=4",
-    "surface=もも, pos=[名詞, 一般, *, *], start=4, end=6",
-    "surface=も, pos=[助詞, 係助詞, *, *], start=6, end=7",
-    "surface=もも, pos=[名詞, 一般, *, *], start=7, end=9",
-    "surface=の, pos=[助詞, 連体化, *, *], start=9, end=10",
-    "surface=うち, pos=[名詞, 非自立, 副詞可能, *], start=10, end=12",
+	"surface=すもも, pos=[名詞, 一般, *, *], base_form=すもも, conj_type=*, conj_form=*, reading=スモモ, pronunciation=スモモ, start=0, end=3",
+	"surface=も, pos=[助詞, 係助詞, *, *], base_form=も, conj_type=*, conj_form=*, reading=モ, pronunciation=モ, start=3, end=4",
+	"surface=もも, pos=[名詞, 一般, *, *], base_form=もも, conj_type=*, conj_form=*, reading=モモ, pronunciation=モモ, start=4, end=6",
+	"surface=も, pos=[助詞, 係助詞, *, *], base_form=も, conj_type=*, conj_form=*, reading=モ, pronunciation=モ, start=6, end=7",
+	"surface=もも, pos=[名詞, 一般, *, *], base_form=もも, conj_type=*, conj_form=*, reading=モモ, pronunciation=モモ, start=7, end=9",
+	"surface=の, pos=[助詞, 連体化, *, *], base_form=の, conj_type=*, conj_form=*, reading=ノ, pronunciation=ノ, start=9, end=10",
+	"surface=うち, pos=[名詞, 非自立, 副詞可能, *], base_form=うち, conj_type=*, conj_form=*, reading=ウチ, pronunciation=ウチ, start=10, end=12",
 ];
 $actual = [];
 
@@ -85,9 +90,14 @@ if ($arr->tokens != null && $arr->length > 0) {
 				FFI::string($token->pos4), // POS Subcategory3, 品詞細分類3
 			];
 			$line = sprintf(
-				"surface=%s, pos=[%s], start=%d, end=%d",
+				"surface=%s, pos=[%s], base_form=%s, conj_type=%s, conj_form=%s, reading=%s, pronunciation=%s, start=%d, end=%d",
 				$surface,
 				implode(', ', $posArr),
+				FFI::string($token->base_form),
+				FFI::string($token->conj_type),
+				FFI::string($token->conj_form),
+				FFI::string($token->reading),
+				FFI::string($token->pronunciation),
 				$token->start,
 				$token->end
 			);

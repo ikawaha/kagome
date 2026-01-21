@@ -9,6 +9,11 @@ typedef struct {
 	char* pos2;
 	char* pos3;
 	char* pos4;
+	char* base_form;
+	char* conj_type;
+	char* conj_form;
+	char* reading;
+	char* pronunciation;
 	int start;
 	int end;
 } Token;
@@ -31,16 +36,18 @@ import (
 type Token C.struct_Token
 type TokenArray C.struct_TokenArray
 
+// Opaque handle struct for C API
+type KagomeHandle struct{}
+
 var (
 	mu        sync.Mutex
-	instances         = make(map[uintptr]*tokenizer.Tokenizer)
-	nextID    uintptr = 1
+	instances = make(map[*KagomeHandle]*tokenizer.Tokenizer)
 )
 
 //export KagomeTokenizeStruct
-func KagomeTokenizeStruct(handle C.uintptr_t, input *C.char) *C.TokenArray {
+func KagomeTokenizeStruct(handle unsafe.Pointer, input *C.char) *C.TokenArray {
 	mu.Lock()
-	t := instances[uintptr(handle)]
+	t := instances[(*KagomeHandle)(handle)]
 	mu.Unlock()
 	if t == nil || input == nil {
 		return nil
@@ -64,33 +71,31 @@ func KagomeTokenizeStruct(handle C.uintptr_t, input *C.char) *C.TokenArray {
 	for i, tok := range tokens {
 		slice[i].surface = C.CString(tok.Surface)
 		pos := tok.POS()
-		// Always 4 elements, but check length for safety
-		if len(pos) > 0 {
-			slice[i].pos1 = C.CString(pos[0])
-		} else {
-			slice[i].pos1 = C.CString("")
-		}
-		if len(pos) > 1 {
-			slice[i].pos2 = C.CString(pos[1])
-		} else {
-			slice[i].pos2 = C.CString("")
-		}
-		if len(pos) > 2 {
-			slice[i].pos3 = C.CString(pos[2])
-		} else {
-			slice[i].pos3 = C.CString("")
-		}
-		if len(pos) > 3 {
-			slice[i].pos4 = C.CString(pos[3])
-		} else {
-			slice[i].pos4 = C.CString("")
-		}
+		features := tok.Features()
+		// POS
+		slice[i].pos1 = C.CString(getOrEmpty(pos, 0))
+		slice[i].pos2 = C.CString(getOrEmpty(pos, 1))
+		slice[i].pos3 = C.CString(getOrEmpty(pos, 2))
+		slice[i].pos4 = C.CString(getOrEmpty(pos, 3))
+		// Features (IPA: 0-品詞,1-細1,2-細2,3-細3,4-活用型,5-活用形,6-原形,7-読み,8-発音)
+		slice[i].conj_type = C.CString(getOrEmpty(features, 4))
+		slice[i].conj_form = C.CString(getOrEmpty(features, 5))
+		slice[i].base_form = C.CString(getOrEmpty(features, 6))
+		slice[i].reading = C.CString(getOrEmpty(features, 7))
+		slice[i].pronunciation = C.CString(getOrEmpty(features, 8))
 		slice[i].start = C.int(tok.Start)
 		slice[i].end = C.int(tok.End)
 	}
-
 	arr.tokens = cTokens
 	return arr
+}
+
+// getOrEmpty returns the element at idx or "" if out of range
+func getOrEmpty(arr []string, idx int) string {
+	if idx < len(arr) {
+		return arr[idx]
+	}
+	return ""
 }
 
 //export KagomeFreeTokenArray
@@ -105,6 +110,11 @@ func KagomeFreeTokenArray(arr *C.TokenArray) {
 		C.free(unsafe.Pointer(slice[i].pos2))
 		C.free(unsafe.Pointer(slice[i].pos3))
 		C.free(unsafe.Pointer(slice[i].pos4))
+		C.free(unsafe.Pointer(slice[i].base_form))
+		C.free(unsafe.Pointer(slice[i].conj_type))
+		C.free(unsafe.Pointer(slice[i].conj_form))
+		C.free(unsafe.Pointer(slice[i].reading))
+		C.free(unsafe.Pointer(slice[i].pronunciation))
 	}
 	C.free(unsafe.Pointer(arr.tokens))
 	C.free(unsafe.Pointer(arr))
@@ -127,26 +137,23 @@ func EchoFree(p *C.char) {
 }
 
 //export KagomeInit
-func KagomeInit(dictPath *C.char) C.uintptr_t {
+func KagomeInit(dictPath *C.char) unsafe.Pointer {
 	mu.Lock()
 	defer mu.Unlock()
 
 	t, err := tokenizer.New(ipa.Dict(), tokenizer.OmitBosEos())
 	if err != nil {
-		return 0
+		return nil
 	}
-
-	id := nextID
-	nextID++
-	instances[id] = t
-
-	return C.uintptr_t(id)
+	handle := &KagomeHandle{}
+	instances[handle] = t
+	return unsafe.Pointer(handle)
 }
 
 //export KagomeTokenize
-func KagomeTokenize(handle C.uintptr_t, input *C.char) *C.char {
+func KagomeTokenize(handle unsafe.Pointer, input *C.char) *C.char {
 	mu.Lock()
-	t := instances[uintptr(handle)]
+	t := instances[(*KagomeHandle)(handle)]
 	mu.Unlock()
 
 	if t == nil || input == nil {
@@ -179,9 +186,9 @@ func KagomeFree(p *C.char) {
 }
 
 //export KagomeDestroy
-func KagomeDestroy(handle C.uintptr_t) {
+func KagomeDestroy(handle unsafe.Pointer) {
 	mu.Lock()
-	delete(instances, uintptr(handle))
+	delete(instances, (*KagomeHandle)(handle))
 	mu.Unlock()
 }
 
