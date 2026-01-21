@@ -74,26 +74,31 @@ $expect = [
 $actual = [];
 
 if ($arr->tokens != null && $arr->length > 0) {
-	for ($i = 0; $i < $arr->length; $i++) {
-		$token = $arr->tokens[$i];
-		$surface = FFI::string($token->surface);
-		$posArr = [
-			FFI::string($token->pos1),
-			FFI::string($token->pos2),
-			FFI::string($token->pos3),
-			FFI::string($token->pos4),
-		];
-		$line = sprintf(
-			"surface=%s, pos=[%s], start=%d, end=%d",
-			$surface,
-			implode(', ', $posArr),
-			$token->start,
-			$token->end
-		);
-		echo $line . PHP_EOL;
-		$actual[] = $line;
+	try {
+		for ($i = 0; $i < $arr->length; $i++) {
+			$token = $arr->tokens[$i];
+			$surface = FFI::string($token->surface);
+			$posArr = [
+				FFI::string($token->pos1), // Part-of-speech, 品詞
+				FFI::string($token->pos2), // POS Subcategory1, 品詞細分類1
+				FFI::string($token->pos3), // POS Subcategory2, 品詞細分類2
+				FFI::string($token->pos4), // POS Subcategory3, 品詞細分類3
+			];
+			$line = sprintf(
+				"surface=%s, pos=[%s], start=%d, end=%d",
+				$surface,
+				implode(', ', $posArr),
+				$token->start,
+				$token->end
+			);
+			echo $line . PHP_EOL;
+			$actual[] = $line;
+		}
+	} finally {
+		$ffi->KagomeFreeTokenArray($arr_p);
+		unset($arr);
+		unset($arr_p);
 	}
-	$ffi->KagomeFreeTokenArray($arr_p);
 }
 
 if ($actual === $expect) {

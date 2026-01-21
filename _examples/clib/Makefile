@@ -38,8 +38,8 @@ clean:
 	@docker image prune -f
 	@docker volume prune -f
 	@docker network prune -f
-	@docker image rm -f clib-kagome-build:latest clib-php-test:latest
 	@docker volume rm -f clib_kagome-dist
+	@docker image rm -f clib-kagome-build:latest clib-php-test:latest
 
 docker-build:
 	@docker pull golang:latest
