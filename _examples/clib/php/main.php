@@ -44,6 +44,7 @@ typedef struct {
 TokenArray* KagomeTokenizeStruct(void* handle, char* input);
 void KagomeFreeTokenArray(TokenArray* arr);
 void* KagomeInit(void);
+void KagomeDestroy(void* handle);
 ', $libpath);
 
 // Prepare input
@@ -110,13 +111,19 @@ if ($arr->tokens != null && $arr->length > 0) {
 	}
 }
 
+// Success
 if ($actual === $expect) {
 	echo "PASS" . PHP_EOL;
+	$ffi->KagomeDestroy($handle); // Free the tokenizer handle (API best practice)
 	exit(0);
-} else {
-	echo "FAIL" . PHP_EOL . "expect:" . PHP_EOL;
-	foreach ($expect as $line) echo $line . PHP_EOL;
-	echo "actual:" . PHP_EOL;
-	foreach ($actual as $line) echo $line . PHP_EOL;
-	exit(1);
 }
+
+// Failure
+echo "FAIL" . PHP_EOL . "expect:" . PHP_EOL;
+foreach ($expect as $line) echo $line . PHP_EOL;
+
+echo "actual:" . PHP_EOL;
+foreach ($actual as $line) echo $line . PHP_EOL;
+
+$ffi->KagomeDestroy($handle); // Free the tokenizer handle (API best practice)
+exit(1);
