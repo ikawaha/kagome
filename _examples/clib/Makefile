@@ -1,6 +1,7 @@
 prebuild:
-	mkdir -p ./bin
-	if [ "$$(go env GOOS)" = "darwin" ]; then \
+	@mkdir -p ./bin
+	@rm -rf ./bin/lib*
+	@if [ "$$(go env GOOS)" = "darwin" ]; then \
 		GOOS=darwin GOARCH=$$(go env GOARCH) go build -buildmode=c-archive -o ./bin/libkagome.a ./go/main.go; \
 	elif [ "$$(go env GOOS)" = "windows" ]; then \
 		GOOS=windows GOARCH=$$(go env GOARCH) go build -buildmode=c-archive -o ./bin/libkagome.a ./go/main.go; \
@@ -11,7 +12,7 @@ prebuild:
 	fi
 
 build: prebuild
-	if [ "$$(go env GOOS)" = "darwin" ]; then \
+	@if [ "$$(go env GOOS)" = "darwin" ]; then \
 		cc -fPIC -shared ./c/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.dylib; \
 	elif [ "$$(go env GOOS)" = "windows" ]; then \
 		cc -fPIC -shared ./c/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.dll; \
@@ -27,3 +28,17 @@ test:
 	else \
 		echo "No libkagome.(so|dll|dylib) found. Please run make build first." ; exit 1 ; \
 	fi
+
+clean:
+	@docker compose down --rmi --volumes --remove-orphans
+	@rm -rf ./bin
+	@docker container prune -f
+	@docker image prune -f
+	@docker volume prune -f
+	@docker network prune -f
+	@docker image rm clib-kagome-build:latest clib-php-test:latest
+	@docker volume rm clib_kagome-dist
+
+docker-test:
+	@docker compose build
+	@docker compose up --remove-orphans
