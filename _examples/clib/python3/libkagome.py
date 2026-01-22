@@ -6,12 +6,34 @@ from pathlib import Path
 from typing import List
 
 
+"""
+libkagome.py
+
+Python wrapper for Kagome tokenizer via C ABI.
+
+This module loads a shared library built from the Go implementation of Kagome
+and exposes Python-friendly APIs equivalent to:
+
+- kagome.Tokenize(input string) []Token
+- kagome.Wakati(input string) []string
+"""
+
+
 # ---------------------------------------------------------------------------
 # Platform helpers
 # ---------------------------------------------------------------------------
 
 
 def _shared_library_name() -> str:
+    """
+    Return platform-specific shared library filename.
+
+    Returns:
+        str:
+            - Windows: libkagome.dll
+            - macOS:   libkagome.dylib
+            - Linux:   libkagome.so
+    """
     match platform.system():
         case "Windows":
             return "libkagome.dll"
@@ -24,6 +46,23 @@ def _shared_library_name() -> str:
 
 
 def _shared_library_path() -> Path:
+    """
+    Resolve absolute path to the Kagome shared library.
+
+    The library is expected at:
+
+        <project_root>/bin/libkagome.(so|dll|dylib)
+
+    Note:
+        Path joining via `/` is OS-independent in pathlib,
+        similar to Go's filepath.Join.
+
+    Returns:
+        Path: Absolute path to the shared library.
+
+    Raises:
+        FileNotFoundError: If the shared library does not exist.
+    """
     base = Path(__file__).resolve().parent.parent
     path = (
         base / "bin" / _shared_library_name()
@@ -39,6 +78,12 @@ def _shared_library_path() -> Path:
 
 
 class _Token(ctypes.Structure):
+    """
+    ctypes representation of Kagome Token struct (C ABI).
+
+    This structure must match the C struct layout exactly.
+    """
+
     _fields_ = [
         ("surface", ctypes.c_char_p),
         ("pos1", ctypes.c_char_p),
@@ -56,6 +101,10 @@ class _Token(ctypes.Structure):
 
 
 class _TokenArray(ctypes.Structure):
+    """
+    ctypes representation of array returned from KagomeTokenizeStruct.
+    """
+
     _fields_ = [
         ("tokens", ctypes.POINTER(_Token)),
         ("length", ctypes.c_int),
@@ -68,7 +117,47 @@ class _TokenArray(ctypes.Structure):
 
 
 class Token:
-    """Pure Python representation of a Kagome token."""
+    """
+    Python representation of a Kagome token.
+
+    Each field corresponds to Kagome's dictionary features.
+
+    Attributes:
+        surface (str):
+            Surface form (表層形)
+
+        pos (list[str]):
+            Part-of-speech hierarchy (品詞階層)
+            - pos[0]: Major category (品詞大分類)
+            - pos[1]: Subcategory 1 (品詞中分類)
+            - pos[2]: Subcategory 2 (品詞小分類)
+            - pos[3]: Subcategory 3 / detail (品詞再分類)
+
+        base_form (str):
+            Base / dictionary form (原型・基本形)
+
+        conj_type (str):
+            Conjugation type (活用型)
+            e.g. 五段・カ行促音便
+
+        conj_form (str):
+            Conjugation form (活用形)
+            e.g. 連用タ接続
+
+        reading (str):
+            Reading in katakana (読み)
+            e.g. 公園 -> コウエン
+
+        pronunciation (str):
+            Pronunciation (発音)
+            e.g. 公園 -> コーエン
+
+        start (int):
+            Start position in input string (開始位置)
+
+        end (int):
+            End position in input string (終了位置)
+    """
 
     def __init__(
         self,
@@ -93,6 +182,7 @@ class Token:
         self.end = end
 
     def __str__(self) -> str:
+        """Human-readable representation used in examples and tests."""
         return (
             f"surface={self.surface}, "
             f"pos={self.pos}, "
@@ -111,12 +201,28 @@ class Token:
 
 
 class Kagome:
-    """Python-friendly wrapper around Kagome C ABI."""
+    """
+    Python-friendly wrapper around Kagome C ABI.
+
+    This class manages:
+    - Loading the shared library
+    - Initializing the Kagome tokenizer
+    - Converting C structs into Python objects
+
+    Intended to be long-lived and reused.
+    """
 
     def __init__(self) -> None:
+        """
+        Load Kagome shared library and initialize tokenizer.
+
+        Raises:
+            RuntimeError: If initialization fails.
+        """
         lib_path = _shared_library_path()
         self._lib = ctypes.CDLL(str(lib_path))
 
+        # C function signatures
         self._lib.KagomeInit.argtypes = []
         self._lib.KagomeInit.restype = ctypes.c_void_p
 
@@ -136,7 +242,18 @@ class Kagome:
     # ------------------------------------------------------------------
 
     def tokenize(self, text: str) -> List[Token]:
-        """Equivalent of kagome.Tokenize."""
+        """
+        Tokenize input text (equivalent of kagome.Tokenize).
+
+        Args:
+            text (str): Input text to tokenize.
+
+        Returns:
+            list[Token]: List of Token objects with full morphological info.
+
+        Raises:
+            RuntimeError: If tokenization fails.
+        """
         arr_p = self._lib.KagomeTokenizeStruct(self._handle, text.encode("utf-8"))
         if not arr_p:
             raise RuntimeError("Tokenization failed")
@@ -165,6 +282,7 @@ class Kagome:
                     )
                 )
         finally:
+            # Always free C-allocated memory
             self._lib.KagomeFreeTokenArray(arr_p)
 
         return tokens
@@ -172,5 +290,15 @@ class Kagome:
     # ------------------------------------------------------------------
 
     def wakati(self, text: str) -> List[str]:
-        """Equivalent of kagome.Wakati."""
+        """
+        Perform wakati-gaki (分かち書き).
+
+        Equivalent of kagome.Wakati.
+
+        Args:
+            text (str): Input text.
+
+        Returns:
+            list[str]: List of surface forms only.
+        """
         return [t.surface for t in self.tokenize(text)]
