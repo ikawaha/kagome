@@ -23,10 +23,10 @@ services:
 
   php-test:
     build:
-      context: ./php
+      context: ./php8
     volumes:
       - kagome-dist:/app/bin:ro
-      - ./php:/app/php:ro
+      - ./php8:/app/php:ro
     working_dir: /app
     entrypoint: ["/usr/local/bin/php", "/app/php/main.php"]
     depends_on:

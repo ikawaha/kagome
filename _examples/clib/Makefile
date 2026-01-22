@@ -34,7 +34,7 @@ python-test:
 
 php-test:
 	@if [ -f ./bin/libkagome.so ] || [ -f ./bin/libkagome.dll ] || [ -f ./bin/libkagome.dylib ]; then \
-		php ./php/main.php ; \
+		php ./php8/main.php ; \
 	else \
 		echo "No libkagome.(so|dll|dylib) found. Please run make build first." ; exit 1 ; \
 	fi
