@@ -1,29 +1,42 @@
+from __future__ import annotations
+
 import ctypes
 import platform
-import os
 import sys
-
-# Select library name by OS
-system = platform.system()
-if system == "Windows":
-    libname = "libkagome.dll"
-elif system == "Darwin":
-    libname = "libkagome.dylib"
-else:
-    libname = "libkagome.so"
-
-# ./.. /bin/libkagome(_linux.so|_win.dll|_mac.dylib)
-libpath = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), os.path.pardir, "bin", libname)
-)
-print(f"Loading library: {libpath}")
-
-lib = ctypes.CDLL(libpath)
-lib.KagomeInit.argtypes = []
-lib.KagomeInit.restype = ctypes.c_void_p
+from pathlib import Path
 
 
-# Define Token and TokenArray struct for ctypes
+# ---------------------------------------------------------------------------
+# Platform helpers
+# ---------------------------------------------------------------------------
+
+
+def shared_library_name() -> str:
+    """Return platform-specific shared library name."""
+    match platform.system():
+        case "Windows":
+            return "libkagome.dll"
+        case "Darwin":
+            return "libkagome.dylib"
+        case "Linux":
+            return "libkagome.so"
+        case _:
+            raise RuntimeError("Unsupported OS")
+
+
+def shared_library_path() -> Path:
+    """Resolve shared library path under ../bin."""
+    path = Path(__file__).resolve().parent.parent / "bin" / shared_library_name()
+    if not path.exists():
+        raise FileNotFoundError(f"Shared library not found: {path}")
+    return path
+
+
+# ---------------------------------------------------------------------------
+# ctypes struct definitions (must match C layout exactly)
+# ---------------------------------------------------------------------------
+
+
 class Token(ctypes.Structure):
     _fields_ = [
         ("surface", ctypes.c_char_p),
@@ -48,68 +61,118 @@ class TokenArray(ctypes.Structure):
     ]
 
 
-# Set argument and return types for Go shared library functions (pointer version)
-lib.KagomeTokenizeStruct.argtypes = [
-    ctypes.c_void_p,
-    ctypes.c_char_p,
-]  # handle is a C pointer, not an integer
-lib.KagomeTokenizeStruct.restype = ctypes.POINTER(TokenArray)
-lib.KagomeFreeTokenArray.argtypes = [ctypes.POINTER(TokenArray)]
-lib.KagomeFreeTokenArray.restype = None
-
-# Initialize tokenizer and get handle
-handle = lib.KagomeInit()
-if handle == 0:
-    raise RuntimeError("Failed to initialize Kagome tokenizer")
+# ---------------------------------------------------------------------------
+# Kagome FFI loader
+# ---------------------------------------------------------------------------
 
 
-# Tokenize text using struct array
-text = "すもももももももものうち".encode("utf-8")
+class KagomeFFI:
+    """Thin Python wrapper around Kagome C ABI."""
 
+    def __init__(self, lib_path: Path) -> None:
+        print(f"Loading library: {lib_path}")
+        self._lib = ctypes.CDLL(str(lib_path))
 
-# --- Testable output ---
-expect = [
-    "surface=すもも, pos=['名詞', '一般', '*', '*'], base_form=すもも, conj_type=*, conj_form=*, reading=スモモ, pronunciation=スモモ, start=0, end=3",
-    "surface=も, pos=['助詞', '係助詞', '*', '*'], base_form=も, conj_type=*, conj_form=*, reading=モ, pronunciation=モ, start=3, end=4",
-    "surface=もも, pos=['名詞', '一般', '*', '*'], base_form=もも, conj_type=*, conj_form=*, reading=モモ, pronunciation=モモ, start=4, end=6",
-    "surface=も, pos=['助詞', '係助詞', '*', '*'], base_form=も, conj_type=*, conj_form=*, reading=モ, pronunciation=モ, start=6, end=7",
-    "surface=もも, pos=['名詞', '一般', '*', '*'], base_form=もも, conj_type=*, conj_form=*, reading=モモ, pronunciation=モモ, start=7, end=9",
-    "surface=の, pos=['助詞', '連体化', '*', '*'], base_form=の, conj_type=*, conj_form=*, reading=ノ, pronunciation=ノ, start=9, end=10",
-    "surface=うち, pos=['名詞', '非自立', '副詞可能', '*'], base_form=うち, conj_type=*, conj_form=*, reading=ウチ, pronunciation=ウチ, start=10, end=12",
-]
+        # function signatures
+        self._lib.KagomeInit.argtypes = []
+        self._lib.KagomeInit.restype = ctypes.c_void_p
 
-actual = []
-
-# Call KagomeTokenizeStruct and handle pointer result
-arr_p = lib.KagomeTokenizeStruct(handle, text)
-if not arr_p:
-    raise RuntimeError("tokenize failed")
-
-arr = arr_p.contents
-if arr.tokens and arr.length > 0:
-    for i in range(arr.length):
-        token = arr.tokens[i]
-        surface = token.surface.decode("utf-8")
-        pos_arr = [
-            token.pos1.decode("utf-8"),
-            token.pos2.decode("utf-8"),
-            token.pos3.decode("utf-8"),
-            token.pos4.decode("utf-8"),
+        self._lib.KagomeTokenizeStruct.argtypes = [
+            ctypes.c_void_p,
+            ctypes.c_char_p,
         ]
-        line = f"surface={surface}, pos={pos_arr}, base_form={token.base_form.decode('utf-8')}, conj_type={token.conj_type.decode('utf-8')}, conj_form={token.conj_form.decode('utf-8')}, reading={token.reading.decode('utf-8')}, pronunciation={token.pronunciation.decode('utf-8')}, start={token.start}, end={token.end}"
-        print(line)
-        actual.append(line)
-    lib.KagomeFreeTokenArray(arr_p)
+        self._lib.KagomeTokenizeStruct.restype = ctypes.POINTER(TokenArray)
 
-if actual == expect:
-    print("PASS")
-    sys.exit(0)
-else:
-    print("FAIL")
-    print("expect:")
-    for line in expect:
-        print(line)
-    print("actual:")
+        self._lib.KagomeFreeTokenArray.argtypes = [ctypes.POINTER(TokenArray)]
+        self._lib.KagomeFreeTokenArray.restype = None
+
+    def init(self) -> ctypes.c_void_p:
+        handle = self._lib.KagomeInit()
+        if not handle:
+            raise RuntimeError("Failed to initialize Kagome tokenizer")
+        return handle
+
+    def tokenize(self, handle: ctypes.c_void_p, text: bytes) -> list[str]:
+        arr_p = self._lib.KagomeTokenizeStruct(handle, text)
+        if not arr_p:
+            raise RuntimeError("Tokenization failed")
+
+        results: list[str] = []
+        try:
+            arr = arr_p.contents
+            for i in range(arr.length):
+                tok = arr.tokens[i]
+                results.append(format_token(tok))
+        finally:
+            self._lib.KagomeFreeTokenArray(arr_p)
+
+        return results
+
+
+# ---------------------------------------------------------------------------
+# Formatting helpers
+# ---------------------------------------------------------------------------
+
+
+def decode(ptr: ctypes.c_char_p) -> str:
+    return ptr.decode("utf-8")
+
+
+def format_token(token: Token) -> str:
+    pos = [
+        decode(token.pos1),
+        decode(token.pos2),
+        decode(token.pos3),
+        decode(token.pos4),
+    ]
+    return (
+        f"surface={decode(token.surface)}, "
+        f"pos={pos}, "
+        f"base_form={decode(token.base_form)}, "
+        f"conj_type={decode(token.conj_type)}, "
+        f"conj_form={decode(token.conj_form)}, "
+        f"reading={decode(token.reading)}, "
+        f"pronunciation={decode(token.pronunciation)}, "
+        f"start={token.start}, end={token.end}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+
+def main() -> int:
+    ffi = KagomeFFI(shared_library_path())
+    handle = ffi.init()
+
+    text = "すもももももももものうち".encode("utf-8")
+
+    expect = [
+        "surface=すもも, pos=['名詞', '一般', '*', '*'], base_form=すもも, conj_type=*, conj_form=*, reading=スモモ, pronunciation=スモモ, start=0, end=3",
+        "surface=も, pos=['助詞', '係助詞', '*', '*'], base_form=も, conj_type=*, conj_form=*, reading=モ, pronunciation=モ, start=3, end=4",
+        "surface=もも, pos=['名詞', '一般', '*', '*'], base_form=もも, conj_type=*, conj_form=*, reading=モモ, pronunciation=モモ, start=4, end=6",
+        "surface=も, pos=['助詞', '係助詞', '*', '*'], base_form=も, conj_type=*, conj_form=*, reading=モ, pronunciation=モ, start=6, end=7",
+        "surface=もも, pos=['名詞', '一般', '*', '*'], base_form=もも, conj_type=*, conj_form=*, reading=モモ, pronunciation=モモ, start=7, end=9",
+        "surface=の, pos=['助詞', '連体化', '*', '*'], base_form=の, conj_type=*, conj_form=*, reading=ノ, pronunciation=ノ, start=9, end=10",
+        "surface=うち, pos=['名詞', '非自立', '副詞可能', '*'], base_form=うち, conj_type=*, conj_form=*, reading=ウチ, pronunciation=ウチ, start=10, end=12",
+    ]
+
+    actual = ffi.tokenize(handle, text)
+
     for line in actual:
         print(line)
-    sys.exit(1)
+
+    if actual == expect:
+        print("PASS")
+        return 0
+
+    print("FAIL\nexpect:")
+    print("\n".join(expect))
+    print("actual:")
+    print("\n".join(actual))
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
