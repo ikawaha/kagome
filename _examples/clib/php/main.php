@@ -1,132 +1,146 @@
 <?php
+declare(strict_types=1);
 
-// Detect shared library name by platform
-switch (PHP_OS_FAMILY) {
-    case 'Windows':
-        $lib = 'libkagome.dll';
-        break;
-    case 'Darwin':
-        $lib = 'libkagome.dylib';
-        break;
-    case 'Linux':
-        $lib = 'libkagome.so';
-        break;
-    default:
-        throw new RuntimeException('Unsupported OS');
+/**
+ * Resolve shared library path by OS.
+ */
+function resolveLibraryPath(): string
+{
+    $libName = match (PHP_OS_FAMILY) {
+        'Windows' => 'libkagome.dll',
+        'Darwin'  => 'libkagome.dylib',
+        'Linux'   => 'libkagome.so',
+        default   => throw new RuntimeException('Unsupported OS family'),
+    };
+
+    $path = realpath(__DIR__ . '/../bin/' . $libName);
+    if ($path === false || !is_file($path)) {
+        throw new RuntimeException("Shared library not found: {$libName}");
+    }
+
+    return $path;
 }
 
-$libpath = realpath(__DIR__ . '/../bin/' . $lib);
-
-if ($libpath && file_exists($libpath)) {
-	echo "Loading library: {$libpath}" . PHP_EOL;
-} else {
-	fwrite(STDERR, "libkagome shared library not found at expected path: {$libpath}" . PHP_EOL);
-	exit(1);
-}
-
-// Load FFI
- $ffi = FFI::cdef('
+/**
+ * C definitions for Kagome C ABI.
+ */
+const KAGOME_CDEF = <<<CDEF
 typedef struct {
-	char* surface;
-	char* pos1;
-	char* pos2;
-	char* pos3;
-	char* pos4;
-	char* base_form;
-	char* conj_type;
-	char* conj_form;
-	char* reading;
-	char* pronunciation;
-	int start;
-	int end;
+    char* surface;
+    char* pos1;
+    char* pos2;
+    char* pos3;
+    char* pos4;
+    char* base_form;
+    char* conj_type;
+    char* conj_form;
+    char* reading;
+    char* pronunciation;
+    int start;
+    int end;
 } Token;
+
 typedef struct {
-	Token* tokens;
-	int length;
+    Token* tokens;
+    int length;
 } TokenArray;
+
 TokenArray* KagomeTokenizeStruct(void* handle, char* input);
 void KagomeFreeTokenArray(TokenArray* arr);
 void* KagomeInit(void);
 void KagomeDestroy(void* handle);
-', $libpath);
+CDEF;
 
-// Prepare input
-$text = "すもももももももものうち";
+try {
+    $libPath = resolveLibraryPath();
+    echo "Loading library: {$libPath}" . PHP_EOL;
 
-// Go: void* KagomeInit(void);
-$handle = $ffi->KagomeInit();
-if ($handle == null) {
-	fwrite(STDERR, "Failed to initialize Kagome tokenizer" . PHP_EOL);
-	exit(1);
+    $ffi = FFI::cdef(KAGOME_CDEF, $libPath);
+
+    // Initialize tokenizer
+    $handle = $ffi->KagomeInit();
+    if ($handle === null) {
+        throw new RuntimeException('Failed to initialize Kagome tokenizer');
+    }
+
+    $text = 'すもももももももものうち';
+
+    // Prepare C string (null-terminated)
+    $cstr = $ffi->new('char[' . (strlen($text) + 1) . ']', false);
+    FFI::memcpy($cstr, $text, strlen($text));
+
+    $arrPtr = $ffi->KagomeTokenizeStruct($handle, $cstr);
+    if ($arrPtr === null) {
+        throw new RuntimeException('Tokenization failed');
+    }
+
+    $expected = [
+        "surface=すもも, pos=[名詞, 一般, *, *], base_form=すもも, conj_type=*, conj_form=*, reading=スモモ, pronunciation=スモモ, start=0, end=3",
+        "surface=も, pos=[助詞, 係助詞, *, *], base_form=も, conj_type=*, conj_form=*, reading=モ, pronunciation=モ, start=3, end=4",
+        "surface=もも, pos=[名詞, 一般, *, *], base_form=もも, conj_type=*, conj_form=*, reading=モモ, pronunciation=モモ, start=4, end=6",
+        "surface=も, pos=[助詞, 係助詞, *, *], base_form=も, conj_type=*, conj_form=*, reading=モ, pronunciation=モ, start=6, end=7",
+        "surface=もも, pos=[名詞, 一般, *, *], base_form=もも, conj_type=*, conj_form=*, reading=モモ, pronunciation=モモ, start=7, end=9",
+        "surface=の, pos=[助詞, 連体化, *, *], base_form=の, conj_type=*, conj_form=*, reading=ノ, pronunciation=ノ, start=9, end=10",
+        "surface=うち, pos=[名詞, 非自立, 副詞可能, *], base_form=うち, conj_type=*, conj_form=*, reading=ウチ, pronunciation=ウチ, start=10, end=12",
+    ];
+
+    $actual = [];
+
+    try {
+        $arr = $arrPtr[0];
+        for ($i = 0; $i < $arr->length; $i++) {
+            $t = $arr->tokens[$i];
+
+            $pos = implode(', ', [
+                FFI::string($t->pos1),
+                FFI::string($t->pos2),
+                FFI::string($t->pos3),
+                FFI::string($t->pos4),
+            ]);
+
+            $line = sprintf(
+                'surface=%s, pos=[%s], base_form=%s, conj_type=%s, conj_form=%s, reading=%s, pronunciation=%s, start=%d, end=%d',
+                FFI::string($t->surface),
+                $pos,
+                FFI::string($t->base_form),
+                FFI::string($t->conj_type),
+                FFI::string($t->conj_form),
+                FFI::string($t->reading),
+                FFI::string($t->pronunciation),
+                $t->start,
+                $t->end
+            );
+
+            echo $line . PHP_EOL;
+            $actual[] = $line;
+        }
+    } finally {
+        // Always free memory allocated by Go
+        $ffi->KagomeFreeTokenArray($arrPtr);
+    }
+
+	// Success
+    if ($actual === $expected) {
+        echo "PASS" . PHP_EOL;
+        $ffi->KagomeDestroy($handle);
+        exit(0);
+    }
+
+	// Failure
+    echo "FAIL" . PHP_EOL . "expect:" . PHP_EOL;
+    foreach ($expected as $line) {
+        echo $line . PHP_EOL;
+    }
+
+    echo "actual:" . PHP_EOL;
+    foreach ($actual as $line) {
+        echo $line . PHP_EOL;
+    }
+
+    $ffi->KagomeDestroy($handle);
+    exit(1);
+
+} catch (Throwable $e) {
+    fwrite(STDERR, $e->getMessage() . PHP_EOL);
+    exit(1);
 }
-
-// Go: TokenArray* KagomeTokenizeStruct(void* handle, char* input);
-$cstr = $ffi->new('char[' . (strlen($text) + 1) . ']', false);
-FFI::memcpy($cstr, $text, strlen($text));
-$arr_p = $ffi->KagomeTokenizeStruct($handle, $cstr);
-if ($arr_p == null) {
-	fwrite(STDERR, "tokenize failed" . PHP_EOL);
-	exit(1);
-}
-$arr = $arr_p[0];
-
-$expect = [
-	"surface=すもも, pos=[名詞, 一般, *, *], base_form=すもも, conj_type=*, conj_form=*, reading=スモモ, pronunciation=スモモ, start=0, end=3",
-	"surface=も, pos=[助詞, 係助詞, *, *], base_form=も, conj_type=*, conj_form=*, reading=モ, pronunciation=モ, start=3, end=4",
-	"surface=もも, pos=[名詞, 一般, *, *], base_form=もも, conj_type=*, conj_form=*, reading=モモ, pronunciation=モモ, start=4, end=6",
-	"surface=も, pos=[助詞, 係助詞, *, *], base_form=も, conj_type=*, conj_form=*, reading=モ, pronunciation=モ, start=6, end=7",
-	"surface=もも, pos=[名詞, 一般, *, *], base_form=もも, conj_type=*, conj_form=*, reading=モモ, pronunciation=モモ, start=7, end=9",
-	"surface=の, pos=[助詞, 連体化, *, *], base_form=の, conj_type=*, conj_form=*, reading=ノ, pronunciation=ノ, start=9, end=10",
-	"surface=うち, pos=[名詞, 非自立, 副詞可能, *], base_form=うち, conj_type=*, conj_form=*, reading=ウチ, pronunciation=ウチ, start=10, end=12",
-];
-$actual = [];
-
-if ($arr->tokens != null && $arr->length > 0) {
-	try {
-		for ($i = 0; $i < $arr->length; $i++) {
-			$token = $arr->tokens[$i];
-			$surface = FFI::string($token->surface);
-			$posArr = [
-				FFI::string($token->pos1), // Part-of-speech, 品詞
-				FFI::string($token->pos2), // POS Subcategory1, 品詞細分類1
-				FFI::string($token->pos3), // POS Subcategory2, 品詞細分類2
-				FFI::string($token->pos4), // POS Subcategory3, 品詞細分類3
-			];
-			$line = sprintf(
-				"surface=%s, pos=[%s], base_form=%s, conj_type=%s, conj_form=%s, reading=%s, pronunciation=%s, start=%d, end=%d",
-				$surface,
-				implode(', ', $posArr),
-				FFI::string($token->base_form),
-				FFI::string($token->conj_type),
-				FFI::string($token->conj_form),
-				FFI::string($token->reading),
-				FFI::string($token->pronunciation),
-				$token->start,
-				$token->end
-			);
-			echo $line . PHP_EOL;
-			$actual[] = $line;
-		}
-	} finally {
-		$ffi->KagomeFreeTokenArray($arr_p);
-		unset($arr);
-		unset($arr_p);
-	}
-}
-
-// Success
-if ($actual === $expect) {
-	echo "PASS" . PHP_EOL;
-	$ffi->KagomeDestroy($handle); // Free the tokenizer handle (API best practice)
-	exit(0);
-}
-
-// Failure
-echo "FAIL" . PHP_EOL . "expect:" . PHP_EOL;
-foreach ($expect as $line) echo $line . PHP_EOL;
-
-echo "actual:" . PHP_EOL;
-foreach ($actual as $line) echo $line . PHP_EOL;
-
-$ffi->KagomeDestroy($handle); // Free the tokenizer handle (API best practice)
-exit(1);
