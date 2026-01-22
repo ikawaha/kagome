@@ -1,25 +1,28 @@
 <?php
 
 // Detect shared library name by platform
-$libnames = [
-	'libkagome.so',
-	'libkagome.dylib',
-	'libkagome.dll',
-];
-$libpath = null;
-foreach ($libnames as $name) {
-    $try = realpath(__DIR__ . '/../bin/' . $name);
-    if ($try !== false && file_exists($try)) {
-        $libpath = $try;
+switch (PHP_OS_FAMILY) {
+    case 'Windows':
+        $lib = 'libkagome.dll';
         break;
-    }
+    case 'Darwin':
+        $lib = 'libkagome.dylib';
+        break;
+    case 'Linux':
+        $lib = 'libkagome.so';
+        break;
+    default:
+        throw new RuntimeException('Unsupported OS');
 }
 
-if (!$libpath) {
-	fwrite(STDERR, "libkagome shared library not found" . PHP_EOL);
+$libpath = realpath(__DIR__ . '/../bin/' . $lib);
+
+if ($libpath && file_exists($libpath)) {
+	echo "Loading library: {$libpath}" . PHP_EOL;
+} else {
+	fwrite(STDERR, "libkagome shared library not found at expected path: {$libpath}" . PHP_EOL);
 	exit(1);
 }
-echo "Loading library: {$libpath}" . PHP_EOL;
 
 // Load FFI
  $ffi = FFI::cdef('
