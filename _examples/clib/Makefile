@@ -25,16 +25,25 @@ build: prebuild
 	fi
 	@sleep 1; # cooldown for file system
 
-test:
+python-test:
 	@if [ -f ./bin/libkagome.so ] || [ -f ./bin/libkagome.dll ] || [ -f ./bin/libkagome.dylib ]; then \
 		python3 ./python3/main.py ; \
 	else \
 		echo "No libkagome.(so|dll|dylib) found. Please run make build first." ; exit 1 ; \
 	fi
 
+php-test:
+	@if [ -f ./bin/libkagome.so ] || [ -f ./bin/libkagome.dll ] || [ -f ./bin/libkagome.dylib ]; then \
+		php ./php/main.php ; \
+	else \
+		echo "No libkagome.(so|dll|dylib) found. Please run make build first." ; exit 1 ; \
+	fi
+
 clean:
-	@docker compose down --rmi all --volumes --remove-orphans
 	@rm -rf ./bin
+
+docker-clean: clean
+	@docker compose down --rmi all --volumes --remove-orphans
 	@docker container prune -f
 	@docker image prune -f
 	@docker volume prune -f
