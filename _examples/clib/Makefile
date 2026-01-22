@@ -15,11 +15,11 @@ prebuild:
 # Use -fvisibility=hidden to only export symbols explicitly marked in the wrapper (for a clean public API)
 build: prebuild
 	@if [ "$$(go env GOOS)" = "darwin" ]; then \
-		cc -fPIC -fvisibility=hidden -shared ./c/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.dylib; \
+		cc -fPIC -fvisibility=hidden -shared ./c_wrapper/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.dylib; \
 	elif [ "$$(go env GOOS)" = "windows" ]; then \
-		cc -fPIC -fvisibility=hidden -shared ./c/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.dll; \
+		cc -fPIC -fvisibility=hidden -shared ./c_wrapper/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.dll; \
 	elif [ "$$(go env GOOS)" = "linux" ]; then \
-		cc -fPIC -fvisibility=hidden -shared ./c/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.so; \
+		cc -fPIC -fvisibility=hidden -shared ./c_wrapper/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.so; \
 	else \
 		echo "Unsupported GOOS: $$(go env GOOS)" ; exit 1 ; \
 	fi
@@ -39,6 +39,8 @@ php-test:
 		echo "No libkagome.(so|dll|dylib) found. Please run make build first." ; exit 1 ; \
 	fi
 
+test: python-test php-test
+
 clean:
 	@rm -rf ./bin
 
@@ -52,11 +54,12 @@ docker-clean: clean
 	@docker image rm -f clib-kagome-build:latest clib-php-test:latest
 
 docker-build:
+	# Pull latest base images for stability
 	@docker pull golang:latest
 	@docker pull python:latest
 	@docker pull php:latest
+	# Build all images without cache
 	@docker compose build --no-cache
 
 docker-test:
-	@docker compose build
-	@docker compose up --remove-orphans
+	@docker compose up --exit-code-from python-test --exit-code-from php-test
