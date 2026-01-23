@@ -72,6 +72,16 @@ func getOrEmpty(arr []string, idx int) string {
 	return ""
 }
 
+// freeStrings safely frees multiple C strings.
+// Checks for nil before freeing (safe to pass nil pointers).
+func freeStrings(strs ...*C.char) {
+	for _, s := range strs {
+		if s != nil {
+			C.free(unsafe.Pointer(s))
+		}
+	}
+}
+
 // ------------------------------------------------------------------
 // Exported C API
 // ------------------------------------------------------------------
@@ -160,17 +170,57 @@ func KagomeTokenizeStruct(handle unsafe.Pointer, input *C.char) *C.TokenArray {
 		pos := tok.POS()
 		features := tok.Features()
 
+		// Allocate all strings for this token
+		surface := C.CString(tok.Surface)
+		pos1 := C.CString(getOrEmpty(pos, 0))
+		pos2 := C.CString(getOrEmpty(pos, 1))
+		pos3 := C.CString(getOrEmpty(pos, 2))
+		pos4 := C.CString(getOrEmpty(pos, 3))
+		conjType := C.CString(getOrEmpty(features, 4))
+		conjForm := C.CString(getOrEmpty(features, 5))
+		baseForm := C.CString(getOrEmpty(features, 6))
+		reading := C.CString(getOrEmpty(features, 7))
+		pronunciation := C.CString(getOrEmpty(features, 8))
+
+		// Check if any allocation failed
+		if surface == nil || pos1 == nil || pos2 == nil || pos3 == nil || pos4 == nil ||
+			conjType == nil || conjForm == nil || baseForm == nil || reading == nil || pronunciation == nil {
+
+			// Free strings we just allocated for current token
+			freeStrings(surface, pos1, pos2, pos3, pos4, conjType, conjForm, baseForm, reading, pronunciation)
+
+			// Free all previously completed tokens
+			for j := 0; j < i; j++ {
+				freeStrings(
+					slice[j].surface,
+					slice[j].pos1,
+					slice[j].pos2,
+					slice[j].pos3,
+					slice[j].pos4,
+					slice[j].conj_type,
+					slice[j].conj_form,
+					slice[j].base_form,
+					slice[j].reading,
+					slice[j].pronunciation,
+				)
+			}
+
+			C.free(unsafe.Pointer(cTokens))
+			C.free(unsafe.Pointer(arr))
+			return nil
+		}
+
 		slice[i] = C.Token{
-			surface:       C.CString(tok.Surface),
-			pos1:          C.CString(getOrEmpty(pos, 0)),
-			pos2:          C.CString(getOrEmpty(pos, 1)),
-			pos3:          C.CString(getOrEmpty(pos, 2)),
-			pos4:          C.CString(getOrEmpty(pos, 3)),
-			conj_type:     C.CString(getOrEmpty(features, 4)),
-			conj_form:     C.CString(getOrEmpty(features, 5)),
-			base_form:     C.CString(getOrEmpty(features, 6)),
-			reading:       C.CString(getOrEmpty(features, 7)),
-			pronunciation: C.CString(getOrEmpty(features, 8)),
+			surface:       surface,
+			pos1:          pos1,
+			pos2:          pos2,
+			pos3:          pos3,
+			pos4:          pos4,
+			conj_type:     conjType,
+			conj_form:     conjForm,
+			base_form:     baseForm,
+			reading:       reading,
+			pronunciation: pronunciation,
 			start:         C.int(tok.Start),
 			end:           C.int(tok.End),
 		}
