@@ -26,14 +26,22 @@ build: prebuild
 	@sleep 1; # cooldown for file system
 
 python-test:
-	@if [ -f ./bin/libkagome.so ] || [ -f ./bin/libkagome.dll ] || [ -f ./bin/libkagome.dylib ]; then \
+	@if ! command -v python3 >/dev/null 2>&1; then \
+		echo "[SKIP] Python3 is not installed."; \
+		exit 0; \
+	fi; \
+	if [ -f ./bin/libkagome.so ] || [ -f ./bin/libkagome.dll ] || [ -f ./bin/libkagome.dylib ]; then \
 		python3 ./python3/main.py ; \
 	else \
 		echo "No libkagome.(so|dll|dylib) found. Please run make build first." ; exit 1 ; \
 	fi
 
 php-test:
-	@if [ -f ./bin/libkagome.so ] || [ -f ./bin/libkagome.dll ] || [ -f ./bin/libkagome.dylib ]; then \
+	@if ! command -v php >/dev/null 2>&1; then \
+		echo "[SKIP] PHP is not installed."; \
+		exit 0; \
+	fi; \
+	if [ -f ./bin/libkagome.so ] || [ -f ./bin/libkagome.dll ] || [ -f ./bin/libkagome.dylib ]; then \
 		php ./php8/main.php ; \
 	else \
 		echo "No libkagome.(so|dll|dylib) found. Please run make build first." ; exit 1 ; \

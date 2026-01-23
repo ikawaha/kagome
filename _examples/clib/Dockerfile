@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY ./go/main.go /app/go/main.go
 COPY ./Makefile /app/Makefile
+COPY ./c_wrapper/kagome_wrapper.h /app/c_wrapper/kagome_wrapper.h
 COPY ./c_wrapper/kagome_wrapper.c /app/c_wrapper/kagome_wrapper.c
 
 ENV CGO_ENABLED=1 CC=cc

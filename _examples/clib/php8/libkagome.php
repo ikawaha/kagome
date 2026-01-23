@@ -2,10 +2,11 @@
 declare(strict_types=1);
 
 /**
- * Kagome PHP FFI wrapper.
+ * PHP wrapper for Kagome tokenizer.
  *
- * This class loads the Kagome C ABI shared library and provides
- * PHP-friendly methods such as tokenize() and wakati().
+ * Loads the shared library and provides PHP-friendly methods:
+ * - tokenize(): Full morphological analysis
+ * - wakati(): Surface forms only
  */
 final class Kagome
 {
@@ -17,7 +18,7 @@ final class Kagome
         $libPath = self::resolveLibraryPath();
         $this->ffi = FFI::cdef(self::cDefinitions(), $libPath);
 
-        $this->handle = $this->ffi->KagomeInit();
+        $this->handle = $this->ffi->kagome_init();
         if ($this->handle === null) {
             throw new RuntimeException('Failed to initialize Kagome tokenizer');
         }
@@ -26,24 +27,22 @@ final class Kagome
     public function __destruct()
     {
         if (isset($this->handle)) {
-            $this->ffi->KagomeDestroy($this->handle);
+            $this->ffi->kagome_destroy($this->handle);
         }
     }
 
     /**
-     * Tokenize input text.
+     * Tokenize Japanese text.
      *
-     * Equivalent to kagome.Tokenize in Go.
-     *
-     * @param string $text UTF-8 encoded Japanese text
-     * @return Token[] List of tokens
+     * @param string $text Japanese text (UTF-8)
+     * @return Token[] Tokens with full morphological info
      */
     public function tokenize(string $text): array
     {
         $cstr = $this->ffi->new('char[' . (strlen($text) + 1) . ']', false);
         FFI::memcpy($cstr, $text, strlen($text));
 
-        $arrPtr = $this->ffi->KagomeTokenizeStruct($this->handle, $cstr);
+        $arrPtr = $this->ffi->kagome_tokenize($this->handle, $cstr);
         if ($arrPtr === null) {
             throw new RuntimeException('Tokenization failed');
         }
@@ -56,19 +55,17 @@ final class Kagome
                 $tokens[] = Token::fromC($arr->tokens[$i]);
             }
         } finally {
-            $this->ffi->KagomeFreeTokenArray($arrPtr);
+            $this->ffi->kagome_free_token_array($arrPtr);
         }
 
         return $tokens;
     }
 
     /**
-     * Wakati (surface-only tokenization).
+     * Tokenize and return surface forms only (wakati-gaki).
      *
-     * Equivalent to kagome.Wakati in Go.
-     *
-     * @param string $text
-     * @return string[] List of token surfaces
+     * @param string $text Japanese text (UTF-8)
+     * @return string[] Surface forms only
      */
     public function wakati(string $text): array
     {
@@ -98,11 +95,10 @@ final class Kagome
     }
 
     /**
-     * Raw C ABI definitions for FFI.
+     * C function declarations for FFI.
      *
-     * IMPORTANT:
-     * - Do not add comments here.
-     * - Keep this in sync with the C header.
+     * Must match kagome_wrapper.h exactly.
+     * Do not add comments inside the CDEF string.
      */
     private static function cDefinitions(): string
     {
@@ -127,55 +123,44 @@ typedef struct {
     int length;
 } TokenArray;
 
-TokenArray* KagomeTokenizeStruct(void* handle, char* input);
-void KagomeFreeTokenArray(TokenArray* arr);
-void* KagomeInit(void);
-void KagomeDestroy(void* handle);
+void* kagome_init(void);
+void kagome_destroy(void* handle);
+TokenArray* kagome_tokenize(void* handle, const char* input);
+void kagome_free_token_array(TokenArray* arr);
 CDEF;
     }
 }
 
 /**
- * Immutable PHP representation of a Kagome token.
- *
- * Each field corresponds to Kagome dictionary features.
+ * One morphological token from Kagome.
  */
 final class Token
 {
     /** Surface form (表層形) */
     public string $surface;
 
-    /**
-     * Part-of-speech hierarchy (品詞階層)
-     *
-     * [0] Major class (大分類)
-     * [1] Middle class (中分類)
-     * [2] Small class (小分類)
-     * [3] Fine class / subcategory (再分類)
-     *
-     * @var string[]
-     */
+    /** Part-of-speech [major, middle, small, detail] (品詞階層) */
     public array $pos;
 
-    /** Base form / dictionary form (原形・基本形) */
+    /** Base form (原形) */
     public string $base_form;
 
-    /** Conjugation type (活用型, e.g. 五段・カ行促音便) */
+    /** Conjugation type (活用型) */
     public string $conj_type;
 
-    /** Conjugation form (活用形, e.g. 連用タ接続) */
+    /** Conjugation form (活用形) */
     public string $conj_form;
 
-    /** Reading in katakana (読み, e.g. 公園 → コウエン) */
+    /** Katakana reading (読み) */
     public string $reading;
 
-    /** Pronunciation (発音, e.g. 公園 → コーエン) */
+    /** Pronunciation (発音) */
     public string $pronunciation;
 
-    /** Start byte position in input text (開始位置) */
+    /** Start position in input */
     public int $start;
 
-    /** End byte position in input text (終了位置) */
+    /** End position in input */
     public int $end;
 
     private function __construct() {}

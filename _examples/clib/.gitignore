@@ -1,6 +1,2 @@
-*.a
-*.h
-*.so
-*.dll
-*.dylib
+libkagome.*
 __pycache__/
