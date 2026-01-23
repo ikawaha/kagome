@@ -121,9 +121,9 @@ func KagomeTokenizeStruct(handle unsafe.Pointer, input *C.char) *C.TokenArray {
 	}
 
 	mu.Lock()
-	t := instances[handle]
-	mu.Unlock()
+	defer mu.Unlock()
 
+	t := instances[handle]
 	if t == nil {
 		return nil
 	}
