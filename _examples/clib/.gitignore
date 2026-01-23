@@ -1,2 +1,8 @@
-libkagome.*
+# Build artifacts
+bin/
+
+# Python bytecode
 __pycache__/
+
+# Go test binaries
+*.test
