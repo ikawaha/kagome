@@ -1,12 +1,13 @@
 # Kagome C Library Example: Python & PHP FFI
 
-This directory contains minimal examples showing how to use **`kagome` (the Japanese Morphological Analyzer written in Go) as a C library** from both Python and PHP using [FFI](https://en.wikipedia.org/wiki/Foreign_function_interface) (Foreign Function Interface).
+This directory shows how to use **Kagome** (a Japanese Morphological Analyzer written in Go) from other languages via [FFI](https://en.wikipedia.org/wiki/Foreign_function_interface) (Foreign Function Interface).
 
 ## What is this?
 
-- Provides C ABI wrappers for the Kagome tokenizer built from Go.
-- Includes example scripts for Python (using `ctypes`) and PHP (using `FFI`).
-- Each script loads the shared library (`.so`, `.dll`, or `.dylib`), tokenizes a Japanese sentence, and checks the result.
+- Builds Kagome as a C shared library (`.so`, `.dll`, or `.dylib`)
+- Provides a C wrapper with four simple functions: `kagome_init()`, `kagome_destroy()`, `kagome_tokenize()`, `kagome_free_token_array()`
+- Includes example scripts for Python (using `ctypes`) and PHP (using `FFI`)
+- Each example loads the library, tokenizes Japanese text, and verifies the results
 
 ## Directory Structure
 

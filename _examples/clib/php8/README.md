@@ -1,13 +1,13 @@
 # PHP FFI Example for Kagome Tokenizer
 
-This directory contains a minimal example showing how to use `kagome` (a Japanese Morphological Analyzer/tokenizer written in Go) from PHP via **C ABI and PHP FFI** including a simple test.
+This directory shows how to use Kagome (a Japanese Morphological Analyzer written in Go) from PHP via FFI.
 
 ## What is this?
 
-- A small PHP script that calls Kagome through a shared library (`.so`, `.dll`, or `.dylib`) built from Go.
-- PHP accesses the library using [PHP FFI](https://www.php.net/manual/en/class.ffi.php).
-- The script tokenizes a Japanese sentence and prints each token.
-- It also verifies the result against an expected output and prints `PASS` on success.
+- PHP script that calls the Kagome shared library using [PHP FFI](https://www.php.net/manual/en/class.ffi.php)
+- Uses the `kagome_*` C wrapper functions for a stable API
+- Tokenizes Japanese text and prints each token
+- Includes a test that verifies the output
 
 ## Requirements (for local run)
 
