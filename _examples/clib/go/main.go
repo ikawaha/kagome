@@ -141,10 +141,11 @@ func KagomeTokenizeStruct(handle unsafe.Pointer, input *C.char) *C.TokenArray {
 		return nil
 	}
 
+	// Lock ONLY for map access
 	mu.Lock()
-	defer mu.Unlock()
-
 	t := instances[handle]
+	mu.Unlock() // early unlock after getting the instance
+
 	if t == nil {
 		return nil
 	}
