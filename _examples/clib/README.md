@@ -25,39 +25,26 @@ This directory shows how to use **Kagome** (a Japanese Morphological Analyzer wr
 
 > **For Docker users**, you can run these examples without installing the above dependencies locally using Docker and Docker Compose.
 
-## How to build (locally)
+## How to build and test locally
 
 From this directory (`_examples/clib/`), run:
 
 ```sh
+make clean
 make build
-```
-
-This will build the shared library for your platform in `./bin/`.
-
-## How to test (locally)
-
-From this directory (`_examples/clib/`), run:
-
-```sh
 make test
 ```
 
 If the test passes, you will see `PASS` in the output.
 
-## How to test (with Docker and Docker Compose)
+## How to build and test with Docker and Docker Compose
 
-1. Build Docker images and the shared library:
+From this directory (`_examples/clib/`), run:
 
-    ```sh
-    make docker-build
-    ```
-
-2. Run the test containers:
-
-    ```sh
-    make docker-test
-    ```
+```sh
+make docker-build
+make docker-test
+```
 
 If the test passes, you will see `PASS` in the output.
 
