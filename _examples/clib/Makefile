@@ -22,6 +22,14 @@ prebuild:
 build: prebuild
 	cc -fPIC -fvisibility=hidden -shared ./c_wrapper/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.$(LIB_EXT)
 
+go-test:
+	@if ! command -v go >/dev/null 2>&1; then \
+		echo "[SKIP] Go is not installed."; \
+		exit 0; \
+	fi; \
+	echo "**NOTE**: On macOS, 'ld: warning: ...' can be ignored if tests pass."; \
+	go clean -testcache && go test -race ./...
+
 python-test:
 	@if ! command -v python3 >/dev/null 2>&1; then \
 		echo "[SKIP] Python3 is not installed."; \
@@ -44,7 +52,7 @@ php-test:
 		echo "No libkagome.(so|dll|dylib) found. Please run make build first." ; exit 1 ; \
 	fi
 
-test: python-test php-test
+test: go-test python-test php-test
 
 clean:
 	@rm -rf ./bin
@@ -55,8 +63,6 @@ docker-clean: clean
 	@docker image prune -f
 	@docker volume prune -f
 	@docker network prune -f
-	@docker volume rm -f clib_kagome-dist
-	@docker image rm -f clib-kagome-build:latest clib-php-test:latest
 
 docker-build:
 	# Pull latest base images for stability

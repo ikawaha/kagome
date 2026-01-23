@@ -66,7 +66,7 @@ var (
 // getOrEmpty returns arr[idx] if it exists, otherwise an empty string.
 // This avoids bounds checks at every call site.
 func getOrEmpty(arr []string, idx int) string {
-	if idx < len(arr) {
+	if idx >= 0 && idx < len(arr) {
 		return arr[idx]
 	}
 	return ""
