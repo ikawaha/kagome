@@ -10,7 +10,6 @@ prebuild:
 	else \
 		echo "Unsupported GOOS: $$(go env GOOS)" ; exit 1 ; \
 	fi
-	@sleep 1; # cooldown for file system
 
 # Use -fvisibility=hidden to only export symbols explicitly marked in the wrapper (for a clean public API)
 build: prebuild
@@ -23,7 +22,6 @@ build: prebuild
 	else \
 		echo "Unsupported GOOS: $$(go env GOOS)" ; exit 1 ; \
 	fi
-	@sleep 1; # cooldown for file system
 
 python-test:
 	@if ! command -v python3 >/dev/null 2>&1; then \
