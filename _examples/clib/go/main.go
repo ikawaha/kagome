@@ -72,6 +72,17 @@ func getOrEmpty(arr []string, idx int) string {
 	return ""
 }
 
+// wouldOverflowTokenAllocation checks if allocating n tokens would cause integer overflow.
+// Returns true if the allocation would be unsafe.
+func wouldOverflowTokenAllocation(n int) bool {
+	if n < 0 {
+		return true
+	}
+	tokenSize := C.size_t(unsafe.Sizeof(C.Token{}))
+	maxSafeTokens := (^C.size_t(0)) / tokenSize
+	return C.size_t(n) > maxSafeTokens
+}
+
 // freeStrings safely frees multiple C strings.
 // Checks for nil before freeing (safe to pass nil pointers).
 func freeStrings(strs ...*C.char) {
@@ -141,6 +152,11 @@ func KagomeTokenizeStruct(handle unsafe.Pointer, input *C.char) *C.TokenArray {
 	text := C.GoString(input)
 	tokens := t.Tokenize(text)
 	n := len(tokens)
+
+	// Check for integer overflow in allocation
+	if wouldOverflowTokenAllocation(n) {
+		return nil
+	}
 
 	// Allocate TokenArray (always owned by caller).
 	arr := (*C.TokenArray)(C.malloc(C.size_t(unsafe.Sizeof(C.TokenArray{}))))
