@@ -439,7 +439,7 @@ Kagome compiles to WebAssembly for browser use.
 
 ### Use from other languages (FFI)
 
-Kagome is written in pure Go butcan be compiled as a C shared library and used from other languages via FFI (Foreign Function Interface).
+Kagome is written in pure Go but can be compiled as a C shared library and used from other languages via FFI (Foreign Function Interface).
 
 * Currently supported/tested languages:
   * **Python 3.12+** (using `ctypes`)
