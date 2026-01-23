@@ -13,6 +13,7 @@ RUN \
 FROM builder AS build-and-test
 
 COPY ./go/main.go /app/go/main.go
+COPY ./go/main_test.go /app/go/main_test.go
 COPY ./Makefile /app/Makefile
 COPY ./c_wrapper/kagome_wrapper.h /app/c_wrapper/kagome_wrapper.h
 COPY ./c_wrapper/kagome_wrapper.c /app/c_wrapper/kagome_wrapper.c
