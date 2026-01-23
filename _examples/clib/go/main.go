@@ -208,9 +208,14 @@ func KagomeFreeTokenArray(arr *C.TokenArray) {
 }
 
 // ------------------------------------------------------------------
-// Optional utility API (example / test)
+// Test utilities (wrapped as kagome_echo/kagome_echo_free)
 // ------------------------------------------------------------------
 
+// Echo copies a string and returns it.
+// Used for testing FFI setup (string passing, memory allocation).
+//
+// FFI users should call kagome_echo() from the C wrapper, not this directly.
+//
 //export Echo
 func Echo(input *C.char) *C.char {
 	if input == nil {
@@ -219,6 +224,9 @@ func Echo(input *C.char) *C.char {
 	return C.CString(C.GoString(input))
 }
 
+// EchoFree frees a string returned by Echo.
+// FFI users should call kagome_echo_free() from the C wrapper, not this directly.
+//
 //export EchoFree
 func EchoFree(p *C.char) {
 	if p != nil {

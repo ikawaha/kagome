@@ -4,12 +4,17 @@ The C wrapper provides a **stable, public API** for using Kagome from other lang
 
 ## What does it do?
 
-The wrapper exposes four simple functions:
+The wrapper exposes these functions:
 
+**Core API:**
 - `kagome_init()` — Create a tokenizer
 - `kagome_destroy()` — Free a tokenizer
 - `kagome_tokenize()` — Tokenize text
 - `kagome_free_token_array()` — Free tokenization results
+
+**Testing utilities:**
+- `kagome_echo()` — Echo a string (for testing FFI setup)
+- `kagome_echo_free()` — Free the echoed string
 
 All FFI users (Python, PHP, Rust, etc.) call these functions. They never call Go functions directly.
 

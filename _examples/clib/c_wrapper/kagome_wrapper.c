@@ -27,3 +27,13 @@ __attribute__((visibility("default")))
 void kagome_free_token_array(TokenArray* arr) {
     KagomeFreeTokenArray(arr);
 }
+
+__attribute__((visibility("default")))
+char* kagome_echo(const char* input) {
+    return Echo((char*)input);
+}
+
+__attribute__((visibility("default")))
+void kagome_echo_free(char* str) {
+    EchoFree(str);
+}

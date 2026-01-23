@@ -83,6 +83,33 @@ TokenArray* kagome_tokenize(void* handle, const char* input);
  */
 void kagome_free_token_array(TokenArray* arr);
 
+/*
+ * Echo a string (for testing FFI setup).
+ *
+ * This is a simple test function that copies the input string and returns it.
+ * Useful for:
+ * - Verifying the library loads correctly
+ * - Testing string passing across FFI boundary
+ * - Checking memory allocation/deallocation works
+ * - Troubleshooting FFI issues before trying tokenization
+ *
+ * input: UTF-8 text (null-terminated)
+ *
+ * Returns: Copy of the input string, or NULL if input is NULL
+ *
+ * You MUST call kagome_echo_free() to free the result.
+ */
+char* kagome_echo(const char* input);
+
+/*
+ * Free string returned by kagome_echo().
+ *
+ * str: String from kagome_echo()
+ *
+ * Safe to call with NULL.
+ */
+void kagome_echo_free(char* str);
+
 #ifdef __cplusplus
 }
 #endif
