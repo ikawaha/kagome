@@ -5,7 +5,7 @@ RUN apt update && apt upgrade -y
 WORKDIR /app
 
 RUN \
-    go mod init kagome/example/clib && \
+    go mod init kagome/examples/clib && \
     go get "github.com/ikawaha/kagome/v2" && \
     go get "github.com/ikawaha/kagome-dict/ipa" && \
     go mod download
