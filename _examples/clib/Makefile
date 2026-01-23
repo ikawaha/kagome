@@ -1,27 +1,26 @@
+# Detect platform once
+GOOS := $(shell go env GOOS)
+GOARCH := $(shell go env GOARCH)
+
+# Platform-specific library extension
+ifeq ($(GOOS),darwin)
+    LIB_EXT := dylib
+else ifeq ($(GOOS),windows)
+    LIB_EXT := dll
+else ifeq ($(GOOS),linux)
+    LIB_EXT := so
+else
+    $(error Unsupported GOOS: $(GOOS))
+endif
+
 prebuild:
 	@mkdir -p ./bin
 	@rm -rf ./bin/lib*
-	@if [ "$$(go env GOOS)" = "darwin" ]; then \
-		GOOS=darwin GOARCH=$$(go env GOARCH) go build -buildmode=c-archive -o ./bin/libkagome.a ./go/main.go; \
-	elif [ "$$(go env GOOS)" = "windows" ]; then \
-		GOOS=windows GOARCH=$$(go env GOARCH) go build -buildmode=c-archive -o ./bin/libkagome.a ./go/main.go; \
-	elif [ "$$(go env GOOS)" = "linux" ]; then \
-		GOOS=linux GOARCH=$$(go env GOARCH) go build -buildmode=c-archive -o ./bin/libkagome.a ./go/main.go; \
-	else \
-		echo "Unsupported GOOS: $$(go env GOOS)" ; exit 1 ; \
-	fi
+	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -buildmode=c-archive -o ./bin/libkagome.a ./go/main.go
 
 # Use -fvisibility=hidden to only export symbols explicitly marked in the wrapper (for a clean public API)
 build: prebuild
-	@if [ "$$(go env GOOS)" = "darwin" ]; then \
-		cc -fPIC -fvisibility=hidden -shared ./c_wrapper/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.dylib; \
-	elif [ "$$(go env GOOS)" = "windows" ]; then \
-		cc -fPIC -fvisibility=hidden -shared ./c_wrapper/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.dll; \
-	elif [ "$$(go env GOOS)" = "linux" ]; then \
-		cc -fPIC -fvisibility=hidden -shared ./c_wrapper/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.so; \
-	else \
-		echo "Unsupported GOOS: $$(go env GOOS)" ; exit 1 ; \
-	fi
+	cc -fPIC -fvisibility=hidden -shared ./c_wrapper/kagome_wrapper.c ./bin/libkagome.a -o ./bin/libkagome.$(LIB_EXT)
 
 python-test:
 	@if ! command -v python3 >/dev/null 2>&1; then \
