@@ -62,4 +62,4 @@ If the test passes, you will see `PASS` in the output.
 
 ## More Information
 
-See the README in each subdirectory (`python3/README.md`, `php/README.md`) for details and expected output.
+See the README in each subdirectory (`python3/README.md`, `php8/README.md`) for details and expected output.
