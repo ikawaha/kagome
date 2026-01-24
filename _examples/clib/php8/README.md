@@ -14,7 +14,7 @@ This directory shows how to use Kagome (a Japanese Morphological Analyzer writte
 - PHP 8 or later (tested with PHP 8.5.2)
 - PHP extension `FFI` enabled
 - Go 1.24 or later (to build the archive and header files for `libkagome`)
-- C compiler (required to build the `libkagome` shared library. E.g., `gcc`)
+- C compiler (required to build the `libkagome` shared library. E.g., `gcc`, `clang`)
 
 > **For Docker users**, you can run this example without installing the above dependencies locally using Docker and Docker Compose.
 > See the "How to run (with Docker and Docker Compose)" section below.
