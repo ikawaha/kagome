@@ -3,7 +3,6 @@ from __future__ import annotations
 import ctypes
 import platform
 from pathlib import Path
-from typing import List
 
 
 """
@@ -206,7 +205,7 @@ class Kagome:
 
     # ------------------------------------------------------------------
 
-    def tokenize(self, text: str) -> List[Token]:
+    def tokenize(self, text: str) -> list[Token]:
         """
         Tokenize Japanese text.
 
@@ -254,7 +253,7 @@ class Kagome:
 
     # ------------------------------------------------------------------
 
-    def wakati(self, text: str) -> List[str]:
+    def wakati(self, text: str) -> list[str]:
         """
         Tokenize and return surface forms only (wakati-gaki 分かち書き).
 
