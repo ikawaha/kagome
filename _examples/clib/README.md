@@ -1,4 +1,4 @@
-# Kagome C Library Example: Python & PHP FFI
+# Kagome C Library Example: Multi-Language FFI
 
 This directory shows how to use **Kagome** (a Japanese Morphological Analyzer written in Go) from other languages via [FFI](https://en.wikipedia.org/wiki/Foreign_function_interface) (Foreign Function Interface).
 
@@ -11,11 +11,23 @@ This directory shows how to use **Kagome** (a Japanese Morphological Analyzer wr
 
 ## Directory Structure
 
-- [go/](./go) — Go source for the C ABI wrapper
-- [c_wrapper/](./c_wrapper) — C wrapper source code for stable ABI exposure (see its README for details)
-- [python3/](./python3) — Python 3 example using `ctypes` (see its README for details)
-- [php8/](./php8) — PHP 8 example using `FFI` (see its README for details)
-- `bin/` — Built shared libraries and archives (output directory of `libkagome`)
+```shellsession
+% tree -L 1 --dirsfirst -F
+./
+├── bin/               # Built shared libraries and archives (ignored in git)
+├── c_wrapper/         # C wrapper source code for stable ABI exposure
+├── go/                # Go source for the C ABI wrapper
+├── php8/              # PHP 8 example using FFI
+├── python3/           # Python 3 example using ctypes
+│
+├── .gitignore         # Git ignore file (ignores artifacts in 'bin/' and '__pycache__/')
+├── docker-compose.yml # for Docker and Docker Compose
+├── Dockerfile         # Dockerfile for building the shared library and running tests
+├── go.mod             # Go module file
+├── go.sum             # Go module checksum file
+├── Makefile           # Makefile for building and testing
+└── README.md          # This README file
+```
 
 ## Requirements (for local run)
 
