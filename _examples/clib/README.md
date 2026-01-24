@@ -31,8 +31,9 @@ This directory shows how to use **Kagome** (a Japanese Morphological Analyzer wr
 
 ## Requirements (for local run)
 
-- Go and a C compiler (e.g., gcc) to build the shared library
-- Python 3.12 or later for the Python example
+- Go 1.24 or later (required to build the archive and header files for `libkagome`)
+- C compiler (required to build the `libkagome` shared library. E.g., `gcc`, `clang`)
+- Python 3.10 or later for the Python example
 - PHP 8 or later with the `FFI` extension for the PHP example
 
 > **For Docker users**, you can run these examples without installing the above dependencies locally using Docker and Docker Compose.
@@ -59,6 +60,23 @@ make docker-test
 ```
 
 If the test passes, you will see `PASS` in the output.
+
+## Tested Environments
+
+- macOS Tahoe 26.2 (M4 Mac mini, 16 GB RAM)
+  - Go 1.25.6
+  - C compiler: Apple clang 17.0.0
+  - Python 3.14.2
+  - PHP n/a (not tested locally)
+  - GNU Make 3.81 (via Homebrew)
+  - Docker 29.1.3 (via Docker Desktop)
+  - Docker Compose 5.0.1
+- Docker:
+  - Go 1.25.6 (`golang:1.25.6` Docker image)
+  - Python 3.14.2 (`python:3.14.2` Docker image)
+    - C compiler: gcc (Debian 14.2.0-19) 14.2.0
+  - PHP 8.5.2 with FFI enabled (`php:8.5.2-cli` Docker image as base)
+    - C compiler: gcc (Debian 14.2.0-19) 14.2.0
 
 ## More Information
 
