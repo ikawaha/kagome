@@ -16,7 +16,7 @@ This directory shows how to use **Kagome** (a Japanese Morphological Analyzer wr
 ./
 ├── bin/               # Built shared libraries and archives (ignored in git)
 ├── c_wrapper/         # C wrapper source code for stable ABI exposure
-├── go/                # Go source for the C ABI wrapper
+├── go/                # Go FFI bridge and tests
 ├── php8/              # PHP 8 example using FFI
 ├── python3/           # Python 3 example using ctypes
 │
@@ -28,6 +28,8 @@ This directory shows how to use **Kagome** (a Japanese Morphological Analyzer wr
 ├── Makefile           # Makefile for building and testing
 └── README.md          # This README file
 ```
+
+- For details on each component, see the README files in the respective subdirectories.
 
 ## Requirements (for local run)
 
@@ -61,7 +63,7 @@ make docker-test
 
 If the test passes, you will see `PASS` in the output.
 
-## Tested Environments
+## Tested Environments (as of 2026/01/24)
 
 - macOS Tahoe 26.2 (M4 Mac mini, 16 GB RAM)
   - Go 1.25.6
@@ -80,4 +82,9 @@ If the test passes, you will see `PASS` in the output.
 
 ## More Information
 
-See the README in each subdirectory (`python3/README.md`, `php8/README.md`) for details and expected output.
+See the README in each subdirectory for details:
+
+- `c_wrapper/README.md` — C wrapper layer explanation
+- `go/README.md` — Go FFI bridge implementation and tests
+- `python3/README.md` — Python example with expected output
+- `php8/README.md` — PHP example with expected output
