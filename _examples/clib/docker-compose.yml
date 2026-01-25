@@ -1,0 +1,35 @@
+volumes:
+  kagome-dist:
+
+services:
+  kagome-build:
+    build:
+      context: .
+    volumes:
+      - kagome-dist:/app/bin
+      - ./Makefile:/app/Makefile:ro
+
+  python-test:
+    image: python:latest
+    volumes:
+      - kagome-dist:/app/bin:ro
+      - ./python3:/app/python3:ro
+    working_dir: /app
+    entrypoint: ["/usr/local/bin/python3", "/app/python3/main.py"]
+    depends_on:
+      kagome-build:
+        condition: service_completed_successfully
+
+
+  php-test:
+    build:
+      context: ./php8
+    volumes:
+      - kagome-dist:/app/bin:ro
+      - ./php8:/app/php:ro
+    working_dir: /app
+    entrypoint: ["/usr/local/bin/php", "/app/php/main.php"]
+    depends_on:
+      kagome-build:
+        condition: service_completed_successfully
+

@@ -15,12 +15,15 @@ Kagome is an open source Japanese morphological analyzer written in pure Go. It 
 > * Multiple segmentation modes for different use cases
 > * RESTful API server mode for production use
 > * WebAssembly support for browser environments
+> * C library API for FFI integration (Python, PHP, and other languages)
 
 ## Index
 
 * [Basic Usage](#basic-usage)
   * [Command line](#command-line)
   * [As a Go library](#as-a-go-library)
+  * [As a C library](#as-a-c-library)
+  * [More examples](#more-examples)
 * [Install](#install)
 * [Commands](#commands)
   * [Tokenize command](#tokenize-command)
@@ -33,6 +36,7 @@ Kagome is an open source Japanese morphological analyzer written in pure Go. It 
 * [Segmentation modes](#segmentation-modes)
 * [Docker](#docker)
 * [WebAssembly](#webassembly)
+* [Use from other languages (FFI)](#use-from-other-languages-ffi)
 * [Reference](#reference)
 * [License](#license)
 
@@ -87,6 +91,8 @@ EOS
 
 ### As a Go library
 
+You can integrate Kagome into your Go applications as follows:
+
 ```sh
 # Install Kagome module
 go get github.com/ikawaha/kagome/v2
@@ -138,9 +144,18 @@ output:
 うち	名詞,非自立,副詞可能,*,*,*,うち,ウチ,ウチ
 ```
 
-* For more examples, see:
-  * [examples directory](https://github.com/ikawaha/kagome/tree/v2/_examples)
-  * [GoDoc](https://pkg.go.dev/github.com/ikawaha/kagome/v2)
+### As a C library
+
+Kagome is written in pure Go but can be compiled as a C shared library and used from other languages via [FFI](https://en.wikipedia.org/wiki/Foreign_function_interface) (Foreign Function Interface).
+
+See the "[Use from other languages (FFI)](#use-from-other-languages-ffi)" section below for details and examples.
+
+### More examples
+
+We provide various examples demonstrating how to use Kagome in different scenarios:
+
+* [Examples directory](https://github.com/ikawaha/kagome/tree/v2/_examples)
+* [Examples in GoDoc](https://pkg.go.dev/github.com/ikawaha/kagome/v2)
 
 ## Install
 
@@ -279,7 +294,7 @@ Start a server and access `http://localhost:6060` in your browser.
 
 > [!IMPORTANT]
 > The demo web application uses [graphviz](https://graphviz.org/) to draw a lattice. You need graphviz to be installed on your system.
->
+
 > [!TIP]
 > Kagome can be compiled to WebAssembly (wasm) and run locally in a web browser as well. For details, see the [WebAssembly section](#webassembly).
 >
@@ -421,6 +436,47 @@ Kagome compiles to WebAssembly for browser use.
 
 * **Live demo:** [https://ikawaha.github.io/kagome/](https://ikawaha.github.io/kagome/)
 * **Source code:** [./_examples/wasm](./_examples/wasm)
+
+### Use from other languages (FFI)
+
+Kagome is written in pure Go but can be compiled as a C shared library and used from other languages via FFI (Foreign Function Interface).
+
+* Currently supported/tested languages:
+  * **Python 3.12+** (using `ctypes`)
+  * **PHP 8+** (using `FFI`)
+
+```python
+# Python example using ctypes
+from libkagome import Kagome
+
+kagome = Kagome()
+tokens = kagome.tokenize("すもももももももものうち")
+
+for token in tokens:
+    print(f"{token.surface}\t{token.pos}")
+```
+
+```php
+<!-- PHP example using FFI -->
+<?php
+declare(strict_types=1);
+
+require __DIR__ . '/libkagome.php';
+
+$kagome = new Kagome();
+$tokens = $kagome->tokenize("すもももももももものうち");
+
+foreach ($tokens as $token) {
+    echo "{$token->surface}\t" . implode(',', $token->pos) . "\n";
+}
+```
+
+For complete examples and build instructions, see:
+
+* [./_examples/clib/](./_examples/clib/) - C library FFI examples for Python and PHP
+
+> [!NOTE]
+> The C library provides thread-safe tokenization with proper memory management and includes comprehensive tests.
 
 ## Reference
 

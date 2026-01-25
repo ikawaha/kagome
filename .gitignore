@@ -4,3 +4,4 @@ dist
 dict/mecab-ipadic-2.7.0-20070801
 dict/unidic-mecab-2.1.2_src
 go.work.sum
+.claude/
