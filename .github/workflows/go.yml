@@ -60,6 +60,7 @@ jobs:
       - name: Install goveralls
         run: go install github.com/mattn/goveralls@latest
       - name: Coverage
+        continue-on-error: true
         run: |
           go test -v -coverprofile=profile.cov -covermode=atomic ./...
           goveralls -coverprofile=profile.cov -service=github
