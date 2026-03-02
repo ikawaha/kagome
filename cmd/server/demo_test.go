@@ -228,54 +228,32 @@ func TestLatticeHandler_ServeHTTP(t *testing.T) {
 			t.Errorf("expected empty SVG on error, got %q", body.SVG)
 		}
 	})
-	t.Run("success", func(t *testing.T) {
-		if _, err := exec.LookPath(graphvizCmd); err != nil {
-			t.Skipf("graphviz command not found, %v", err)
-		}
-		req := httptest.NewRequest(http.MethodPost, `/lattice?s=ねこです&r=Normal`, nil)
-		w := httptest.NewRecorder()
-		(&LatticeHandler{tokenizer: tnz}).ServeHTTP(w, req)
-		resp := w.Result()
-		defer resp.Body.Close() //nolint:errcheck
+	for _, mode := range []string{"Normal", "Search", "Extended"} {
+		t.Run(mode, func(t *testing.T) {
+			if _, err := exec.LookPath(graphvizCmd); err != nil {
+				t.Skipf("graphviz command not found, %v", err)
+			}
+			req := httptest.NewRequest(http.MethodPost, `/lattice?s=ねこです&r=`+mode, nil)
+			w := httptest.NewRecorder()
+			(&LatticeHandler{tokenizer: tnz}).ServeHTTP(w, req)
+			resp := w.Result()
+			defer resp.Body.Close() //nolint:errcheck
 
-		if got, want := resp.StatusCode, http.StatusOK; got != want {
-			t.Errorf("http status: got %d, want %d", got, want)
-		}
-		var body latticeResponse
-		if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
-			t.Fatalf("json decode error, %v", err)
-		}
-		if body.Error != "" {
-			t.Errorf("unexpected error: %s", body.Error)
-		}
-		if !strings.HasPrefix(body.SVG, "<svg") {
-			t.Errorf("expected SVG content, got %q", body.SVG[:min(len(body.SVG), 50)])
-		}
-	})
-	t.Run("extended mode", func(t *testing.T) {
-		if _, err := exec.LookPath(graphvizCmd); err != nil {
-			t.Skipf("graphviz command not found, %v", err)
-		}
-		req := httptest.NewRequest(http.MethodPost, `/lattice?s=ねこです&r=Extended`, nil)
-		w := httptest.NewRecorder()
-		(&LatticeHandler{tokenizer: tnz}).ServeHTTP(w, req)
-		resp := w.Result()
-		defer resp.Body.Close() //nolint:errcheck
-
-		if got, want := resp.StatusCode, http.StatusOK; got != want {
-			t.Errorf("http status: got %d, want %d", got, want)
-		}
-		var body latticeResponse
-		if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
-			t.Fatalf("json decode error, %v", err)
-		}
-		if body.Error != "" {
-			t.Errorf("unexpected error: %s", body.Error)
-		}
-		if !strings.HasPrefix(body.SVG, "<svg") {
-			t.Errorf("expected SVG content, got %q", body.SVG[:min(len(body.SVG), 50)])
-		}
-	})
+			if got, want := resp.StatusCode, http.StatusOK; got != want {
+				t.Errorf("http status: got %d, want %d", got, want)
+			}
+			var body latticeResponse
+			if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+				t.Fatalf("json decode error, %v", err)
+			}
+			if body.Error != "" {
+				t.Errorf("unexpected error: %s", body.Error)
+			}
+			if !strings.HasPrefix(body.SVG, "<svg") {
+				t.Errorf("expected SVG content, got %q", body.SVG[:min(len(body.SVG), 50)])
+			}
+		})
+	}
 }
 
 func Test_toRecords(t *testing.T) {

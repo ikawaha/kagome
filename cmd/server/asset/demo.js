@@ -66,22 +66,19 @@ function tokenize() {
     $.post('./tokenize', JSON.stringify(o), cb, 'json');
 }
 
-// ズーム管理
+// zoom
 var currentZoom = 1.0;
 var svgOrigDims = null;
-var svgOrigPx   = null; // SVG のピクセル換算サイズ（Fit 計算用）
-var cachedBestNodes = null; // SVG ロード後にキャッシュするベストパスノード
+var svgOrigPx   = null;
+var cachedBestNodes = null;
 var zoomStep = 0.25;
 var minZoom = 0.25;
 var maxZoom = 4.0;
 
-// SVG 属性値（pt 単位など）をピクセルに換算する（1pt = 96/72px）
 function toPx(value, unit) {
     return unit === 'pt' ? value * 96 / 72 : value;
 }
 
-// graphviz SVG は y-up 座標系のため上部に空白が生じる。
-// background polygon の上端までスクロールしてスキップする。
 function scrollToSVGContent() {
     var outEl = document.getElementById('lattice-output');
     var svgEl = outEl && outEl.querySelector('svg');
@@ -123,14 +120,12 @@ function fitZoom() {
     if (!svgOrigPx) return;
     var outEl = document.getElementById('lattice-output');
     var containerW = outEl.clientWidth;
-    // CSS の max-height (500px) をコンテナの高さとして使う
     var containerH = parseInt(window.getComputedStyle(outEl).maxHeight) || outEl.clientHeight;
     var zoom = Math.min(containerW / svgOrigPx.width, containerH / svgOrigPx.height);
     currentZoom = parseFloat(Math.max(minZoom, Math.min(maxZoom, zoom)).toFixed(2));
     applyZoom();
 }
 
-// Ctrl+ホイールでズーム
 document.getElementById('lattice-output').addEventListener('wheel', function(e) {
     if (e.ctrlKey || e.metaKey) {
         e.preventDefault();
@@ -161,7 +156,6 @@ function updateLattice() {
             }
             var svgEl = outEl.querySelector('svg');
             if (svgEl) {
-                // オリジナルのサイズを保存してズームをリセット
                 var wAttr = svgEl.getAttribute('width')  || '';
                 var hAttr = svgEl.getAttribute('height') || '';
                 var wM = wAttr.match(/^([0-9.]+)([a-z]*)$/i);
@@ -172,7 +166,6 @@ function updateLattice() {
                     wUnit:  wM ? wM[2] : '',
                     hUnit:  hM ? hM[2] : '',
                 };
-                // pt → px 換算して Fit 計算用に保存
                 svgOrigPx = {
                     width:  toPx(svgOrigDims.width,  svgOrigDims.wUnit),
                     height: toPx(svgOrigDims.height, svgOrigDims.hUnit),
@@ -189,10 +182,9 @@ function updateLattice() {
                         cachedBestNodes.push({ el: g, cx: parseFloat(ellipses[0].getAttribute('cx') || '0') });
                     }
                 });
-                // rankdir=LR なので cx 昇順 = 形態素の出現順
                 cachedBestNodes.sort(function(a, b) { return a.cx - b.cx; });
                 ctrlEl.style.display = '';
-                fitZoom(); // 全体が収まる倍率で表示
+                fitZoom();
             }
         }
     }, 'json');

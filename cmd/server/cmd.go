@@ -5,10 +5,12 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -20,6 +22,20 @@ import (
 
 // Stderr is the standard error writer.
 var Stderr io.Writer = os.Stderr
+
+// staticFS is an http.FileSystem that serves only non-HTML files and
+// denies directory listings. It is used to expose /asset/ without leaking
+// server-side template sources (demo.html, graph.html).
+type staticFS struct {
+	base http.FileSystem
+}
+
+func (s staticFS) Open(name string) (http.File, error) {
+	if strings.HasSuffix(name, ".html") {
+		return nil, fs.ErrNotExist
+	}
+	return s.base.Open(name)
+}
 
 // subcommand property
 var (
@@ -103,7 +119,7 @@ func command(ctx context.Context, opt *option) error {
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/asset/", http.FileServer(http.FS(assetFS)))
+	mux.Handle("/asset/", http.FileServer(staticFS{http.FS(assetFS)}))
 	mux.Handle("/", &TokenizeDemoHandler{tokenizer: t})
 	mux.Handle("/tokenize", &TokenizeHandler{tokenizer: t})
 	mux.Handle("/lattice", &LatticeHandler{tokenizer: t})
