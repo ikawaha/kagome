@@ -103,8 +103,10 @@ func command(ctx context.Context, opt *option) error {
 	}
 
 	mux := http.NewServeMux()
+	mux.Handle("/asset/", http.FileServer(http.FS(assetFS)))
 	mux.Handle("/", &TokenizeDemoHandler{tokenizer: t})
 	mux.Handle("/tokenize", &TokenizeHandler{tokenizer: t})
+	mux.Handle("/lattice", &LatticeHandler{tokenizer: t})
 	srv := http.Server{
 		Addr:              opt.http,
 		Handler:           mux,

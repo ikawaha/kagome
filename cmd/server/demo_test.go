@@ -54,7 +54,7 @@ func TestTokenizeDemoHandler_ServeHTTP(t *testing.T) {
 		if !bytes.Contains(body, []byte(`Kagome demo - Japanese morphological analyzer`)) {
 			t.Errorf("demo title not be found")
 		}
-		if bytes.Contains(body, []byte(`<svg width=`)) {
+		if bytes.Contains(body, []byte(`data-svg="`)) {
 			t.Errorf("unexpected svg found")
 		}
 	})
@@ -79,8 +79,8 @@ func TestTokenizeDemoHandler_ServeHTTP(t *testing.T) {
 		if !bytes.Contains(body, []byte(`Kagome demo - Japanese morphological analyzer`)) {
 			t.Errorf("demo title not be found")
 		}
-		if !bytes.Contains(body, []byte(`<svg width=`)) {
-			t.Errorf("svg not found")
+		if !bytes.Contains(body, []byte(`data-svg="&lt;svg width=`)) {
+			t.Errorf("svg not found in data-svg attribute")
 		}
 	})
 }
@@ -93,8 +93,7 @@ func TestTokenizeDemoHandler_analyzeGraph(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error, %v", err)
 	}
-	handler := TokenizeDemoHandler{tokenizer: tnz}
-	records, svg, err := handler.analyzeGraph(context.Background(), "ねこです", tokenizer.Normal)
+	records, svg, err := analyzeGraph(context.Background(), tnz, "ねこです", tokenizer.Normal)
 	if err != nil {
 		t.Fatalf("unexpected error, analyzeGraph() failed, %v", err)
 	}

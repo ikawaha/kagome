@@ -1,0 +1,218 @@
+function cb(data, status) {
+    if (status === "success" && Array.isArray(data.tokens)) {
+        $("#morphs").empty();
+        $.each(data.tokens, function(i, val) {
+            var pos     = (val.pos == null || val.pos.length === 0) ? "*" : val.pos.join(",");
+            var base    = val.base_form     != "" ? val.base_form     : "*";
+            var reading = val.reading       != "" ? val.reading       : "*";
+            var pronoun = val.pronunciation != "" ? val.pronunciation : "*";
+            var row = $("<tr>").attr("data-morph-idx", i);
+            row.append($("<td>").text(val.surface));
+            row.append($("<td>").text(pos));
+            row.append($("<td>").text(base));
+            row.append($("<td>").text(reading));
+            row.append($("<td>").text(pronoun));
+            row.click(function() {
+                focusLatticeNode(parseInt($(this).attr("data-morph-idx"), 10));
+            });
+            $("#morphs").append(row);
+        });
+    }
+}
+
+function focusLatticeNode(idx) {
+    var svgEl = document.querySelector('#lattice-output svg');
+
+    // clear table row highlight
+    document.querySelectorAll('#morphs tr.morph-selected').forEach(function(tr) {
+        tr.classList.remove('morph-selected');
+    });
+    var rows = document.querySelectorAll('#morphs tr');
+    if (idx >= 0 && idx < rows.length) {
+        rows[idx].classList.add('morph-selected');
+    }
+
+    if (!svgEl || !cachedBestNodes) return;
+
+    // clear previous SVG highlight
+    svgEl.querySelectorAll('g.node.morph-highlight').forEach(function(g) {
+        g.classList.remove('morph-highlight');
+    });
+
+    if (idx < 0 || idx >= cachedBestNodes.length) return;
+
+    var targetNode = cachedBestNodes[idx].el;
+    targetNode.classList.add('morph-highlight');
+
+    // scroll the node into view within #lattice-output (horizontal and vertical)
+    var ellipse = targetNode.querySelector('ellipse');
+    if (ellipse) {
+        var outEl = document.getElementById('lattice-output');
+        var elRect = ellipse.getBoundingClientRect();
+        var outRect = outEl.getBoundingClientRect();
+        if (elRect.left < outRect.left || elRect.right > outRect.right) {
+            outEl.scrollLeft += elRect.left - outRect.left - (outRect.width - elRect.width) / 2;
+        }
+        if (elRect.top < outRect.top || elRect.bottom > outRect.bottom) {
+            outEl.scrollTop += elRect.top - outRect.top - (outRect.height - elRect.height) / 2;
+        }
+    }
+}
+
+function tokenize() {
+    var s = document.getElementById("inp").value;
+    var m = $('input[name="r"]').filter(':checked').val();
+    var o = {"sentence": s, "mode": m};
+    $.post('./tokenize', JSON.stringify(o), cb, 'json');
+}
+
+// ズーム管理
+var currentZoom = 1.0;
+var svgOrigDims = null;
+var svgOrigPx   = null; // SVG のピクセル換算サイズ（Fit 計算用）
+var cachedBestNodes = null; // SVG ロード後にキャッシュするベストパスノード
+var zoomStep = 0.25;
+var minZoom = 0.25;
+var maxZoom = 4.0;
+
+// SVG 属性値（pt 単位など）をピクセルに換算する（1pt = 96/72px）
+function toPx(value, unit) {
+    return unit === 'pt' ? value * 96 / 72 : value;
+}
+
+// graphviz SVG は y-up 座標系のため上部に空白が生じる。
+// background polygon の上端までスクロールしてスキップする。
+function scrollToSVGContent() {
+    var outEl = document.getElementById('lattice-output');
+    var svgEl = outEl && outEl.querySelector('svg');
+    if (!svgEl) return;
+    var polygon = svgEl.querySelector('polygon');
+    if (polygon) {
+        var emptyTop = polygon.getBoundingClientRect().top - svgEl.getBoundingClientRect().top;
+        if (emptyTop > 0) {
+            outEl.scrollTop = emptyTop;
+        }
+    }
+}
+
+function applyZoom() {
+    var svgEl = document.querySelector('#lattice-output svg');
+    if (!svgEl || !svgOrigDims) return;
+    svgEl.setAttribute('width',  (svgOrigDims.width  * currentZoom) + svgOrigDims.wUnit);
+    svgEl.setAttribute('height', (svgOrigDims.height * currentZoom) + svgOrigDims.hUnit);
+    document.getElementById('zoom-label').textContent = Math.round(currentZoom * 100) + '%';
+    scrollToSVGContent();
+}
+
+function zoomIn() {
+    currentZoom = Math.min(maxZoom, parseFloat((currentZoom + zoomStep).toFixed(2)));
+    applyZoom();
+}
+
+function zoomOut() {
+    currentZoom = Math.max(minZoom, parseFloat((currentZoom - zoomStep).toFixed(2)));
+    applyZoom();
+}
+
+function resetZoom() {
+    currentZoom = 1.0;
+    applyZoom();
+}
+
+function fitZoom() {
+    if (!svgOrigPx) return;
+    var outEl = document.getElementById('lattice-output');
+    var containerW = outEl.clientWidth;
+    // CSS の max-height (500px) をコンテナの高さとして使う
+    var containerH = parseInt(window.getComputedStyle(outEl).maxHeight) || outEl.clientHeight;
+    var zoom = Math.min(containerW / svgOrigPx.width, containerH / svgOrigPx.height);
+    currentZoom = parseFloat(Math.max(minZoom, Math.min(maxZoom, zoom)).toFixed(2));
+    applyZoom();
+}
+
+// Ctrl+ホイールでズーム
+document.getElementById('lattice-output').addEventListener('wheel', function(e) {
+    if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        if (e.deltaY < 0) { zoomIn(); } else { zoomOut(); }
+    }
+}, { passive: false });
+
+function updateLattice() {
+    var s = document.getElementById("inp").value;
+    var m = $('input[name="r"]').filter(':checked').val();
+    $.post('./lattice', {s: s, r: m}, function(data) {
+        var errEl = document.getElementById('lattice-error');
+        var outEl = document.getElementById('lattice-output');
+        var ctrlEl = document.getElementById('lattice-controls');
+        if (data.error) {
+            errEl.textContent = 'Error: ' + data.error;
+            outEl.innerHTML = '';
+            ctrlEl.style.display = 'none';
+            svgOrigDims = null;
+            svgOrigPx   = null;
+            cachedBestNodes = null;
+        } else {
+            errEl.textContent = '';
+            if (typeof outEl.setHTML === 'function') {
+                outEl.setHTML(data.svg || '');
+            } else {
+                outEl.innerHTML = data.svg || '';
+            }
+            var svgEl = outEl.querySelector('svg');
+            if (svgEl) {
+                // オリジナルのサイズを保存してズームをリセット
+                var wAttr = svgEl.getAttribute('width')  || '';
+                var hAttr = svgEl.getAttribute('height') || '';
+                var wM = wAttr.match(/^([0-9.]+)([a-z]*)$/i);
+                var hM = hAttr.match(/^([0-9.]+)([a-z]*)$/i);
+                svgOrigDims = {
+                    width:  wM ? parseFloat(wM[1]) : 100,
+                    height: hM ? parseFloat(hM[1]) : 100,
+                    wUnit:  wM ? wM[2] : '',
+                    hUnit:  hM ? hM[2] : '',
+                };
+                // pt → px 換算して Fit 計算用に保存
+                svgOrigPx = {
+                    width:  toPx(svgOrigDims.width,  svgOrigDims.wUnit),
+                    height: toPx(svgOrigDims.height, svgOrigDims.hUnit),
+                };
+                // best-path nodes have peripheries=2 in DOT → two <ellipse> in SVG
+                // BOS/EOS are also in the optimal path and get peripheries=2, so exclude them by label
+                cachedBestNodes = [];
+                svgEl.querySelectorAll('g.node').forEach(function(g) {
+                    var ellipses = g.querySelectorAll('ellipse');
+                    if (ellipses.length >= 2) {
+                        var firstText = g.querySelector('text');
+                        var label = firstText ? firstText.textContent.trim() : '';
+                        if (label === 'BOS' || label === 'EOS') return;
+                        cachedBestNodes.push({ el: g, cx: parseFloat(ellipses[0].getAttribute('cx') || '0') });
+                    }
+                });
+                // rankdir=LR なので cx 昇順 = 形態素の出現順
+                cachedBestNodes.sort(function(a, b) { return a.cx - b.cx; });
+                ctrlEl.style.display = '';
+                fitZoom(); // 全体が収まる倍率で表示
+            }
+        }
+    }, 'json');
+}
+
+var latticeTimer = null;
+function scheduleLattice() {
+    if (latticeTimer !== null) {
+        clearTimeout(latticeTimer);
+    }
+    latticeTimer = setTimeout(function() {
+        latticeTimer = null;
+        updateLattice();
+    }, 500);
+}
+
+$('input[name="r"]:radio').change(function() {
+    var s = document.getElementById("inp").value;
+    var m = $('input[name="r"]').filter(':checked').val();
+    var o = {"sentence": s, "mode": m};
+    $.post('./tokenize', JSON.stringify(o), cb, 'json');
+    updateLattice();
+});
