@@ -13,14 +13,14 @@
 <body>
 <div id="center">
   <h1>Kagome demo</h1>
-  <form class="frm" action="/_demo" method="POST" oninput="tokenize(); scheduleLattice();">
+  <form class="frm" action="/_demo" method="POST" oninput="tokenize(); scheduleLattice();" onsubmit="return false;">
     <div id="box">
     <textarea id="inp" class="txar" rows="3" name="s"
               placeholder="Enter Japanese text below.">{{.Sentence}}</textarea>
       <div id="rbox">
         <div><label><input type="radio" name="r" value="Normal" checked>Normal</label></div>
-        <div><label><input type="radio" name="r" value="Search" {{if eq .RadioOpt "search"}}checked{{end}}>Search</label></div>
-        <div><label><input type="radio" name="r" value="Extended" {{if eq .RadioOpt "extended"}}checked{{end}}>Extended</label></div>
+        <div><label><input type="radio" name="r" value="Search" {{if eq .RadioOpt "Search"}}checked{{end}}>Search</label></div>
+        <div><label><input type="radio" name="r" value="Extended" {{if eq .RadioOpt "Extended"}}checked{{end}}>Extended</label></div>
       </div>
     </div>
   </form>
@@ -28,13 +28,13 @@
   <div id="results-row">
     <div id="morphs-panel">
       <table class="tbl">
-        <thread><tr>
+        <thead><tr>
           <th>Surface</th>
           <th>Part-of-Speech</th>
           <th>Base Form</th>
           <th>Reading</th>
           <th>Pronunciation</th>
-        </tr></thread>
+        </tr></thead>
         <tbody id="morphs">
         </tbody>
       </table>

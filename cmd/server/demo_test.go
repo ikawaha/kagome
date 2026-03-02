@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -56,6 +57,10 @@ func TestTokenizeDemoHandler_ServeHTTP(t *testing.T) {
 		}
 		if bytes.Contains(body, []byte(`data-svg="`)) {
 			t.Errorf("unexpected svg found")
+		}
+		// radio button for the selected mode must have checked attribute
+		if !bytes.Contains(body, []byte(`value="Extended" checked`)) {
+			t.Errorf("Extended radio button not checked")
 		}
 	})
 
@@ -192,6 +197,85 @@ func Test_newRecord(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestLatticeHandler_ServeHTTP(t *testing.T) {
+	tnz, err := tokenizer.New(loadTestDict(t))
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	t.Run("graphviz not installed", func(t *testing.T) {
+		if _, err := exec.LookPath(graphvizCmd); err == nil {
+			t.Skip("graphviz is installed, skipping error path test")
+		}
+		req := httptest.NewRequest(http.MethodPost, `/lattice?s=ねこ&r=Normal`, nil)
+		w := httptest.NewRecorder()
+		(&LatticeHandler{tokenizer: tnz}).ServeHTTP(w, req)
+		resp := w.Result()
+		defer resp.Body.Close() //nolint:errcheck
+
+		if got, want := resp.StatusCode, http.StatusOK; got != want {
+			t.Errorf("http status: got %d, want %d", got, want)
+		}
+		var body latticeResponse
+		if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+			t.Fatalf("json decode error, %v", err)
+		}
+		if body.Error == "" {
+			t.Errorf("expected error message, got empty")
+		}
+		if body.SVG != "" {
+			t.Errorf("expected empty SVG on error, got %q", body.SVG)
+		}
+	})
+	t.Run("success", func(t *testing.T) {
+		if _, err := exec.LookPath(graphvizCmd); err != nil {
+			t.Skipf("graphviz command not found, %v", err)
+		}
+		req := httptest.NewRequest(http.MethodPost, `/lattice?s=ねこです&r=Normal`, nil)
+		w := httptest.NewRecorder()
+		(&LatticeHandler{tokenizer: tnz}).ServeHTTP(w, req)
+		resp := w.Result()
+		defer resp.Body.Close() //nolint:errcheck
+
+		if got, want := resp.StatusCode, http.StatusOK; got != want {
+			t.Errorf("http status: got %d, want %d", got, want)
+		}
+		var body latticeResponse
+		if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+			t.Fatalf("json decode error, %v", err)
+		}
+		if body.Error != "" {
+			t.Errorf("unexpected error: %s", body.Error)
+		}
+		if !strings.HasPrefix(body.SVG, "<svg") {
+			t.Errorf("expected SVG content, got %q", body.SVG[:min(len(body.SVG), 50)])
+		}
+	})
+	t.Run("extended mode", func(t *testing.T) {
+		if _, err := exec.LookPath(graphvizCmd); err != nil {
+			t.Skipf("graphviz command not found, %v", err)
+		}
+		req := httptest.NewRequest(http.MethodPost, `/lattice?s=ねこです&r=Extended`, nil)
+		w := httptest.NewRecorder()
+		(&LatticeHandler{tokenizer: tnz}).ServeHTTP(w, req)
+		resp := w.Result()
+		defer resp.Body.Close() //nolint:errcheck
+
+		if got, want := resp.StatusCode, http.StatusOK; got != want {
+			t.Errorf("http status: got %d, want %d", got, want)
+		}
+		var body latticeResponse
+		if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+			t.Fatalf("json decode error, %v", err)
+		}
+		if body.Error != "" {
+			t.Errorf("unexpected error: %s", body.Error)
+		}
+		if !strings.HasPrefix(body.SVG, "<svg") {
+			t.Errorf("expected SVG content, got %q", body.SVG[:min(len(body.SVG), 50)])
+		}
+	})
 }
 
 func Test_toRecords(t *testing.T) {
