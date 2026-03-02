@@ -22,20 +22,17 @@ var assetFS embed.FS
 
 // assets
 var (
-	graphT *template.Template
-	demoT  *template.Template
+	graphT = mustParseTemplate("graph", "asset/graph.html")
+	demoT  = mustParseTemplate("demo", "asset/demo.html")
 )
 
-func init() {
-	readAsset := func(path string) string {
-		b, err := assetFS.ReadFile(path)
-		if err != nil {
-			panic(err)
-		}
-		return string(b)
+func mustParseTemplate(name, path string) *template.Template {
+	b, err := assetFS.ReadFile(path)
+	if err != nil {
+		panic(err)
 	}
-	graphT = template.Must(template.New("graph").Parse(readAsset("asset/graph.html")))
-	demoT = template.Must(template.New("demo").Parse(readAsset("asset/demo.html")))
+
+	return template.Must(template.New(name).Parse(string(b)))
 }
 
 const (
@@ -137,10 +134,12 @@ func (h *LatticeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	sen := r.FormValue("s")
 	mode := r.FormValue("r")
 	m := tokenizer.Normal
+
 	switch mode {
 	case "Search", "Extended":
 		m = tokenizer.Search
 	}
+
 	var resp latticeResponse
 	_, svg, err := analyzeGraph(r.Context(), h.tokenizer, sen, m)
 	if err != nil {
@@ -148,7 +147,10 @@ func (h *LatticeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else {
 		resp.SVG = svg
 	}
-	_ = json.NewEncoder(w).Encode(resp)
+
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 // ServeHTTP serves a tokenize demo server.
