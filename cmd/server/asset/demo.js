@@ -71,6 +71,7 @@ var currentZoom = 1.0;
 var svgOrigDims = null;
 var svgOrigPx   = null;
 var cachedBestNodes = null;
+var cachedSVGString = null;
 var zoomStep = 0.25;
 var minZoom = 0.25;
 var maxZoom = 4.0;
@@ -142,6 +143,7 @@ function updateLattice() {
         svgOrigDims = null;
         svgOrigPx   = null;
         cachedBestNodes = null;
+        cachedSVGString = null;
         return;
     }
     var m = $('input[name="r"]').filter(':checked').val();
@@ -163,6 +165,7 @@ function updateLattice() {
             } else {
                 outEl.innerHTML = data.svg || '';
             }
+            cachedSVGString = data.svg || null;
             var svgEl = outEl.querySelector('svg');
             if (svgEl) {
                 var wAttr = svgEl.getAttribute('width')  || '';
@@ -199,6 +202,62 @@ function updateLattice() {
     }, 'json');
 }
 
+function toggleDownloadMenu(event) {
+    event.stopPropagation();
+    var menu = document.getElementById('download-menu');
+    menu.classList.toggle('open');
+}
+
+function closeDownloadMenu() {
+    var menu = document.getElementById('download-menu');
+    if (menu) menu.classList.remove('open');
+}
+
+function downloadAs(format) {
+    closeDownloadMenu();
+    if (!cachedSVGString) return;
+
+    var inp = document.getElementById('inp').value.trim();
+    var base = inp
+        ? inp.replace(/[^0-9A-Za-z\u3040-\u9FFF]/g, '_').slice(0, 50)
+        : 'lattice';
+
+    if (format === 'svg') {
+        var blob = new Blob([cachedSVGString], {type: 'image/svg+xml'});
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = base + '.svg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } else if (format === 'png') {
+        var w = svgOrigPx ? svgOrigPx.width  : 800;
+        var h = svgOrigPx ? svgOrigPx.height : 600;
+        var scale = 2;
+        var blob2 = new Blob([cachedSVGString], {type: 'image/svg+xml'});
+        var url2 = URL.createObjectURL(blob2);
+        var img = new Image();
+        img.onload = function() {
+            var canvas = document.createElement('canvas');
+            canvas.width  = w * scale;
+            canvas.height = h * scale;
+            var ctx = canvas.getContext('2d');
+            ctx.scale(scale, scale);
+            ctx.drawImage(img, 0, 0, w, h);
+            URL.revokeObjectURL(url2);
+            var a2 = document.createElement('a');
+            a2.href = canvas.toDataURL('image/png');
+            a2.download = base + '.png';
+            document.body.appendChild(a2);
+            a2.click();
+            document.body.removeChild(a2);
+        };
+        img.src = url2;
+    }
+}
+
 var latticeTimer = null;
 function scheduleLattice() {
     if (latticeTimer !== null) {
@@ -216,4 +275,8 @@ $('input[name="r"]:radio').change(function() {
     var o = {"sentence": s, "mode": m};
     $.post('./tokenize', JSON.stringify(o), cb, 'json');
     updateLattice();
+});
+
+document.addEventListener('click', function() {
+    closeDownloadMenu();
 });

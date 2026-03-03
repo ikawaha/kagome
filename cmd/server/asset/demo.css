@@ -152,3 +152,31 @@ div#center {
     stroke: #e67e00 !important;
     stroke-width: 2px !important;
 }
+.download-wrap {
+    position: relative;
+    display: inline-block;
+}
+.download-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 2px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    z-index: 100;
+    min-width: 80px;
+}
+.download-menu.open {
+    display: block;
+}
+.download-item {
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+.download-item:hover {
+    background: #e0e0e0;
+}

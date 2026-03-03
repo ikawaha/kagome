@@ -49,6 +49,13 @@
         </span>
         <button class="zoom-action" onclick="fitZoom()" title="全体を表示">Fit</button>
         <button class="zoom-action" onclick="resetZoom()" title="等倍に戻す">Reset</button>
+        <div class="download-wrap">
+          <button class="zoom-action" onclick="toggleDownloadMenu(event)" title="ダウンロード形式を選択">Download ▾</button>
+          <div id="download-menu" class="download-menu">
+            <div class="download-item" onclick="downloadAs('svg')">SVG</div>
+            <div class="download-item" onclick="downloadAs('png')">PNG</div>
+          </div>
+        </div>
       </div>
       <div id="lattice-output"></div>
     </div>
