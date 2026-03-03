@@ -3,7 +3,8 @@ package server
 import (
 	"bytes"
 	"context"
-	_ "embed"
+	"embed"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"html/template"
@@ -16,16 +17,23 @@ import (
 	"github.com/ikawaha/kagome/v2/tokenizer"
 )
 
+//go:embed asset
+var assetFS embed.FS
+
 // assets
 var (
-	//go:embed asset/graph.html
-	graphHTML string
-	graphT    = template.Must(template.New("graph").Parse(graphHTML))
-
-	//go:embed asset/demo.html
-	demoHTML string
-	demoT    = template.Must(template.New("demo").Parse(demoHTML))
+	graphT = mustParseTemplate("graph", "asset/graph.html")
+	demoT  = mustParseTemplate("demo", "asset/demo.html")
 )
+
+func mustParseTemplate(name, path string) *template.Template {
+	b, err := assetFS.ReadFile(path)
+	if err != nil {
+		panic(err)
+	}
+
+	return template.Must(template.New(name).Parse(string(b)))
+}
 
 const (
 	graphvizCmd = "dot"
@@ -80,7 +88,7 @@ func toRecords(tokens []tokenizer.Token) []record {
 }
 
 //nolint:nonamedreturns
-func (h *TokenizeDemoHandler) analyzeGraph(ctx context.Context, sen string, mode tokenizer.TokenizeMode) (records []record, svg string, err error) {
+func analyzeGraph(ctx context.Context, tnz *tokenizer.Tokenizer, sen string, mode tokenizer.TokenizeMode) (records []record, svg string, err error) {
 	if _, err := exec.LookPath(graphvizCmd); err != nil {
 		return nil, "", errors.New("circo/graphviz is not installed in your $PATH")
 	}
@@ -95,7 +103,7 @@ func (h *TokenizeDemoHandler) analyzeGraph(ctx context.Context, sen string, mode
 	if err := cmd.Start(); err != nil {
 		return nil, "", fmt.Errorf("process done with error, %w", err)
 	}
-	tokens := h.tokenizer.AnalyzeGraph(w0, sen, mode)
+	tokens := tnz.AnalyzeGraph(w0, sen, mode)
 	if err := w0.Close(); err != nil {
 		return nil, "", fmt.Errorf("pipe close error, %w", err)
 	}
@@ -108,6 +116,47 @@ func (h *TokenizeDemoHandler) analyzeGraph(ctx context.Context, sen string, mode
 	}
 	records = toRecords(tokens)
 	return records, svg, nil
+}
+
+// LatticeHandler represents the lattice graph handler that returns SVG as JSON.
+type LatticeHandler struct {
+	tokenizer *tokenizer.Tokenizer
+}
+
+type latticeResponse struct {
+	SVG   string `json:"svg,omitempty"`
+	Error string `json:"error,omitempty"`
+}
+
+// ServeHTTP serves the lattice SVG as JSON.
+func (h *LatticeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	sen := r.FormValue("s")
+	if strings.TrimSpace(sen) == "" {
+		if err := json.NewEncoder(w).Encode(latticeResponse{}); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	mode := r.FormValue("r")
+	m := tokenizer.Normal
+
+	switch mode {
+	case "Search", "Extended":
+		m = tokenizer.Search
+	}
+
+	var resp latticeResponse
+	_, svg, err := analyzeGraph(r.Context(), h.tokenizer, sen, m)
+	if err != nil {
+		resp.Error = err.Error()
+	} else {
+		resp.SVG = svg
+	}
+
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 // ServeHTTP serves a tokenize demo server.
@@ -134,7 +183,7 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		m = tokenizer.Search
 	}
 	var cmdErr string
-	records, svg, err := h.analyzeGraph(r.Context(), sen, m)
+	records, svg, err := analyzeGraph(r.Context(), h.tokenizer, sen, m)
 	if err != nil {
 		cmdErr = "Error: " + err.Error()
 		if errors.Is(err, context.DeadlineExceeded) {
@@ -145,13 +194,13 @@ func (h *TokenizeDemoHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		Sentence string
 		Tokens   []record
 		CmdErr   string
-		GraphSVG template.HTML
+		GraphSVG string
 		Mode     string
 	}{
 		Sentence: sen,
 		Tokens:   records,
 		CmdErr:   cmdErr,
-		GraphSVG: template.HTML(svg), //nolint:gosec // G203: The used method does not auto-escape HTML. This can potentially lead to 'Cross-site Scripting' vulnerabilities, in case the attacker controls the input.
+		GraphSVG: svg,
 		Mode:     mode,
 	}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
