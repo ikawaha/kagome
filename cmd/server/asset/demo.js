@@ -13,7 +13,8 @@ function cb(data, status) {
             row.append($("<td>").text(reading));
             row.append($("<td>").text(pronoun));
             row.click(function() {
-                focusLatticeNode(parseInt($(this).attr("data-morph-idx"), 10));
+                var idx = parseInt($(this).attr("data-morph-idx"), 10);
+                focusLatticeNode($(this).hasClass('morph-selected') ? -1 : idx);
             });
             $("#morphs").append(row);
         });
@@ -93,29 +94,67 @@ function scrollToSVGContent() {
     }
 }
 
-function applyZoom() {
+function getZoomAnchor(outEl, svgEl) {
+    if (!svgOrigPx) return null;
+    var curW = svgOrigPx.width  * currentZoom;
+    var curH = svgOrigPx.height * currentZoom;
+    // 選択中の形態素ノードがあれば、その中心を基準にする
+    // getBoundingClientRect() を使うことで graphviz の内部座標系に依存せず正確な位置を取得する
+    var highlight = svgEl && svgEl.querySelector('g.node.morph-highlight ellipse');
+    if (highlight) {
+        var elRect  = highlight.getBoundingClientRect();
+        var outRect = outEl.getBoundingClientRect();
+        var elCenterX = (elRect.left + elRect.right)  / 2 - outRect.left + outEl.scrollLeft;
+        var elCenterY = (elRect.top  + elRect.bottom) / 2 - outRect.top  + outEl.scrollTop;
+        return {
+            fracX: elCenterX / curW,
+            fracY: elCenterY / curH,
+            viewportOffsetX: outEl.clientWidth  / 2,
+            viewportOffsetY: outEl.clientHeight / 2,
+        };
+    }
+    // なければ表示領域の中心を基準にする
+    return {
+        fracX: (outEl.scrollLeft + outEl.clientWidth  / 2) / curW,
+        fracY: (outEl.scrollTop  + outEl.clientHeight / 2) / curH,
+        viewportOffsetX: outEl.clientWidth  / 2,
+        viewportOffsetY: outEl.clientHeight / 2,
+    };
+}
+
+function applyZoom(anchor) {
     var svgEl = document.querySelector('#lattice-output svg');
+    var outEl = document.getElementById('lattice-output');
     if (!svgEl || !svgOrigDims) return;
     svgEl.setAttribute('width',  (svgOrigDims.width  * currentZoom) + svgOrigDims.wUnit);
     svgEl.setAttribute('height', (svgOrigDims.height * currentZoom) + svgOrigDims.hUnit);
     document.getElementById('zoom-label').textContent = Math.round(currentZoom * 100) + '%';
-    scrollToSVGContent();
+    if (anchor && svgOrigPx) {
+        var newW = svgOrigPx.width  * currentZoom;
+        var newH = svgOrigPx.height * currentZoom;
+        outEl.scrollLeft = Math.max(0, newW * anchor.fracX - anchor.viewportOffsetX);
+        outEl.scrollTop  = Math.max(0, newH * anchor.fracY - anchor.viewportOffsetY);
+    } else {
+        scrollToSVGContent();
+    }
 }
 
 function zoomIn() {
+    var outEl = document.getElementById('lattice-output');
+    var svgEl = outEl && outEl.querySelector('svg');
+    var anchor = getZoomAnchor(outEl, svgEl);
     currentZoom = Math.min(maxZoom, parseFloat((currentZoom + zoomStep).toFixed(2)));
-    applyZoom();
+    applyZoom(anchor);
 }
 
 function zoomOut() {
+    var outEl = document.getElementById('lattice-output');
+    var svgEl = outEl && outEl.querySelector('svg');
+    var anchor = getZoomAnchor(outEl, svgEl);
     currentZoom = Math.max(minZoom, parseFloat((currentZoom - zoomStep).toFixed(2)));
-    applyZoom();
+    applyZoom(anchor);
 }
 
-function resetZoom() {
-    currentZoom = 1.0;
-    applyZoom();
-}
 
 function fitZoom() {
     if (!svgOrigPx) return;
@@ -160,11 +199,7 @@ function updateLattice() {
             cachedBestNodes = null;
         } else {
             errEl.textContent = '';
-            if (typeof outEl.setHTML === 'function') {
-                outEl.setHTML(data.svg || '');
-            } else {
-                outEl.innerHTML = data.svg || '';
-            }
+            outEl.innerHTML = data.svg || '';
             cachedSVGString = data.svg || null;
             var svgEl = outEl.querySelector('svg');
             if (svgEl) {
@@ -189,7 +224,8 @@ function updateLattice() {
                     var ellipses = g.querySelectorAll('ellipse');
                     if (ellipses.length >= 2) {
                         var firstText = g.querySelector('text');
-                        var label = firstText ? firstText.textContent.trim() : '';
+                        if (!firstText) return;
+                        var label = firstText.textContent.trim();
                         if (label === 'BOS' || label === 'EOS') return;
                         cachedBestNodes.push({ el: g, cx: parseFloat(ellipses[0].getAttribute('cx') || '0') });
                     }
