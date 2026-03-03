@@ -132,6 +132,12 @@ type latticeResponse struct {
 func (h *LatticeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	sen := r.FormValue("s")
+	if strings.TrimSpace(sen) == "" {
+		if err := json.NewEncoder(w).Encode(latticeResponse{}); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
 	mode := r.FormValue("r")
 	m := tokenizer.Normal
 

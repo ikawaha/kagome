@@ -228,6 +228,27 @@ func TestLatticeHandler_ServeHTTP(t *testing.T) {
 			t.Errorf("expected empty SVG on error, got %q", body.SVG)
 		}
 	})
+	t.Run("empty input", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, `/lattice?s=&r=Normal`, nil)
+		w := httptest.NewRecorder()
+		(&LatticeHandler{tokenizer: tnz}).ServeHTTP(w, req)
+		resp := w.Result()
+		defer resp.Body.Close() //nolint:errcheck
+
+		if got, want := resp.StatusCode, http.StatusOK; got != want {
+			t.Errorf("http status: got %d, want %d", got, want)
+		}
+		var body latticeResponse
+		if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+			t.Fatalf("json decode error, %v", err)
+		}
+		if body.Error != "" {
+			t.Errorf("unexpected error: %s", body.Error)
+		}
+		if body.SVG != "" {
+			t.Errorf("expected empty SVG for empty input, got %q", body.SVG[:min(len(body.SVG), 50)])
+		}
+	})
 	for _, mode := range []string{"Normal", "Search", "Extended"} {
 		t.Run(mode, func(t *testing.T) {
 			if _, err := exec.LookPath(graphvizCmd); err != nil {

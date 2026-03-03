@@ -135,6 +135,15 @@ document.getElementById('lattice-output').addEventListener('wheel', function(e) 
 
 function updateLattice() {
     var s = document.getElementById("inp").value;
+    if (s.trim() === '') {
+        document.getElementById('lattice-error').textContent = '';
+        document.getElementById('lattice-output').innerHTML = '';
+        document.getElementById('lattice-controls').style.display = 'none';
+        svgOrigDims = null;
+        svgOrigPx   = null;
+        cachedBestNodes = null;
+        return;
+    }
     var m = $('input[name="r"]').filter(':checked').val();
     $.post('./lattice', {s: s, r: m}, function(data) {
         var errEl = document.getElementById('lattice-error');
