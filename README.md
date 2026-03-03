@@ -290,7 +290,7 @@ Start a server and access `http://localhost:6060` in your browser.
 % kagome server &
 ```
 
-![webapp](https://raw.githubusercontent.com/wiki/ikawaha/kagome/images/demoapp.gif)
+<video src="https://github.com/user-attachments/assets/172d8b0c-be9a-4ee5-bdff-315a0eeee85b" controls width="100%"></video>
 
 > [!IMPORTANT]
 > The demo web application uses [graphviz](https://graphviz.org/) to draw a lattice. You need graphviz to be installed on your system.
