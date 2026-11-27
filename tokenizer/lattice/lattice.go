@@ -43,6 +43,7 @@ type Lattice struct {
 	list   [][]*Node
 	dic    *dict.Dict
 	udic   *dict.UserDict
+	nodes  nodeArena
 }
 
 // New returns a new lattice.
@@ -61,12 +62,9 @@ func (la *Lattice) Free() {
 	}
 	la.Output = la.Output[:0]
 	for i := range la.list {
-		for j := range la.list[i] {
-			nodePool.Put(la.list[i][j])
-			la.list[i][j] = nil
-		}
 		la.list[i] = la.list[i][:0]
 	}
+	la.nodes.reset()
 	la.list = la.list[:0]
 	la.udic = nil
 	latticePool.Put(la)
@@ -84,7 +82,7 @@ func (la *Lattice) addNode(pos, id, position, start int, class NodeClass, surfac
 	case USER:
 		// use default cost
 	}
-	n := nodePool.Get()
+	n := la.nodes.alloc()
 	n.ID = id
 	n.Position = position
 	n.Start = start
@@ -214,12 +212,16 @@ func additionalCost(n *Node) int {
 func (la *Lattice) Forward(m TokenizeMode) {
 	for i, size := 1, len(la.list); i < size; i++ {
 		currentList := la.list[i]
-		for index, target := range currentList {
+		for _, target := range currentList {
 			prevList := la.list[target.Start]
 			if len(prevList) == 0 {
-				la.list[i][index].Cost = maximumCost
+				target.Cost = maximumCost
 				continue
 			}
+			var (
+				best     *Node
+				bestCost int32
+			)
 			for j, n := range prevList {
 				var c int16
 				if n.Class != USER && target.Class != USER {
@@ -232,11 +234,13 @@ func (la *Lattice) Forward(m TokenizeMode) {
 				if totalCost > maximumCost {
 					totalCost = maximumCost
 				}
-				if j == 0 || int32(totalCost) < la.list[i][index].Cost { //nolint:gosec // G115: integer overflow conversion int64 -> int32
-					la.list[i][index].Cost = int32(totalCost) //nolint:gosec // G115: integer overflow conversion int64 -> int32
-					la.list[i][index].prev = la.list[target.Start][j]
+				if tc := int32(totalCost); j == 0 || tc < bestCost { //nolint:gosec // G115: integer overflow conversion int64 -> int32
+					bestCost = tc
+					best = n
 				}
 			}
+			target.Cost = bestCost
+			target.prev = best
 		}
 	}
 }
